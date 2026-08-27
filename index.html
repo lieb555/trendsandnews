@@ -915,6 +915,27 @@ main {
 .path-step h4 { margin: 0 0 6px; font-family: "Newsreader", serif; font-variation-settings: "opsz" 24; font-weight: 500; font-size: 16px; color: var(--ink); }
 .path-step p { margin: 0; font-size: 13px; color: var(--muted-ink); max-width: 66ch; }
 
+.comparison-table td.c, .comparison-table th.c { text-align: center; }
+.comparison-table td.c {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--muted-ink);
+  font-size: 12px;
+}
+.comparison-table td.c.yes { color: var(--good); font-weight: 600; }
+.comparison-table td.c.strong-yes { color: var(--accent); font-weight: 700; }
+.comparison-table tr.highlight td {
+  background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+  border-top: 2px solid var(--accent);
+}
+.comparison-table tr.highlight td:first-child { padding-left: 12px; }
+.comparison-table tr.highlight td.c { color: var(--ink); }
+.tier-cost-secondary {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  color: var(--faint-ink);
+  padding-top: 2px;
+}
+
 @media (max-width: 640px) {
   .risk-item { grid-template-columns: 1fr; gap: 4px; }
   .tier-grid { grid-template-columns: 1fr; }
@@ -1098,15 +1119,127 @@ main {
     </div>
 
     <div class="section-block">
+      <h2>Where this fits against existing trackers</h2>
+      <p>The AI-tracker market is fragmented — every major public tracker covers a slice. None of them pair case-level data with the coverage-line, trigger-clause, and exclusion analysis that is this tool's differentiator. That overlay is the moat.</p>
+      <div class="cost-table-wrap">
+        <table class="cost-table comparison-table">
+          <thead>
+            <tr>
+              <th>Tracker</th>
+              <th class="c">Litigation</th>
+              <th class="c">Regulation</th>
+              <th class="c">Data Center</th>
+              <th class="c">Sanctions</th>
+              <th class="c">International</th>
+              <th class="c">Insurance Overlay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GWU ETI — AI Litigation Database</td>
+              <td class="c yes">✓</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">partial</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>Damien Charlotin — Hallucinations</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c strong-yes">✓ deepest</td>
+              <td class="c yes">✓</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>Orrick — AI Law Center</td>
+              <td class="c yes">✓</td>
+              <td class="c yes">✓</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c yes">✓</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>NCSL — AI Legislation Database</td>
+              <td class="c">—</td>
+              <td class="c yes">✓ state</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>Troutman Pepper — State AI Tracker</td>
+              <td class="c">—</td>
+              <td class="c yes">✓ state</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>BrightMine — AI Laws by State (HR)</td>
+              <td class="c">—</td>
+              <td class="c yes">✓ HR only</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>datacentertracker.org</td>
+              <td class="c">—</td>
+              <td class="c">DC-only</td>
+              <td class="c strong-yes">✓ deepest</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr>
+              <td>ChatGPTIsEatingTheWorld — DC bans/suits</td>
+              <td class="c">DC-only</td>
+              <td class="c">—</td>
+              <td class="c yes">✓</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+              <td class="c">—</td>
+            </tr>
+            <tr class="highlight">
+              <td><strong>Atheria Law · AI Working Group Tracker</strong></td>
+              <td class="c yes">✓</td>
+              <td class="c yes">✓</td>
+              <td class="c yes">✓</td>
+              <td class="c yes">✓</td>
+              <td class="c yes">✓</td>
+              <td class="c strong-yes">✓ only tracker</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>What "insurance overlay" means concretely.</strong> Every case in the tracker carries three structured fields no other tracker captures:</p>
+      <ul class="simple">
+        <li><strong>Lines of insurance likely to respond</strong> — Tech E&amp;O, Cyber, D&amp;O, Media Liability, EPL, GL, Product Liability, AEC Professional Liability, Lawyers' Professional Liability, etc.</li>
+        <li><strong>Likely trigger clauses</strong> — wrongful act, personal-injury offense, copyright-infringement offense, security failure, employment-practices wrongful act, statutory-violation coverage, etc.</li>
+        <li><strong>Likely exclusions in play</strong> — IP exclusion, bodily injury (broad form), contractual liability, statutory penalties, prior acts, willful conduct, silent-AI exclusions being filed by carriers, etc.</li>
+      </ul>
+      <p>This is the actual analytical work insurance-coverage attorneys do when advising insurers on AI-related claims. Capturing it in structured form — searchable, filterable, cross-referenced against filings — is what turns a case tracker into a coverage tool. It's also the layer that supports the eventual white-label licensing path in the commercial ladder below.</p>
+    </div>
+
+    <div class="section-block">
       <h2>Investment tiers</h2>
       <p>Four tiers. Bronze is what exists today. Silver, Gold, and Platinum are staged commitments. Platinum sits outside the $50K envelope and requires external co-funding — insurer consortium, subscription revenue, or grant capital.</p>
+      <p>The primary build model is <strong>you writing this yourself using Claude Code</strong>, not a hired contractor. Tiers below show self-build effort (hours of your time, cash close to zero) with the contractor cash cost as a benchmark so partners can see the value the tool represents even without spending firm capital.</p>
       <div class="tier-grid">
         <div class="tier-card" data-tier="bronze">
           <div class="tier-eyebrow">Tier · Bronze</div>
           <div class="tier-title">Working prototype</div>
-          <div class="tier-cost">~$500 / yr</div>
+          <div class="tier-cost">~$200 cash · already built</div>
+          <div class="tier-cost-secondary">Contractor benchmark: n/a</div>
           <ul>
-            <li>Static single-file HTML, ~150 items, deployed as artifact</li>
+            <li>Static single-file HTML, 150+ items, deployed as artifact</li>
             <li>Attorney-manual curation (~3 hrs/wk)</li>
             <li>Daily internal reference; client-conversation support</li>
             <li>No auth, no private notes in-tool</li>
@@ -1116,32 +1249,37 @@ main {
         <div class="tier-card" data-tier="silver">
           <div class="tier-eyebrow">Tier · Silver</div>
           <div class="tier-title">Real backend + shareable client views</div>
-          <div class="tier-cost">~$8K – $14K yr 1</div>
+          <div class="tier-cost">~100–160 hrs your time · ~$560 cash yr 1</div>
+          <div class="tier-cost-secondary">Contractor benchmark: $8K – $14K</div>
           <ul>
             <li>Next.js + Postgres, auth, admin UI</li>
             <li>Private notes, shareable read-only URLs</li>
             <li>Timeline &amp; Case File as first-class views</li>
-            <li>Sprint 1–2, ~4 weeks contractor time</li>
+            <li>10–16 weeks at ~10 hrs/wk</li>
+            <li>Claude Code on Pro plan sufficient</li>
           </ul>
           <div class="tier-status">Committable Q4 2026</div>
         </div>
         <div class="tier-card" data-tier="gold">
           <div class="tier-eyebrow">Tier · Gold</div>
           <div class="tier-title">Sankey, Atlas, LLM-assisted Pulse</div>
-          <div class="tier-cost">~$22K – $32K yr 1</div>
+          <div class="tier-cost">+160–240 hrs · ~$3.7K – $5.4K cash yr 1</div>
+          <div class="tier-cost-secondary">Contractor benchmark: +$10K – $14K</div>
           <ul>
             <li>Custom Sankey (Flow) and choropleth (Atlas)</li>
             <li>Algorithmic anomaly detection</li>
             <li>LLM-drafted Pulse narrative with editorial pass</li>
             <li>Corporate signals ingest (EDGAR, funding)</li>
             <li>Cuts curation from 3 hrs/wk to ~1 hr/wk</li>
+            <li>May need Max plan for 2–3 peak sprint months</li>
           </ul>
           <div class="tier-status">Committable Q1–Q2 2027</div>
         </div>
         <div class="tier-card" data-tier="platinum">
           <div class="tier-eyebrow">Tier · Platinum</div>
           <div class="tier-title">SERFF, DC ingestion, judge analytics</div>
-          <div class="tier-cost">$80K – $200K+</div>
+          <div class="tier-cost">Not self-buildable</div>
+          <div class="tier-cost-secondary">Contractor path: $80K – $200K+</div>
           <ul>
             <li>Cross-state SERFF filings ingestion</li>
             <li>Data-center automated ingestion (priority states)</li>
@@ -1156,7 +1294,7 @@ main {
 
     <div class="section-block">
       <h2>Year-one cash cost breakdown</h2>
-      <p>Rows compound: Silver includes Bronze work; Gold adds to Silver; Platinum adds to Gold. Attorney time is opportunity cost, not cash; shown separately.</p>
+      <p>Rows compound: Silver includes Bronze; Gold adds to Silver; Platinum adds to Gold. Two totals shown at the bottom — the recommended self-build path (you writing this via Claude Code) and the contractor path (benchmark only). Attorney time is opportunity cost, not cash; shown separately.</p>
       <div class="cost-table-wrap">
         <table class="cost-table">
           <thead>
@@ -1169,12 +1307,32 @@ main {
             </tr>
           </thead>
           <tbody>
+            <tr class="subhead">
+              <td colspan="5">Self-build path — via Claude Code (recommended)</td>
+            </tr>
             <tr>
-              <td>Contractor engineering (build)</td>
+              <td>Your engineering time</td>
+              <td class="n">0 hrs</td>
+              <td class="n">100 – 160 hrs</td>
+              <td class="n">+160 – 240 hrs</td>
+              <td class="n">out of scope</td>
+            </tr>
+            <tr>
+              <td>Claude Code plan (build tool)</td>
+              <td class="n">Pro — $20/mo</td>
+              <td class="n">Pro sufficient</td>
+              <td class="n">Max $100/mo × 2–3 mo peak</td>
+              <td class="n">—</td>
+            </tr>
+            <tr>
+              <td>Incremental Claude Code cash</td>
               <td class="n">$0</td>
-              <td class="n">$6K – $10K</td>
-              <td class="n">+$10K – $14K</td>
-              <td class="n">+$60K – $150K</td>
+              <td class="n">$0</td>
+              <td class="n">$200 – $400</td>
+              <td class="n">—</td>
+            </tr>
+            <tr class="subhead">
+              <td colspan="5">Runtime &amp; operating (both paths)</td>
             </tr>
             <tr>
               <td>Hosting &amp; database</td>
@@ -1184,7 +1342,7 @@ main {
               <td class="n">+$1,200</td>
             </tr>
             <tr>
-              <td>LLM API runtime</td>
+              <td>Anthropic API — deployed app runtime</td>
               <td class="n">$0</td>
               <td class="n">$0</td>
               <td class="n">$1,800 – $3,600</td>
@@ -1205,24 +1363,41 @@ main {
               <td class="n">+$500</td>
             </tr>
             <tr class="total">
-              <td>Year-one cash total</td>
+              <td>Year-1 cash total — self-build path</td>
+              <td class="n">~$200</td>
+              <td class="n">~$560</td>
+              <td class="n">$3.7K – $5.4K</td>
+              <td class="n">outside envelope</td>
+            </tr>
+            <tr class="subhead">
+              <td colspan="5">Contractor benchmark (for comparison only)</td>
+            </tr>
+            <tr>
+              <td>Contractor engineering @ ~$120/hr</td>
+              <td class="n">$0</td>
+              <td class="n">$6K – $10K</td>
+              <td class="n">+$10K – $14K</td>
+              <td class="n">+$60K – $150K</td>
+            </tr>
+            <tr class="total">
+              <td>Year-1 cash total — contractor path</td>
               <td class="n">~$200</td>
               <td class="n">$8K – $14K</td>
               <td class="n">$22K – $32K</td>
               <td class="n">outside envelope</td>
             </tr>
             <tr class="subhead">
-              <td colspan="5">Not in cash budget — opportunity cost</td>
+              <td colspan="5">Attorney opportunity cost (not cash)</td>
             </tr>
             <tr>
-              <td>Attorney curation time</td>
+              <td>Curation time</td>
               <td class="n">3 hrs/wk</td>
               <td class="n">3 hrs/wk</td>
               <td class="n">~1 hr/wk</td>
               <td class="n">~1 hr/wk</td>
             </tr>
             <tr>
-              <td>Attorney review of LLM-drafted Pulse</td>
+              <td>Review of LLM-drafted Pulse</td>
               <td class="n">—</td>
               <td class="n">—</td>
               <td class="n">~30 min/wk</td>
@@ -1230,6 +1405,51 @@ main {
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>What "software engineering" costs when you build it yourself</h2>
+      <p>The recommended path is you writing this using Claude Code, not hiring a contractor. The tier grid and cost table show both models — self-build as primary, contractor as benchmark. Here's what each means and where the Claude costs go.</p>
+
+      <div class="challenge-block">
+        <h3>Self-build via Claude Code (primary path)</h3>
+        <p>You direct Claude Code to write and iterate on the app. Your role is architectural and editorial — you set the goals, review the output, catch the mistakes. You don't write code line-by-line; you review what Claude drafts and course-correct.</p>
+        <ul>
+          <li><strong>Silver:</strong> 100–160 hours over 10–16 weeks (~10 hrs/wk). Includes framework choices, database schema, admin UI, auth, initial deployment.</li>
+          <li><strong>Gold:</strong> +160–240 hours over another 3–4 months. Sankey and choropleth take longer than they look because they need design taste, not just code.</li>
+          <li><strong>Rate multiplier vs a contractor:</strong> ~2× the contractor hours to account for framework ramp-up, context-switching from legal work, and QA/review iterations. A skilled contractor is faster on pure execution; you have the advantage of understanding the domain deeply.</li>
+          <li><strong>Cash cost:</strong> essentially $0 for Silver (existing Pro plan). Maybe $200–$400 for Gold's peak weeks if you upgrade to Max plan for 2–3 months.</li>
+        </ul>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Contractor path (benchmark only)</h3>
+        <p>The contractor prices in the table show what it would cost if the firm hired a US-based mid-market freelance developer to do this work instead. Included so the partnership can see the market value of what you're producing.</p>
+        <ul>
+          <li><strong>Rate assumption:</strong> ~$120/hour. Standard for a US mid-level to senior full-stack contractor (Next.js + Postgres + auth).</li>
+          <li><strong>Alternatives:</strong> agencies ($150–$200/hr, more oversight); offshore contractors ($40–$80/hr, more coordination overhead); fixed-price milestone contracts (~1.5–2× hourly equivalent to cover their risk).</li>
+          <li><strong>When to actually hire one:</strong> if the partnership decides your time is better spent on billable work than on building. At a partner billable rate of $500–$800/hour, the raw math already favors that — but the tool's value depends on the coverage-overlay editorial voice, which is yours specifically, not a contractor's.</li>
+          <li><strong>Hybrid option:</strong> pay a contractor for the mechanical parts (Postgres schema, auth, admin scaffolding) — maybe $4K–$6K — while you handle the AI-legal architecture. Cuts self-build hours by ~30%.</li>
+        </ul>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Claude cost dimensions — plan for both separately</h3>
+        <p>Two Claude cost dimensions, unrelated to each other. Partners should see them as separate line items so neither is confused with the other.</p>
+        <p><strong>1. Claude Code for building the app.</strong> Weekly usage caps apply on all plans.</p>
+        <ul>
+          <li><strong>Pro plan ($20/mo):</strong> sufficient for ~10–15 hours/week of active Claude Code work. Fine for Silver at a moderate pace, and for steady-state maintenance.</li>
+          <li><strong>Max plan ($100/mo):</strong> substantially higher caps. Recommended for concentrated Gold-tier sprints or if you compress the timeline to finish faster.</li>
+          <li><strong>Max plan ($200/mo):</strong> highest tier. Only worth it if you're doing 30+ hours/week of intensive coding — unlikely for this project's pace.</li>
+          <li><strong>Peak-usage tactic:</strong> upgrade to $100/mo Max for 2–3 sprint-heavy months, then step back to Pro for steady-state. That's the ~$200–$400 line item in the cost table.</li>
+        </ul>
+        <p><strong>2. Anthropic API for the deployed app's runtime</strong> — completely separate from Claude Code. Gold's LLM-drafted Pulse and anomaly detection call the API on a schedule from the deployed application.</p>
+        <ul>
+          <li>Modeled at ~$150–$300/month at moderate ingest volume, using Haiku 4.5 for triage and Sonnet for narrative drafting with prompt caching.</li>
+          <li>The firm (or a firm-issued API key) pays this, not your personal plan. It's a real cash line in the annual budget.</li>
+          <li>If the tool eventually goes to subscription or white-label, this line scales with usage — but so does revenue, so it becomes a variable cost tracked against seat count.</li>
+        </ul>
       </div>
     </div>
 
@@ -1350,24 +1570,24 @@ main {
           <p>Show partners this artifact, gather reactions, decide on Silver commitment. Zero incremental cost.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">Q4 2026 · ~$8K – $14K</div>
-          <h4>Commit to Silver — real backend and shareable client views</h4>
-          <p>4 weeks of contractor engineering. Deliverable: authenticated app with private notes, admin UI, shareable read-only URLs, Timeline and Case File. First point at which the firm has a durable asset it owns end-to-end.</p>
+          <div class="path-when">Q4 2026 · ~$560 cash + ~100–160 hrs my time</div>
+          <h4>Build Silver via Claude Code — real backend, private notes, shareable client views</h4>
+          <p>10–16 weeks at ~10 hrs/wk. Deliverable: authenticated app with private notes, admin UI, shareable read-only URLs, Timeline and Case File. First point at which the firm has a durable asset it owns end-to-end. Contractor benchmark for comparison: $8K–$14K if outsourced.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">Q1–Q2 2027 · additional ~$12K – $18K</div>
-          <h4>Commit to Gold if Silver adoption is real</h4>
-          <p>3–4 weeks additional. Deliverable: Sankey (Flow) + choropleth (Atlas), LLM-drafted Pulse with editorial review, corporate signals ingest. Adoption metric to justify: at least three firm attorneys logging in weekly.</p>
+          <div class="path-when">Q1–Q2 2027 · ~$3K–$5K cash + ~160–240 additional hrs</div>
+          <h4>Build Gold via Claude Code if Silver adoption is real</h4>
+          <p>Another 3–4 months. Deliverable: Sankey (Flow) + choropleth (Atlas), LLM-drafted Pulse with editorial review, corporate signals ingest. May require Max plan for 2–3 peak months (~$200–$400 additional). Adoption metric to justify: at least three firm attorneys logging in weekly. Contractor benchmark: $10K–$14K if outsourced.</p>
         </li>
         <li class="path-step">
           <div class="path-when">Q3 2027 onward</div>
           <h4>Insurer-consortium conversation for Platinum funding</h4>
-          <p>Approach 2–3 target insurers about co-funding SERFF and DC ingestion. Requires Gold in production and a demonstrable weekly-active-attorney metric. Firm capital commitment stops here; further tier depends on outside money.</p>
+          <p>Approach 2–3 target insurers about co-funding SERFF and DC ingestion. Requires Gold in production and a demonstrable weekly-active-attorney metric. My time commitment stops scaling here; further tier depends on outside money and on hiring contractors properly.</p>
         </li>
         <li class="path-step">
           <div class="path-when">2028</div>
           <h4>Subscription-product decision</h4>
-          <p>Depends on Platinum data completeness and firm strategic posture on non-legal product ventures. Path stays optional — the tool is valuable as a BD asset even if subscription never happens.</p>
+          <p>Depends on Platinum data completeness and firm strategic posture on non-legal product ventures. Path stays optional — the tool is valuable as an internal + BD asset even if subscription never happens.</p>
         </li>
       </ol>
     </div>
