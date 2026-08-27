@@ -1,4 +1,4 @@
-<title>Ratio Iuris — AI Litigation & Insurance Tracker</title>
+<title>Atheria Law · AI Working Group Trend Tracker</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,10 +132,25 @@ a:hover { text-decoration-color: var(--accent); }
   margin-right: 2px;
   transform: translateY(-2px);
 }
-.brand-tag {
+.brand-sub {
   color: var(--muted-ink);
-  font-size: 13px;
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 20;
   font-weight: 400;
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.005em;
+  margin-left: -4px;
+}
+.brand-tag {
+  color: var(--faint-ink);
+  font-size: 12px;
+  font-weight: 400;
+  padding-left: 12px;
+  border-left: 1px solid var(--rule);
+}
+@media (max-width: 720px) {
+  .brand-tag { display: none; }
 }
 .brand-actions {
   margin-left: auto;
@@ -694,8 +709,9 @@ main {
 <header class="site-header">
   <div class="site-header-inner">
     <div class="brand">
-      <span class="brand-mark">Ratio Iuris</span>
-      <span class="brand-tag">AI litigation, regulation &amp; insurance — synthesis with coverage overlay</span>
+      <span class="brand-mark">Atheria Law</span>
+      <span class="brand-sub">Artificial Intelligence Working Group</span>
+      <span class="brand-tag">Trend tracker — litigation, regulation &amp; insurance coverage overlay</span>
       <div class="brand-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Theme</button>
       </div>
@@ -728,7 +744,7 @@ main {
         <span class="caps">Editor's note</span>
         <span class="pulse-lead-date mono">2026-08-27</span>
       </div>
-      <p class="pulse-lead-body">This is the MVP seed of the Ratio Iuris tracker. The Pulse is curated by hand for now; algorithmic anomaly detection and LLM-assisted drafting (with editorial review) land in v1.1. If a development matters to your practice and is missing, add it — the JSON is one file.</p>
+      <p class="pulse-lead-body">This is the MVP seed of the Atheria Law AI Working Group's trend tracker. The Pulse is curated by hand for now; algorithmic anomaly detection and LLM-assisted drafting (with editorial review) land in v1.1. If a development matters to the working group's practice and is missing, add it — the JSON is one file.</p>
     </div>
     <ol class="pulse-list" id="pulseList"></ol>
   </section>
@@ -783,7 +799,7 @@ main {
     <div class="view-head">
       <span class="view-eyebrow">Source Trackers</span>
       <h1 class="view-title">Who tracks what — and where the primary data lives.</h1>
-      <p class="view-desc">Ratio Iuris synthesizes across these trackers and adds the insurance overlay none of them provide. Each source is a credit and a jumping-off point. Direct ingestion from primary sources (CourtListener, Federal Register, EUR-Lex, Open States) is planned in v1.1.</p>
+      <p class="view-desc">The Atheria Law AI Working Group tracker synthesizes across these sources and adds the insurance overlay none of them provide. Each source is a credit and a jumping-off point. Direct ingestion from primary sources (CourtListener, Federal Register, EUR-Lex, Open States) is planned in v1.1.</p>
     </div>
     <div class="source-grid" id="sourceGrid"></div>
   </section>
@@ -814,7 +830,7 @@ main {
 </div>
 
 <footer class="site-footer">
-  <p>Ratio Iuris — an MVP tracker for AI litigation, regulation, and insurance coverage. Curated for demonstration; primary sources govern.</p>
+  <p>Atheria Law · Artificial Intelligence Working Group — trend tracker MVP for AI litigation, regulation, and insurance coverage. Curated for demonstration; primary sources govern.</p>
   <p>Editor: lieberknecht@gmail.com · Draft build 2026-08-27</p>
 </footer>
 
