@@ -772,6 +772,7 @@ main {
       <button class="chip" data-filter="track" data-value="privacy" aria-pressed="false">Privacy</button>
       <button class="chip" data-filter="track" data-value="defamation" aria-pressed="false">Defamation</button>
       <button class="chip" data-filter="track" data-value="bias" aria-pressed="false">Bias</button>
+      <button class="chip" data-filter="track" data-value="product" aria-pressed="false">Product liability</button>
       <button class="chip" data-filter="track" data-value="contract" aria-pressed="false">Contract/D&amp;O</button>
       <button class="chip" data-filter="track" data-value="datacenter" aria-pressed="false">Data-center</button>
       <span class="filter-divider"></span>
@@ -1526,19 +1527,291 @@ main {
       { "label": "datacentertracker.org", "url": "https://datacentertracker.org/" },
       { "label": "ChatGPTIsEatingTheWorld — DC lawsuits tracker", "url": "https://chatgptiseatingtheworld.com/ai-data-center-bans-lawsuits-tracker/" }
     ]
+  },
+  {
+    "id": "bartz-anthropic",
+    "type": "case",
+    "caption": "Bartz v. Anthropic PBC",
+    "court": "N.D. Cal.",
+    "docket": "3:24-cv-05417",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2024-08-19",
+    "status": "decided",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Andrea Bartz; Charles Graeber; Kirk Wallace Johnson (putative class of authors)",
+      "defendant": "Anthropic PBC"
+    },
+    "summary": "Author class action alleging Anthropic trained Claude on pirated and legitimately-acquired books. Judge Alsup's June 23, 2025 summary-judgment ruling held that training on legitimately-purchased books was 'spectacularly transformative' fair use, while use of pirated LibGen/PiLiMi copies infringed and could not qualify.",
+    "significance": "The single most important AI-training fair-use decision to date. Splits the analysis along acquisition posture — a fundamental reframing of the training-corpus risk model. Directly enabled the subsequent $1.5B class settlement.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Willful infringement (elevated risk where corpus includes pirated sources)", "Prior acts", "Contractual liability"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=bartz+anthropic&type=r" }
+    ]
+  },
+  {
+    "id": "anthropic-1p5b-settlement",
+    "type": "case",
+    "caption": "In re Anthropic Copyright Litigation — $1.5B class settlement",
+    "court": "N.D. Cal.",
+    "docket": "3:24-cv-05417 (consolidated)",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2025-09-05",
+    "status": "signed",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Class of book authors",
+      "defendant": "Anthropic PBC"
+    },
+    "summary": "Following Judge Alsup's June 2025 fair-use ruling, Anthropic agreed to pay approximately $1.5 billion to settle class claims tied to training on pirated books. Largest AI-related copyright settlement to date.",
+    "significance": "Reprices the tail exposure for any model trained on pirated corpora. Every carrier writing Tech E&O or Media Liability for foundation-model developers is recalibrating aggregate limits in response.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability", "Excess"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Willful infringement", "Prior knowledge (post-notice acquisition of pirated sources)"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=bartz+anthropic+settlement&type=r" }
+    ]
+  },
+  {
+    "id": "kadrey-meta",
+    "type": "case",
+    "caption": "Kadrey v. Meta Platforms, Inc.",
+    "court": "N.D. Cal.",
+    "docket": "3:23-cv-03417",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2023-07-07",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Richard Kadrey; Sarah Silverman; Christopher Golden; and other named authors (putative class)",
+      "defendant": "Meta Platforms, Inc."
+    },
+    "summary": "Author class action against Meta over LLaMA training. Judge Chhabria's June 25, 2025 summary-judgment ruling granted Meta partial SJ on the record presented but strongly signaled that better-developed market-harm evidence could support liability — an unusually candid road map for future plaintiffs.",
+    "significance": "Read alongside Bartz, shows market-harm framing becoming the pivot point of AI-training fair-use disputes. Meta prevailed on this record; the next case that develops market evidence may not.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Willful infringement", "Contractual liability"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=kadrey+meta&type=r" }
+    ]
+  },
+  {
+    "id": "reddit-anthropic",
+    "type": "case",
+    "caption": "Reddit, Inc. v. Anthropic PBC",
+    "court": "Sup. Ct. Cal., San Francisco County",
+    "docket": "CGC-25-624823",
+    "jurisdiction": "US",
+    "region": "CA-state",
+    "date": "2025-06-04",
+    "status": "active",
+    "tracks": ["contract"],
+    "trackLabels": ["Contract, indemnity, IP ownership"],
+    "parties": {
+      "plaintiff": "Reddit, Inc.",
+      "defendant": "Anthropic PBC"
+    },
+    "summary": "State-court action alleging Anthropic scraped Reddit content to train Claude in violation of Reddit's terms of use and stated licensing regime. Claims sound in unfair competition (Cal. Bus. & Prof. Code § 17200), breach of contract, and trespass to chattels — deliberately sidestepping the copyright fair-use framework.",
+    "significance": "Opens a state-law front against model providers using platform content. Provides a template for other content platforms to sue in state court on non-copyright theories that avoid the Bartz-Kadrey fair-use battle entirely.",
+    "insurance": {
+      "lines": ["Tech E&O", "Cyber (unauthorized-access endorsements)"],
+      "triggers": ["Wrongful act", "Unauthorized-access coverage where granted"],
+      "exclusions": ["Contractual liability (central issue)", "IP exclusion", "Intentional conduct"]
+    },
+    "sources": [
+      { "label": "SF Superior Court records", "url": "https://webapps.sftc.org/ci/CaseInfo.dll" }
+    ]
+  },
+  {
+    "id": "garcia-character-ai",
+    "type": "case",
+    "caption": "Garcia v. Character Technologies, Inc.",
+    "court": "M.D. Fla.",
+    "docket": "6:24-cv-01903",
+    "jurisdiction": "US",
+    "region": "MDFla",
+    "date": "2024-10-22",
+    "status": "active",
+    "tracks": ["product"],
+    "trackLabels": ["Product liability & chatbot harm"],
+    "parties": {
+      "plaintiff": "Megan Garcia, mother of Sewell Setzer III",
+      "defendant": "Character Technologies, Inc.; Google LLC; individual founders"
+    },
+    "summary": "Wrongful-death product-liability action arising from a 14-year-old's suicide after forming an emotional attachment to a Character.AI chatbot. Claims include strict product liability, negligence, deceptive trade practices, and unjust enrichment. In May 2025 the court denied the motion to dismiss, rejecting First Amendment protection at the pleadings stage.",
+    "significance": "The leading US case on chatbot-as-defective-product theories. The MTD denial signals that generative outputs may be treated as product output rather than protected speech in consumer-safety contexts — an entirely new liability frame with direct product-liability and General Liability implications.",
+    "insurance": {
+      "lines": ["Tech E&O", "General Liability", "Product Liability", "Media Liability"],
+      "triggers": ["Bodily injury (where scheduled or affirmatively granted)", "Wrongful act", "Advertising injury (misrepresentation prong)"],
+      "exclusions": ["Bodily injury (broad-form exclusion in Tech E&O)", "Intentional conduct", "Punitive damages", "Emotional distress absent physical injury"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=garcia+character+ai&type=r" }
+    ]
+  },
+  {
+    "id": "us-ai-action-plan",
+    "type": "regulation",
+    "caption": "America's AI Action Plan (Winning the Race)",
+    "court": "White House / OSTP",
+    "docket": "AI Action Plan",
+    "jurisdiction": "US",
+    "region": "Federal",
+    "date": "2025-07-23",
+    "status": "effective",
+    "tracks": ["regulation"],
+    "trackLabels": ["Regulation — formal (US federal policy)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Whole-of-government follow-through on EO 14179 issuing 90+ policy recommendations across three pillars — accelerate AI innovation, build American AI infrastructure, and lead in international AI diplomacy. Data-center-adjacent provisions cover permitting streamlining, grid interconnection reform, and infrastructure siting.",
+    "significance": "The most consequential Trump-administration AI policy document to date. Its infrastructure and permitting sections directly intersect with the data-center vertical and with insurers writing AEC professional liability on hyperscale builds.",
+    "insurance": {
+      "lines": ["Regulatory-defense endorsements", "D&O", "AEC PL (indirectly, via siting reforms)"],
+      "triggers": ["—"],
+      "exclusions": ["—"]
+    },
+    "sources": [
+      { "label": "White House — AI Action Plan", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" }
+    ]
+  },
+  {
+    "id": "omb-m25-21-22",
+    "type": "regulation",
+    "caption": "OMB Memoranda M-25-21 & M-25-22 — Federal AI use & acquisition",
+    "court": "Office of Management and Budget",
+    "docket": "M-25-21; M-25-22",
+    "jurisdiction": "US",
+    "region": "Federal",
+    "date": "2025-04-03",
+    "status": "effective",
+    "tracks": ["regulation"],
+    "trackLabels": ["Regulation — formal (US federal)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "New federal-agency AI use (M-25-21) and acquisition (M-25-22) policies replacing Biden-era M-24-10 and M-24-18. Removes several risk-management overlays while retaining core AI-inventory and impact-assessment obligations. Shifts the compliance frame for federal vendors and contractors.",
+    "significance": "Every federal vendor's AI-governance program built to align with M-24-10 needs recalibration. Directly relevant to Tech E&O underwriting for firms holding federal contracts and to D&O when governance minutes reference the prior framework.",
+    "insurance": {
+      "lines": ["Tech E&O", "D&O", "Regulatory-defense endorsements"],
+      "triggers": ["Wrongful act"],
+      "exclusions": ["Governmental action exclusions", "Fines and penalties"]
+    },
+    "sources": [
+      { "label": "OMB — M-25-21", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/04/M-25-21-Accelerating-Federal-Use-of-AI.pdf" },
+      { "label": "OMB — M-25-22", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/04/M-25-22-Driving-Efficient-Acquisition-of-AI.pdf" }
+    ]
+  },
+  {
+    "id": "tx-traiga",
+    "type": "regulation",
+    "caption": "Texas Responsible AI Governance Act (HB 149 / TRAIGA)",
+    "court": "Texas Legislature",
+    "docket": "HB 149",
+    "jurisdiction": "US",
+    "region": "TX",
+    "date": "2025-06-22",
+    "status": "signed",
+    "tracks": ["bias", "regulation"],
+    "trackLabels": ["Regulation — formal", "Discrimination & algorithmic bias"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Texas comprehensive AI-governance framework regulating AI systems used in consequential decisions. Similar in structure to Colorado's SB24-205 with a narrower scope, industry-favorable safe harbors for compliance with recognized frameworks (NIST AI RMF), and enforcement vested in the Texas Attorney General. Effective January 1, 2026.",
+    "significance": "Confirms the state-scale AI-governance trend beyond Colorado. With Texas and Colorado both in force by Feb 2026, any deployer with market presence in either state faces active compliance exposure.",
+    "insurance": {
+      "lines": ["Tech E&O", "EPL", "D&O"],
+      "triggers": ["Wrongful act", "Employment-practices wrongful act", "Statutory-violation coverage where granted"],
+      "exclusions": ["Statutory penalties / fines", "Intentional non-compliance"]
+    },
+    "sources": [
+      { "label": "Texas Legislature — HB 149", "url": "https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=HB149" }
+    ]
+  },
+  {
+    "id": "ca-sb53",
+    "type": "regulation",
+    "caption": "California SB 53 — Safety in AI Frontier Development Act",
+    "court": "California Legislature",
+    "docket": "SB 53",
+    "jurisdiction": "US",
+    "region": "CA",
+    "date": "2025-09-29",
+    "status": "signed",
+    "tracks": ["regulation"],
+    "trackLabels": ["Regulation — formal (frontier models)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Successor to SB 1047 (vetoed by Governor Newsom in 2024). Targets frontier-model developers with safety framework disclosure, critical-safety-incident reporting, and whistleblower protections. Narrower in scope than SB 1047 to address the governance concerns that led to the earlier veto.",
+    "significance": "The most significant state-scale frontier-model safety law to date. Reporting and incident-disclosure obligations flow directly into Tech E&O and D&O exposure for frontier-model developers with California presence — which is effectively all of them.",
+    "insurance": {
+      "lines": ["Tech E&O", "D&O", "Cyber (incident-response endorsements)"],
+      "triggers": ["Wrongful act", "Regulatory-defense coverage where granted"],
+      "exclusions": ["Statutory penalties", "Intentional non-compliance", "Whistleblower-related exclusions"]
+    },
+    "sources": [
+      { "label": "California Legislature — SB 53", "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB53" }
+    ]
+  },
+  {
+    "id": "eu-ai-act-gpai",
+    "type": "regulation",
+    "caption": "EU AI Act — General-Purpose AI model obligations effective",
+    "court": "European Commission",
+    "docket": "Reg (EU) 2024/1689, Arts. 51-56",
+    "jurisdiction": "EU",
+    "region": "EU",
+    "date": "2025-08-02",
+    "status": "effective",
+    "tracks": ["regulation"],
+    "trackLabels": ["Regulation — formal (EU)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Obligations on providers of general-purpose AI models under the EU AI Act became applicable on August 2, 2025. Providers of models presenting systemic risk face additional obligations including model evaluations, adversarial testing, incident reporting, and cybersecurity requirements. GPAI Code of Practice published to guide compliance.",
+    "significance": "First major EU AI Act compliance milestone directly touching US-headquartered frontier-model providers with EU users. Any client — model developer or downstream deployer — with EU touchpoints needs compliance posture in place now.",
+    "insurance": {
+      "lines": ["Tech E&O", "D&O", "Regulatory-defense endorsements"],
+      "triggers": ["Wrongful act", "Regulatory-defense coverage where granted"],
+      "exclusions": ["Administrative fines / penalties (typically excluded)", "Extraterritorial territory limits", "Intentional non-compliance"]
+    },
+    "sources": [
+      { "label": "EUR-Lex — Regulation (EU) 2024/1689", "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj" },
+      { "label": "GPAI Code of Practice", "url": "https://digital-strategy.ec.europa.eu/en/policies/ai-code-practice" }
+    ]
   }
 ]
 </script>
 
 <script id="pulseData" type="application/json">
 [
-  { "itemId": "thomson-ross", "why": "The first substantive US decision rejecting fair use for AI training on a competing corpus. Most-cited pro-plaintiff data point in the training-data docket." },
-  { "itemId": "mobley-workday", "why": "Class cert granted May 2025. The vendor-as-agent holding materially widens the target set from employers to HR-tech providers — a fundamental EPL and Tech E&O exposure shift." },
-  { "itemId": "trump-eo-ai", "why": "Rescinds EO 14110 and reorients federal AI-governance posture. Every enterprise program built to align with the prior EO needs re-anchoring." },
-  { "itemId": "walters-openai", "why": "First substantive US decision on generative-AI defamation. Summary judgment for OpenAI on actual-malice grounds — a defense-favorable data point for insurers." },
-  { "itemId": "dowjones-perplexity", "why": "The most consequential RAG-focused publisher suit. Tests output-side copyright infringement in live retrieval — distinct question from training-corpus theories." },
-  { "itemId": "bipa-sb2979", "why": "Damages-model reset for voice- and face-based AI systems reaching Illinois residents. Materially lowers BIPA-driven loss ceilings for downstream deployers." },
-  { "itemId": "pwc-digital-gateway", "why": "The template community-opposition suit for hyperscale data-center land-use. Playbook is being replicated across Virginia, Ohio, Indiana, and Missouri hotspots." }
+  { "itemId": "anthropic-1p5b-settlement", "why": "The largest AI copyright settlement to date. Materially reprices tail exposure for any model trained on pirated corpora and reshapes Tech E&O aggregate-limit thinking." },
+  { "itemId": "bartz-anthropic", "why": "Judge Alsup's June 2025 ruling: legitimate-corpus training is 'spectacularly transformative' fair use; pirated-corpus training is not. The single most consequential AI-training fair-use decision to date." },
+  { "itemId": "kadrey-meta", "why": "Judge Chhabria's June 2025 ruling read alongside Bartz makes market-harm evidence the pivot point of future AI-training disputes. Meta prevailed on the record; the next case with better evidence may not." },
+  { "itemId": "garcia-character-ai", "why": "May 2025 MTD denial in a chatbot wrongful-death case rejects First Amendment protection at the pleadings stage. Opens the product-liability and General Liability lane for chatbot harm." },
+  { "itemId": "us-ai-action-plan", "why": "July 2025 whole-of-government AI policy release. Data-center permitting and infrastructure sections directly intersect with the AEC professional-liability vertical." },
+  { "itemId": "eu-ai-act-gpai", "why": "General-purpose AI model obligations under the EU AI Act became applicable Aug 2025. First major EU compliance milestone touching US-headquartered frontier-model providers." },
+  { "itemId": "mobley-workday", "why": "Class certification granted May 2025. The vendor-as-agent holding materially widens the target set from employers to HR-tech providers — a fundamental EPL and Tech E&O exposure shift." }
 ]
 </script>
 
@@ -1550,7 +1823,16 @@ main {
   { "date": "2024-05-17", "label": "Colorado AI Act signed" },
   { "date": "2024-08-01", "label": "EU AI Act in force" },
   { "date": "2025-01-23", "label": "Trump AI EO 14179" },
-  { "date": "2025-02-24", "label": "Thomson Reuters SJ on training" }
+  { "date": "2025-02-24", "label": "Thomson Reuters SJ on training" },
+  { "date": "2025-04-03", "label": "OMB M-25-21 & M-25-22" },
+  { "date": "2025-06-23", "label": "Bartz SJ (fair use split)" },
+  { "date": "2025-07-23", "label": "US AI Action Plan" },
+  { "date": "2025-08-02", "label": "EU AI Act GPAI effective" },
+  { "date": "2025-09-05", "label": "Anthropic $1.5B settlement" },
+  { "date": "2025-09-29", "label": "CA SB 53 signed" },
+  { "date": "2026-01-01", "label": "TX TRAIGA effective" },
+  { "date": "2026-02-01", "label": "CO AI Act effective" },
+  { "date": "2026-08-02", "label": "EU AI Act high-risk obligations" }
 ]
 </script>
 
@@ -1897,8 +2179,8 @@ main {
   });
 
   // ---------- Timeline ----------
-  var TRACK_COLORS_LIGHT = { ip: '#b8383a', privacy: '#2a7d8a', bias: '#b8801a', defamation: '#7d3a8a', contract: '#2a5a8a', datacenter: '#7d5a3a', sanction: '#4a4a4a', regulation: '#2a5a8a' };
-  var TRACK_COLORS_DARK  = { ip: '#e07878', privacy: '#5ec0d0', bias: '#e0b040', defamation: '#c078d0', contract: '#6a9cd0', datacenter: '#c09468', sanction: '#a8a8a8', regulation: '#6a9cd0' };
+  var TRACK_COLORS_LIGHT = { ip: '#b8383a', privacy: '#2a7d8a', bias: '#b8801a', defamation: '#7d3a8a', product: '#a04070', contract: '#2a5a8a', datacenter: '#7d5a3a', sanction: '#4a4a4a', regulation: '#2a5a8a' };
+  var TRACK_COLORS_DARK  = { ip: '#e07878', privacy: '#5ec0d0', bias: '#e0b040', defamation: '#c078d0', product: '#e090b8', contract: '#6a9cd0', datacenter: '#c09468', sanction: '#a8a8a8', regulation: '#6a9cd0' };
   function palette() { return currentTheme() === 'dark' ? TRACK_COLORS_DARK : TRACK_COLORS_LIGHT; }
 
   function renderTimeline() {
@@ -1907,17 +2189,20 @@ main {
     var colors = palette();
 
     // Bucket by month per top track (litigation-facing tracks)
-    var trackOrder = ['ip', 'privacy', 'bias', 'defamation', 'contract', 'datacenter', 'sanction'];
-    var trackNames = { ip: 'IP', privacy: 'Privacy', bias: 'Bias', defamation: 'Defamation', contract: 'Contract/D&O', datacenter: 'Data-center', sanction: 'Sanctions', regulation: 'Regulation' };
+    var trackOrder = ['ip', 'privacy', 'bias', 'defamation', 'product', 'contract', 'datacenter', 'sanction'];
+    var trackNames = { ip: 'IP', privacy: 'Privacy', bias: 'Bias', defamation: 'Defamation', product: 'Product liability', contract: 'Contract/D&O', datacenter: 'Data-center', sanction: 'Sanctions', regulation: 'Regulation' };
 
-    // Determine month range from data
-    var dates = items.map(function (it) { return it.date; }).filter(Boolean).sort();
+    // Determine month range from data + annotations + today (so future regulatory milestones render)
+    var dates = items.map(function (it) { return it.date; }).filter(Boolean);
     if (!dates.length) return;
-    var start = new Date(dates[0]);
+    var annotationDates = annotations.map(function (a) { return a.date; });
+    var todayIso = new Date().toISOString().slice(0, 10);
+    var allDates = dates.concat(annotationDates).concat([todayIso]).sort();
+    var start = new Date(allDates[0]);
     start.setUTCDate(1);
-    var end = new Date(dates[dates.length - 1]);
+    var end = new Date(allDates[allDates.length - 1]);
     end.setUTCDate(1);
-    // Extend one month
+    // Extend one month for breathing room
     end.setUTCMonth(end.getUTCMonth() + 1);
 
     var months = [];
