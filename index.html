@@ -568,15 +568,56 @@ main {
 }
 .timeline-legend {
   display: flex;
-  gap: 18px;
+  gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 16px;
   font-size: 12px;
   color: var(--muted-ink);
+  align-items: center;
 }
-.legend-item { display: inline-flex; align-items: center; gap: 6px; }
-.legend-swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
-.timeline-svg { width: 100%; min-width: 720px; height: 320px; display: block; }
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--muted-ink);
+  transition: opacity .12s, background .12s, color .12s;
+}
+.legend-item:hover { background: var(--surface-2); color: var(--ink); }
+.legend-item[aria-pressed="false"] {
+  opacity: 0.4;
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+}
+.legend-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.timeline-legend-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.timeline-legend-actions button {
+  background: transparent;
+  border: none;
+  color: var(--muted-ink);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+.timeline-legend-actions button:hover { color: var(--accent); background: var(--surface-2); }
+.timeline-legend-actions .divider { color: var(--rule-strong); }
+.timeline-annotation-marker { fill: var(--accent); cursor: help; }
+.timeline-annotation-marker:hover { r: 5; }
+.timeline-svg { width: 100%; min-width: 720px; height: 360px; display: block; }
 .timeline-axis text { fill: var(--faint-ink); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
 .timeline-axis line, .timeline-axis path { stroke: var(--rule-strong); }
 .timeline-grid line { stroke: var(--rule); stroke-dasharray: 2 3; }
@@ -791,11 +832,11 @@ main {
     <div class="view-head">
       <span class="view-eyebrow">Timeline</span>
       <h1 class="view-title">Filings per month, against the regulatory backdrop.</h1>
-      <p class="view-desc">Stacked area of new filings by claim track, with vertical annotations marking the statutes, executive orders, and rulings that shape the landscape.</p>
+      <p class="view-desc">Stacked area of new filings by claim track, with vertical annotations marking statutes, executive orders, and rulings. Click any legend chip to toggle a category on or off — the y-axis rescales. Use the preset buttons to focus on litigation, data-center, or insurance-heavy views. Hover annotation markers for full text.</p>
     </div>
     <div class="timeline-wrap">
       <div class="timeline-legend" id="timelineLegend"></div>
-      <svg class="timeline-svg" id="timelineSvg" viewBox="0 0 900 320" preserveAspectRatio="none"></svg>
+      <svg class="timeline-svg" id="timelineSvg" viewBox="0 0 900 360" preserveAspectRatio="none"></svg>
     </div>
   </section>
 
@@ -3584,14 +3625,19 @@ main {
   var TRACK_COLORS_DARK  = { ip: '#e07878', privacy: '#5ec0d0', bias: '#e0b040', defamation: '#c078d0', product: '#e090b8', contract: '#6a9cd0', datacenter: '#c09468', sanction: '#a8a8a8', regulation: '#6a9cd0' };
   function palette() { return currentTheme() === 'dark' ? TRACK_COLORS_DARK : TRACK_COLORS_LIGHT; }
 
+  var timelineTrackOrder = ['ip', 'privacy', 'bias', 'defamation', 'product', 'contract', 'datacenter', 'sanction'];
+  var timelineTrackNames = { ip: 'IP', privacy: 'Privacy', bias: 'Bias', defamation: 'Defamation', product: 'Product liability', contract: 'Contract/D&O', datacenter: 'Data-center', sanction: 'Sanctions', regulation: 'Regulation' };
+  var enabledTracks = new Set(timelineTrackOrder);
+  var annotationsVisible = true;
+
   function renderTimeline() {
     var svg = document.getElementById('timelineSvg');
     var legend = document.getElementById('timelineLegend');
     var colors = palette();
 
-    // Bucket by month per top track (litigation-facing tracks)
-    var trackOrder = ['ip', 'privacy', 'bias', 'defamation', 'product', 'contract', 'datacenter', 'sanction'];
-    var trackNames = { ip: 'IP', privacy: 'Privacy', bias: 'Bias', defamation: 'Defamation', product: 'Product liability', contract: 'Contract/D&O', datacenter: 'Data-center', sanction: 'Sanctions', regulation: 'Regulation' };
+    var trackOrder = timelineTrackOrder;
+    var trackNames = timelineTrackNames;
+    var activeTracks = trackOrder.filter(function (t) { return enabledTracks.has(t); });
 
     // Determine month range from data + annotations + today (so future regulatory milestones render)
     var dates = items.map(function (it) { return it.date; }).filter(Boolean);
@@ -3630,16 +3676,19 @@ main {
       buckets[primary][m] = (buckets[primary][m] || 0) + 1;
     });
 
-    // SVG geometry
-    var W = 900, H = 320;
-    var padL = 40, padR = 20, padT = 30, padB = 40;
+    // SVG geometry — extra top padding to make room for staggered annotations
+    var W = 900, H = 360;
+    var padL = 40, padR = 20, padT = 62, padB = 40;
     var plotW = W - padL - padR;
     var plotH = H - padT - padB;
     var xStep = plotW / Math.max(1, months.length - 1);
 
-    // Compute stacked max
+    // Update SVG viewBox to match
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    // Compute stacked max — only for enabled tracks so y-axis rescales when toggling
     var stackedTotals = months.map(function (m) {
-      return trackOrder.reduce(function (s, t) { return s + (buckets[t][m] || 0); }, 0);
+      return activeTracks.reduce(function (s, t) { return s + (buckets[t][m] || 0); }, 0);
     });
     var yMax = Math.max(3, Math.max.apply(null, stackedTotals));
     // Round yMax up to nearest even
@@ -3663,9 +3712,9 @@ main {
     }
     svg.appendChild(gridGroup);
 
-    // Stacked areas (paint each track as a filled area based on cumulative baseline)
+    // Stacked areas (paint each enabled track as a filled area based on cumulative baseline)
     var baseline = months.map(function () { return 0; });
-    trackOrder.forEach(function (t) {
+    activeTracks.forEach(function (t) {
       var vals = months.map(function (m) { return buckets[t][m] || 0; });
       var topPts = vals.map(function (v, i) { return { x: x(i), y: y(baseline[i] + v) }; });
       var basePts = vals.map(function (v, i) { return { x: x(i), y: y(baseline[i]) }; }).reverse();
@@ -3711,34 +3760,93 @@ main {
     }
     svg.appendChild(axisGroup);
 
-    // Annotations
-    annotations.forEach(function (a) {
-      var idx = months.indexOf(a.date.slice(0, 7));
-      if (idx < 0) return;
-      var ax = x(idx);
-      var line = document.createElementNS(svgNS, 'line');
-      line.setAttribute('class', 'timeline-annotation-line');
-      line.setAttribute('x1', ax); line.setAttribute('x2', ax);
-      line.setAttribute('y1', padT - 8); line.setAttribute('y2', padT + plotH);
-      svg.appendChild(line);
-      var mark = document.createElementNS(svgNS, 'circle');
-      mark.setAttribute('class', 'timeline-annotation-marker');
-      mark.setAttribute('cx', ax); mark.setAttribute('cy', padT - 8); mark.setAttribute('r', 3);
-      svg.appendChild(mark);
-      var lbl = document.createElementNS(svgNS, 'text');
-      lbl.setAttribute('class', 'timeline-annotation-label');
-      lbl.setAttribute('x', ax + 4);
-      lbl.setAttribute('y', padT - 12);
-      lbl.setAttribute('transform', 'rotate(-14 ' + (ax + 4) + ' ' + (padT - 12) + ')');
-      lbl.textContent = a.label;
-      svg.appendChild(lbl);
-    });
+    // Annotations — stagger vertically in 3 tiers so labels stop overlapping
+    if (annotationsVisible) {
+      var sortedAnnotations = annotations.slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var tierPositions = [padT - 48, padT - 32, padT - 16];
+      var lastXByTier = [-Infinity, -Infinity, -Infinity];
+      var MIN_X_SEP = 70;
+      sortedAnnotations.forEach(function (a) {
+        var idx = months.indexOf(a.date.slice(0, 7));
+        if (idx < 0) return;
+        var ax = x(idx);
+        // Pick lowest tier whose last-used x is far enough away
+        var tier = 0;
+        for (var t = 0; t < tierPositions.length; t++) {
+          if (ax - lastXByTier[t] >= MIN_X_SEP) { tier = t; break; }
+          if (t === tierPositions.length - 1) tier = t; // fallback to bottom tier
+        }
+        lastXByTier[tier] = ax;
+        var ly = tierPositions[tier];
+        var line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('class', 'timeline-annotation-line');
+        line.setAttribute('x1', ax); line.setAttribute('x2', ax);
+        line.setAttribute('y1', ly + 4); line.setAttribute('y2', padT + plotH);
+        svg.appendChild(line);
+        var mark = document.createElementNS(svgNS, 'circle');
+        mark.setAttribute('class', 'timeline-annotation-marker');
+        mark.setAttribute('cx', ax); mark.setAttribute('cy', ly); mark.setAttribute('r', 3);
+        var title = document.createElementNS(svgNS, 'title');
+        title.textContent = a.label + ' (' + a.date + ')';
+        mark.appendChild(title);
+        svg.appendChild(mark);
+        var lbl = document.createElementNS(svgNS, 'text');
+        lbl.setAttribute('class', 'timeline-annotation-label');
+        lbl.setAttribute('x', ax + 5);
+        lbl.setAttribute('y', ly + 3);
+        var titleLbl = document.createElementNS(svgNS, 'title');
+        titleLbl.textContent = a.label + ' (' + a.date + ')';
+        lbl.appendChild(titleLbl);
+        lbl.textContent = a.label;
+        svg.appendChild(lbl);
+      });
+    }
 
-    // Legend
+    // Legend — interactive category toggles + preset actions
+    var actionHtml = '<div class="timeline-legend-actions">' +
+      '<button data-legend-action="all">All</button>' +
+      '<span class="divider">·</span>' +
+      '<button data-legend-action="litigation">Litigation only</button>' +
+      '<span class="divider">·</span>' +
+      '<button data-legend-action="datacenter">Data-center only</button>' +
+      '<span class="divider">·</span>' +
+      '<button data-legend-action="insurance">Insurance-heavy</button>' +
+      '<span class="divider">·</span>' +
+      '<button data-legend-action="toggle-annotations">' + (annotationsVisible ? 'Hide' : 'Show') + ' annotations</button>' +
+      '</div>';
     legend.innerHTML = trackOrder.map(function (t) {
-      return '<span class="legend-item"><span class="legend-swatch" style="background:' + colors[t] + '"></span>' + trackNames[t] + '</span>';
-    }).join('') + '<span class="legend-item"><span class="legend-swatch" style="background:' + colors.regulation + '"></span>Regulation (annotations)</span>';
+      var enabled = enabledTracks.has(t);
+      return '<button class="legend-item" data-track="' + t + '" aria-pressed="' + enabled + '">' +
+        '<span class="legend-swatch" style="background:' + colors[t] + '"></span>' + trackNames[t] +
+      '</button>';
+    }).join('') + actionHtml;
   }
+
+  // Legend interaction — delegate once on the legend container
+  (function () {
+    var legend = document.getElementById('timelineLegend');
+    if (!legend) return;
+    legend.addEventListener('click', function (e) {
+      var trackBtn = e.target.closest('.legend-item');
+      if (trackBtn) {
+        var t = trackBtn.getAttribute('data-track');
+        if (enabledTracks.has(t)) enabledTracks.delete(t);
+        else enabledTracks.add(t);
+        renderTimeline();
+        return;
+      }
+      var actionBtn = e.target.closest('[data-legend-action]');
+      if (actionBtn) {
+        var action = actionBtn.getAttribute('data-legend-action');
+        if (action === 'all') enabledTracks = new Set(timelineTrackOrder);
+        else if (action === 'litigation') enabledTracks = new Set(['ip', 'privacy', 'bias', 'defamation', 'product', 'contract']);
+        else if (action === 'datacenter') enabledTracks = new Set(['datacenter']);
+        else if (action === 'insurance') enabledTracks = new Set(['ip', 'privacy', 'product', 'contract', 'datacenter', 'sanction']);
+        else if (action === 'toggle-annotations') annotationsVisible = !annotationsVisible;
+        renderTimeline();
+      }
+    });
+  })();
 
   // ---------- Sources ----------
   var sourceGrid = document.getElementById('sourceGrid');
