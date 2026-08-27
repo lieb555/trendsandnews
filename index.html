@@ -1,0 +1,2075 @@
+<title>Ratio Iuris — AI Litigation & Insurance Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ground: #f5f2ea;
+  --surface: #faf8f2;
+  --surface-2: #efeadf;
+  --ink: #1e1b17;
+  --muted-ink: #5a544a;
+  --faint-ink: #8a857c;
+  --rule: #e1dcd0;
+  --rule-strong: #cec6b5;
+  --accent: #a83a2c;
+  --accent-quiet: #c6867a;
+  --accent-ink: #6b241a;
+  --good: #5a7a3a;
+  --warn: #b57a15;
+  --critical: #9a2020;
+  --info: #3a6a7a;
+  --shadow: 0 1px 2px rgba(30, 27, 23, 0.04), 0 4px 12px rgba(30, 27, 23, 0.06);
+  --shadow-modal: 0 8px 24px rgba(30, 27, 23, 0.12), 0 24px 64px rgba(30, 27, 23, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #151310;
+    --surface: #1e1b17;
+    --surface-2: #26221d;
+    --ink: #f0ebe0;
+    --muted-ink: #a8a196;
+    --faint-ink: #766f65;
+    --rule: #3a3530;
+    --rule-strong: #4c463f;
+    --accent: #d47264;
+    --accent-quiet: #8a3f36;
+    --accent-ink: #e88f81;
+    --good: #8fb066;
+    --warn: #e0a04a;
+    --critical: #e06060;
+    --info: #7ab4c8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #151310;
+  --surface: #1e1b17;
+  --surface-2: #26221d;
+  --ink: #f0ebe0;
+  --muted-ink: #a8a196;
+  --faint-ink: #766f65;
+  --rule: #3a3530;
+  --rule-strong: #4c463f;
+  --accent: #d47264;
+  --accent-quiet: #8a3f36;
+  --accent-ink: #e88f81;
+  --good: #8fb066;
+  --warn: #e0a04a;
+  --critical: #e06060;
+  --info: #7ab4c8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  font-feature-settings: "kern", "liga", "calt";
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; text-decoration-color: var(--accent-quiet); }
+a:hover { text-decoration-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+.mono, code, kbd { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; }
+.serif { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
+.tabular { font-variant-numeric: tabular-nums; }
+.caps { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; font-weight: 500; color: var(--muted-ink); }
+
+/* --- Header --- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in oklab, var(--ground) 92%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.site-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.brand-mark {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 48;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+}
+.brand-mark::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 2px;
+  transform: translateY(-2px);
+}
+.brand-tag {
+  color: var(--muted-ink);
+  font-size: 13px;
+  font-weight: 400;
+}
+.brand-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  color: var(--muted-ink);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+}
+.theme-toggle:hover { color: var(--ink); border-color: var(--ink); }
+
+.tabnav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabnav::-webkit-scrollbar { display: none; }
+.tabnav button {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px 12px;
+  color: var(--muted-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  margin-bottom: -1px;
+  transition: color .12s, border-color .12s;
+}
+.tabnav button:hover { color: var(--ink); }
+.tabnav button[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.tabnav button .count {
+  color: var(--faint-ink);
+  font-size: 11px;
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Main --- */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 24px 96px;
+}
+.view { display: none; }
+.view[data-active="true"] { display: block; }
+
+/* --- View heads --- */
+.view-head {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  gap: 6px;
+}
+.view-eyebrow { color: var(--accent); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; }
+.view-title {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 60;
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+.view-desc {
+  color: var(--muted-ink);
+  max-width: 62ch;
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+
+/* --- Pulse --- */
+.pulse-lead {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  padding: 18px 22px;
+  border-radius: 3px;
+  margin-bottom: 28px;
+  display: grid;
+  gap: 4px;
+}
+.pulse-lead-label { display: flex; align-items: center; gap: 10px; }
+.pulse-lead-date { color: var(--muted-ink); font-size: 13px; }
+.pulse-lead-body { color: var(--ink); max-width: 68ch; }
+.pulse-list {
+  display: grid;
+  gap: 0;
+}
+.pulse-item {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.pulse-item:last-child { border-bottom: none; }
+.pulse-num {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 60;
+  font-weight: 300;
+  font-size: 30px;
+  color: var(--accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pulse-body h3 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 28;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.25;
+  margin: 0 0 6px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.pulse-body h3 button.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: color .12s;
+}
+.pulse-body h3 button.link-button:hover { color: var(--accent); }
+.pulse-why { color: var(--muted-ink); margin: 0 0 10px; max-width: 68ch; }
+.pulse-meta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--faint-ink); }
+.pulse-meta .dot { color: var(--rule-strong); }
+.pulse-source {
+  align-self: start;
+  padding-top: 8px;
+  font-size: 12px;
+  text-align: right;
+  color: var(--faint-ink);
+  min-width: 130px;
+}
+.pulse-source a { color: var(--muted-ink); text-decoration-color: var(--rule-strong); }
+.pulse-source a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
+/* --- Filters --- */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  align-items: center;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+.filter-label { color: var(--muted-ink); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; }
+.chip {
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--muted-ink);
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: all .12s;
+  font-weight: 500;
+}
+.chip:hover { color: var(--ink); border-color: var(--ink); }
+.chip[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--ground);
+  border-color: var(--accent);
+}
+.filter-divider { width: 1px; height: 18px; background: var(--rule-strong); margin: 0 4px; }
+.filter-clear {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--muted-ink);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+}
+.filter-clear:hover { color: var(--accent); }
+
+/* --- Case cards --- */
+.case-count {
+  color: var(--muted-ink);
+  font-size: 13px;
+  margin-bottom: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.case-list { display: grid; gap: 12px; }
+.case-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: border-color .12s, transform .08s;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 20px;
+  align-items: baseline;
+}
+.case-card:hover { border-color: var(--rule-strong); }
+.case-card:hover .case-caption { color: var(--accent); }
+.case-caption {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 24;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--ink);
+  transition: color .12s;
+  text-wrap: balance;
+  grid-column: 1;
+}
+.case-status {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-ink);
+  font-weight: 500;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: baseline;
+  white-space: nowrap;
+}
+.case-status.status-active { color: var(--info); }
+.case-status.status-pending { color: var(--warn); }
+.case-status.status-decided { color: var(--good); }
+.case-status.status-effective { color: var(--good); }
+.case-status.status-signed { color: var(--good); }
+.case-status.status-rescinded { color: var(--critical); }
+.case-status.status-ongoing { color: var(--warn); }
+.case-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--faint-ink);
+  font-size: 12px;
+  margin: 6px 0 10px;
+  grid-column: 1 / -1;
+}
+.case-meta .dot { color: var(--rule-strong); }
+.case-tracks {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+.track-pill {
+  font-size: 11px;
+  color: var(--muted-ink);
+  background: var(--surface-2);
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--rule);
+  letter-spacing: 0.02em;
+}
+.track-pill.type-regulation { color: var(--info); border-color: color-mix(in oklab, var(--info) 30%, var(--rule)); }
+.track-pill.type-sanction { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 30%, var(--rule)); }
+.track-pill.type-datacenter { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 30%, var(--rule)); }
+
+/* --- Modal (Case File) --- */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklab, var(--ink) 40%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  z-index: 40;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.modal-scrim[data-open="true"] { display: flex; align-items: flex-start; justify-content: center; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  max-width: 780px;
+  width: 100%;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+.modal-head {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  gap: 8px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted-ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  font-family: inherit;
+}
+.modal-close:hover { border-color: var(--rule-strong); color: var(--ink); }
+.modal-eyebrow { display: flex; align-items: center; gap: 10px; color: var(--muted-ink); font-size: 12px; }
+.modal-eyebrow .track-pill { font-size: 11px; }
+.modal-title {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 40;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 4px 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+  padding-right: 40px;
+}
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--faint-ink);
+  font-size: 13px;
+}
+.modal-body {
+  padding: 24px 28px;
+  display: grid;
+  gap: 24px;
+}
+.modal-section h4 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-ink);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.modal-section p { margin: 0 0 8px; }
+.modal-section ul { margin: 0; padding-left: 18px; }
+.modal-section li { margin: 2px 0; }
+.insurance-block {
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  padding: 16px 18px;
+  border-radius: 3px;
+  display: grid;
+  gap: 12px;
+}
+.insurance-row { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: baseline; font-size: 13px; }
+.insurance-row .label { color: var(--muted-ink); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+.insurance-row .value { color: var(--ink); }
+.insurance-row .value .tag {
+  display: inline-block;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin: 0 4px 4px 0;
+  font-size: 12px;
+}
+.modal-sources {
+  padding: 18px 28px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 13px;
+}
+.modal-sources .label { color: var(--muted-ink); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; margin-right: 4px; }
+
+/* --- Timeline --- */
+.timeline-wrap {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 24px;
+  overflow-x: auto;
+}
+.timeline-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--muted-ink);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.timeline-svg { width: 100%; min-width: 720px; height: 320px; display: block; }
+.timeline-axis text { fill: var(--faint-ink); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+.timeline-axis line, .timeline-axis path { stroke: var(--rule-strong); }
+.timeline-grid line { stroke: var(--rule); stroke-dasharray: 2 3; }
+.timeline-annotation-line { stroke: var(--accent-quiet); stroke-width: 1; stroke-dasharray: 3 3; }
+.timeline-annotation-marker { fill: var(--accent); }
+.timeline-annotation-label { fill: var(--accent-ink); font-family: "IBM Plex Sans", sans-serif; font-size: 10px; font-weight: 500; }
+
+/* --- Sources view --- */
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.source-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 20px 22px;
+  display: grid;
+  gap: 8px;
+}
+.source-card h3 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 24;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+  color: var(--ink);
+}
+.source-card h3 a { color: inherit; text-decoration: none; }
+.source-card h3 a:hover { color: var(--accent); }
+.source-card .desc { color: var(--muted-ink); font-size: 14px; margin: 0; }
+.source-card .meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--faint-ink);
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--rule);
+}
+.source-card .meta .k { color: var(--muted-ink); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+
+/* --- What's Next --- */
+.roadmap-note {
+  color: var(--muted-ink);
+  max-width: 66ch;
+  margin-bottom: 24px;
+}
+.roadmap-list { display: grid; gap: 4px; }
+.roadmap-item {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.roadmap-item:last-child { border-bottom: none; }
+.roadmap-when {
+  color: var(--accent);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding-top: 4px;
+}
+.roadmap-body h4 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 22;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.roadmap-body p { color: var(--muted-ink); margin: 0; font-size: 14px; max-width: 62ch; }
+
+/* --- Disclaimer / footer --- */
+.disclaimer {
+  background: color-mix(in oklab, var(--warn) 8%, var(--surface));
+  border: 1px solid color-mix(in oklab, var(--warn) 25%, var(--rule));
+  border-radius: 3px;
+  padding: 14px 18px;
+  margin-bottom: 32px;
+  font-size: 13px;
+  color: var(--ink);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.disclaimer-mark {
+  color: var(--warn);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-top: 2px;
+  white-space: nowrap;
+}
+.disclaimer p { margin: 0; max-width: 78ch; }
+
+.site-footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+  border-top: 1px solid var(--rule);
+  color: var(--faint-ink);
+  font-size: 12px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.site-footer p { margin: 0; max-width: 60ch; }
+
+/* --- Small responsive --- */
+@media (max-width: 640px) {
+  main { padding: 24px 16px 60px; }
+  .site-header-inner { padding: 12px 16px 0; }
+  .pulse-item { grid-template-columns: 32px 1fr; }
+  .pulse-source { grid-column: 2; text-align: left; padding-top: 4px; min-width: 0; }
+  .pulse-num { font-size: 24px; }
+  .case-card { grid-template-columns: 1fr; }
+  .case-status { grid-column: 1; grid-row: auto; }
+  .roadmap-item { grid-template-columns: 1fr; gap: 6px; }
+  .insurance-row { grid-template-columns: 1fr; gap: 2px; }
+  .insurance-row .label { margin-top: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <span class="brand-mark">Ratio Iuris</span>
+      <span class="brand-tag">AI litigation, regulation &amp; insurance — synthesis with coverage overlay</span>
+      <div class="brand-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Theme</button>
+      </div>
+    </div>
+    <nav class="tabnav" role="tablist" id="tabnav">
+      <button role="tab" aria-selected="true" data-view="pulse">The Pulse</button>
+      <button role="tab" aria-selected="false" data-view="cases">Cases &amp; Regulation <span class="count" id="itemsCount"></span></button>
+      <button role="tab" aria-selected="false" data-view="timeline">Timeline</button>
+      <button role="tab" aria-selected="false" data-view="sources">Source Trackers</button>
+      <button role="tab" aria-selected="false" data-view="roadmap">What's Next</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="disclaimer">
+    <span class="disclaimer-mark">Verify first</span>
+    <p>Seed dataset curated from public trackers and reporting for demonstration. Every item links to a primary-source lookup (CourtListener, Federal Register, EUR-Lex, state legislature pages) — verify captions, dockets, dates, and status before any client-facing use. Insurance analysis is preliminary attorney work-product, not underwriting advice.</p>
+  </div>
+
+  <!-- Pulse view -->
+  <section class="view" data-view="pulse" data-active="true">
+    <div class="view-head">
+      <span class="view-eyebrow">The Pulse</span>
+      <h1 class="view-title">What has moved in AI litigation, regulation, and coverage.</h1>
+      <p class="view-desc">A hand-curated view of the developments most worth a working attorney's attention this week. Each item links to its primary source and to a full record with insurance analysis.</p>
+    </div>
+    <div class="pulse-lead">
+      <div class="pulse-lead-label">
+        <span class="caps">Editor's note</span>
+        <span class="pulse-lead-date mono">2026-08-27</span>
+      </div>
+      <p class="pulse-lead-body">This is the MVP seed of the Ratio Iuris tracker. The Pulse is curated by hand for now; algorithmic anomaly detection and LLM-assisted drafting (with editorial review) land in v1.1. If a development matters to your practice and is missing, add it — the JSON is one file.</p>
+    </div>
+    <ol class="pulse-list" id="pulseList"></ol>
+  </section>
+
+  <!-- Cases view -->
+  <section class="view" data-view="cases">
+    <div class="view-head">
+      <span class="view-eyebrow">Cases &amp; Regulation</span>
+      <h1 class="view-title">The corpus, one filter away.</h1>
+      <p class="view-desc">Every item in the tracker with claim tags and coverage-line analysis. Click any card for the full Case File.</p>
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <span class="filter-label">Type</span>
+      <button class="chip" data-filter="type" data-value="case" aria-pressed="false">Litigation</button>
+      <button class="chip" data-filter="type" data-value="sanction" aria-pressed="false">Sanctions</button>
+      <button class="chip" data-filter="type" data-value="regulation" aria-pressed="false">Regulation</button>
+      <button class="chip" data-filter="type" data-value="datacenter" aria-pressed="false">Data-center</button>
+      <span class="filter-divider"></span>
+      <span class="filter-label">Track</span>
+      <button class="chip" data-filter="track" data-value="ip" aria-pressed="false">IP</button>
+      <button class="chip" data-filter="track" data-value="privacy" aria-pressed="false">Privacy</button>
+      <button class="chip" data-filter="track" data-value="defamation" aria-pressed="false">Defamation</button>
+      <button class="chip" data-filter="track" data-value="bias" aria-pressed="false">Bias</button>
+      <button class="chip" data-filter="track" data-value="contract" aria-pressed="false">Contract/D&amp;O</button>
+      <button class="chip" data-filter="track" data-value="datacenter" aria-pressed="false">Data-center</button>
+      <span class="filter-divider"></span>
+      <span class="filter-label">Where</span>
+      <button class="chip" data-filter="juris" data-value="US" aria-pressed="false">US</button>
+      <button class="chip" data-filter="juris" data-value="EU" aria-pressed="false">EU</button>
+      <button class="chip" data-filter="juris" data-value="UK" aria-pressed="false">UK</button>
+      <button class="filter-clear" id="filterClear">Clear all</button>
+    </div>
+    <div class="case-count" id="caseCount"></div>
+    <div class="case-list" id="caseList"></div>
+  </section>
+
+  <!-- Timeline view -->
+  <section class="view" data-view="timeline">
+    <div class="view-head">
+      <span class="view-eyebrow">Timeline</span>
+      <h1 class="view-title">Filings per month, against the regulatory backdrop.</h1>
+      <p class="view-desc">Stacked area of new filings by claim track, with vertical annotations marking the statutes, executive orders, and rulings that shape the landscape.</p>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline-legend" id="timelineLegend"></div>
+      <svg class="timeline-svg" id="timelineSvg" viewBox="0 0 900 320" preserveAspectRatio="none"></svg>
+    </div>
+  </section>
+
+  <!-- Sources view -->
+  <section class="view" data-view="sources">
+    <div class="view-head">
+      <span class="view-eyebrow">Source Trackers</span>
+      <h1 class="view-title">Who tracks what — and where the primary data lives.</h1>
+      <p class="view-desc">Ratio Iuris synthesizes across these trackers and adds the insurance overlay none of them provide. Each source is a credit and a jumping-off point. Direct ingestion from primary sources (CourtListener, Federal Register, EUR-Lex, Open States) is planned in v1.1.</p>
+    </div>
+    <div class="source-grid" id="sourceGrid"></div>
+  </section>
+
+  <!-- Roadmap view -->
+  <section class="view" data-view="roadmap">
+    <div class="view-head">
+      <span class="view-eyebrow">What's Next</span>
+      <h1 class="view-title">The roadmap, in the open.</h1>
+      <p class="view-desc">Kept visible so clients and colleagues viewing the tool see where it's headed and can push back on priorities. See <code>SPEC.md</code> for the full plan.</p>
+    </div>
+    <p class="roadmap-note">The tonight MVP proves the presentation and the coverage-overlay differentiator. Everything below is scoped work planned in sprints of one to two weeks each.</p>
+    <div class="roadmap-list" id="roadmapList"></div>
+  </section>
+</main>
+
+<div class="modal-scrim" id="modalScrim" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <div class="modal-eyebrow" id="modalEyebrow"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-meta" id="modalMeta"></div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-sources" id="modalSources"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>Ratio Iuris — an MVP tracker for AI litigation, regulation, and insurance coverage. Curated for demonstration; primary sources govern.</p>
+  <p>Editor: lieberknecht@gmail.com · Draft build 2026-08-27</p>
+</footer>
+
+<script id="itemsData" type="application/json">
+[
+  {
+    "id": "nyt-openai",
+    "type": "case",
+    "caption": "The New York Times Co. v. Microsoft Corp. & OpenAI",
+    "court": "S.D.N.Y.",
+    "docket": "1:23-cv-11195",
+    "jurisdiction": "US",
+    "region": "SDNY",
+    "date": "2023-12-27",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "The New York Times Company",
+      "defendant": "Microsoft Corporation; OpenAI, Inc. and affiliates"
+    },
+    "summary": "News publisher alleges systematic infringement of copyrighted articles through unlicensed training of GPT models and verbatim regurgitation in ChatGPT and Bing Chat outputs. Seeks damages, disgorgement, and destruction of models and training sets containing plaintiff's works.",
+    "significance": "The most consequential publisher-vs-model-developer case, watched as a bellwether for whether training on paywalled news is transformative fair use. Repeated MTD denials have kept substantive claims alive; discovery is ongoing.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability", "Cyber (data-collection endorsements)"],
+      "triggers": ["Copyright infringement offense", "Wrongful act", "Content-based personal-injury offenses (e.g., misappropriation of ideas)"],
+      "exclusions": ["IP exclusion (broad or with copyright carve-back)", "Contractual liability", "Prior knowledge / prior acts", "Intentional / knowing conduct"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=%22new+york+times%22+openai&type=r" },
+      { "label": "GWU AI Litigation Database", "url": "https://blogs.gwu.edu/law-eti/ai-litigation-database/" }
+    ]
+  },
+  {
+    "id": "andersen-stability",
+    "type": "case",
+    "caption": "Andersen v. Stability AI Ltd.",
+    "court": "N.D. Cal.",
+    "docket": "3:23-cv-00201",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2023-01-13",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Sarah Andersen and other visual artists (putative class)",
+      "defendant": "Stability AI Ltd.; Midjourney; DeviantArt; Runway"
+    },
+    "summary": "Visual-artist class action over use of works scraped via LAION to train Stable Diffusion and derivative image-generation models. Claims include direct and induced copyright infringement, DMCA §1202 CMI-stripping, and (initially) trade-dress / right-of-publicity theories.",
+    "significance": "First large-scale visual-artist class action against image generators. Court has narrowed but not dismissed core copyright and CMI claims; provides the template most subsequent artist suits follow.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability", "Cyber"],
+      "triggers": ["Copyright infringement offense", "DMCA violation coverage (where affirmatively granted)", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability", "Willful infringement / punitive damages", "Prior acts"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=andersen+stability+ai&type=r" }
+    ]
+  },
+  {
+    "id": "getty-stability",
+    "type": "case",
+    "caption": "Getty Images (US) Inc. v. Stability AI Inc.",
+    "court": "D. Del. (US) + High Court of Justice (UK)",
+    "docket": "1:23-cv-00135 (D. Del.)",
+    "jurisdiction": "US-UK",
+    "region": "DDel",
+    "date": "2023-02-03",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Getty Images (US) Inc.; Getty Images Ltd.",
+      "defendant": "Stability AI Inc.; Stability AI Ltd."
+    },
+    "summary": "Parallel US and UK actions over training of Stable Diffusion on Getty's licensed photo library. US complaint alleges copyright, trademark, and DMCA violations; UK proceedings raise database-rights and passing-off claims. Notable for cross-border strategic posture.",
+    "significance": "Key trans-Atlantic case comparing US fair use to UK/EU database-rights and TDM-exception regimes; directly relevant to any client with training operations spanning both jurisdictions.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability", "IP defense endorsements"],
+      "triggers": ["Copyright infringement offense", "Trademark infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion (varies by carrier)", "Contractual liability", "Extraterritorial coverage territory language", "Foreign-law application"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=getty+stability+ai&type=r" },
+      { "label": "UK judiciary decisions", "url": "https://www.judiciary.uk/judgments/" }
+    ]
+  },
+  {
+    "id": "doe-github",
+    "type": "case",
+    "caption": "Doe v. GitHub, Inc. (Copilot)",
+    "court": "N.D. Cal.",
+    "docket": "4:22-cv-06823",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2022-11-03",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Anonymous open-source developers (putative class)",
+      "defendant": "GitHub, Inc.; Microsoft Corp.; OpenAI"
+    },
+    "summary": "Class action by open-source developers alleging Copilot reproduces licensed code without attribution or license compliance. Claims narrowed by court but DMCA §1202 CMI-stripping theory has proven durable.",
+    "significance": "Leading DMCA §1202 case in the AI-training context. The persistence of the CMI-stripping theory is a significant litigation posture for any model trained on works with author identification embedded.",
+    "insurance": {
+      "lines": ["Tech E&O", "Cyber"],
+      "triggers": ["DMCA / statutory-violation coverage (where granted)", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Statutory damages exclusions", "Contractual liability"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=doe+github+copilot&type=r" }
+    ]
+  },
+  {
+    "id": "authors-guild-openai",
+    "type": "case",
+    "caption": "Authors Guild v. OpenAI Inc.",
+    "court": "S.D.N.Y.",
+    "docket": "1:23-cv-08292",
+    "jurisdiction": "US",
+    "region": "SDNY",
+    "date": "2023-09-19",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Authors Guild; named author plaintiffs (Grisham, Martin, Picoult, and others)",
+      "defendant": "OpenAI, Inc.; Microsoft Corp."
+    },
+    "summary": "Consolidated author class action alleging OpenAI trained GPT models on copyrighted fiction and non-fiction without license. Consolidated with related Silverman v. OpenAI action.",
+    "significance": "Represents the traditional publishing establishment's principal front against generative model training on books. Discovery has probed the composition of training corpora.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability", "Prior acts"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=authors+guild+openai&type=r" }
+    ]
+  },
+  {
+    "id": "concord-anthropic",
+    "type": "case",
+    "caption": "Concord Music Group Inc. v. Anthropic PBC",
+    "court": "M.D. Tenn. (transferred to N.D. Cal.)",
+    "docket": "3:23-cv-01092",
+    "jurisdiction": "US",
+    "region": "MDTN",
+    "date": "2023-10-18",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Concord Music Group; Universal Music Publishing Group; ABKCO Music",
+      "defendant": "Anthropic PBC"
+    },
+    "summary": "Music-publisher suit alleging Claude reproduces copyrighted lyrics verbatim or near-verbatim in outputs. First major suit specifically targeting an AI assistant for lyric reproduction, distinct from music-generation training claims.",
+    "significance": "Notable for the output-side infringement theory (regurgitation) as distinct from training-corpus claims. Result will influence how model providers implement lyric-output filters.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Willful conduct"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=concord+anthropic&type=r" }
+    ]
+  },
+  {
+    "id": "walters-openai",
+    "type": "case",
+    "caption": "Walters v. OpenAI L.L.C.",
+    "court": "Superior Court of Gwinnett County, Georgia",
+    "docket": "23-A-04860-2",
+    "jurisdiction": "US",
+    "region": "GA-state",
+    "date": "2023-06-05",
+    "status": "decided",
+    "tracks": ["defamation"],
+    "trackLabels": ["Defamation & hallucination"],
+    "parties": {
+      "plaintiff": "Mark Walters",
+      "defendant": "OpenAI L.L.C."
+    },
+    "summary": "Radio host sued OpenAI after ChatGPT generated a false summary of a real federal lawsuit fabricating allegations against him. Court granted summary judgment for OpenAI on actual-malice grounds (May 2025), finding no evidence of knowledge of falsity or reckless disregard.",
+    "significance": "First substantive US decision on AI-hallucination defamation. SJ ruling underscores how difficult First Amendment standards make plaintiff success in this posture — a defense-favorable data point for insurers underwriting generative-AI defamation risk.",
+    "insurance": {
+      "lines": ["Media Liability", "Tech E&O", "General Liability (personal-injury offense)"],
+      "triggers": ["Defamation offense", "Trade libel", "Injurious falsehood", "Wrongful act"],
+      "exclusions": ["Intentional / knowing false statements", "Prior publication", "Punitive damages (in some states)"]
+    },
+    "sources": [
+      { "label": "GA court records lookup", "url": "https://www.gwinnettcourts.com/" },
+      { "label": "Damien Charlotin — related hallucinations tracker", "url": "https://www.damiencharlotin.com/hallucinations/" }
+    ]
+  },
+  {
+    "id": "mobley-workday",
+    "type": "case",
+    "caption": "Mobley v. Workday, Inc.",
+    "court": "N.D. Cal.",
+    "docket": "3:23-cv-00770",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2023-02-21",
+    "status": "active",
+    "tracks": ["bias"],
+    "trackLabels": ["Discrimination & algorithmic bias"],
+    "parties": {
+      "plaintiff": "Derek Mobley (putative class)",
+      "defendant": "Workday, Inc."
+    },
+    "summary": "Age, race, and disability discrimination class action against Workday for its AI-driven applicant-screening tools. Court held Workday can be sued as an agent of employers under Title VII, ADA, and ADEA. Class certification granted May 2025.",
+    "significance": "The leading case for vendor liability in algorithmic-hiring discrimination. The vendor-as-agent holding materially expands the target set from employers to HR-tech providers — a fundamental change in loss-exposure for Tech E&O and EPL underwriting.",
+    "insurance": {
+      "lines": ["Tech E&O", "Employment Practices Liability (deployer side)", "D&O"],
+      "triggers": ["Wrongful act", "Employment-practices wrongful act (for deployers)", "Statutory-violation coverage where granted"],
+      "exclusions": ["Bodily injury (broad form)", "Discrimination exclusion in some GL forms", "Contractual liability", "Punitive damages"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=mobley+workday&type=r" },
+      { "label": "EEOC guidance on AI in employment", "url": "https://www.eeoc.gov/ai" }
+    ]
+  },
+  {
+    "id": "thomson-ross",
+    "type": "case",
+    "caption": "Thomson Reuters Enterprise Centre GmbH v. Ross Intelligence Inc.",
+    "court": "D. Del.",
+    "docket": "1:20-cv-00613",
+    "jurisdiction": "US",
+    "region": "DDel",
+    "date": "2020-05-06",
+    "status": "decided",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Thomson Reuters Enterprise Centre GmbH; West Publishing Corp.",
+      "defendant": "Ross Intelligence Inc."
+    },
+    "summary": "Copyright suit over use of Westlaw headnotes to train a legal-research AI. Court granted partial summary judgment for Thomson Reuters (Feb 2025), rejecting Ross's fair-use defense on the core headnotes-copying claim.",
+    "significance": "First substantive US decision squarely holding that training a commercial AI on copyrighted material is not fair use where the model competes with the source. Cited across the AI-training docket as the leading pro-plaintiff precedent to date.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability"]
+    },
+    "sources": [
+      { "label": "CourtListener docket", "url": "https://www.courtlistener.com/?q=thomson+reuters+ross+intelligence&type=r" }
+    ]
+  },
+  {
+    "id": "umg-suno",
+    "type": "case",
+    "caption": "UMG Recordings, Inc. v. Suno, Inc.",
+    "court": "D. Mass.",
+    "docket": "1:24-cv-11611",
+    "jurisdiction": "US",
+    "region": "DMass",
+    "date": "2024-06-24",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "UMG Recordings; Sony Music Entertainment; Warner Records (RIAA coordinated)",
+      "defendant": "Suno, Inc."
+    },
+    "summary": "RIAA-coordinated action alleging Suno trained its music-generation model on copyrighted sound recordings without license. Companion suit (SDNY) against Udio filed same day.",
+    "significance": "Music industry's principal challenge to generative-music model training. Discovery is expected to focus on the composition of training corpora and the extent to which outputs reproduce protected recordings.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability", "Willful infringement"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=umg+suno&type=r" }
+    ]
+  },
+  {
+    "id": "umg-udio",
+    "type": "case",
+    "caption": "UMG Recordings, Inc. v. Uncharted Labs, Inc. (Udio)",
+    "court": "S.D.N.Y.",
+    "docket": "1:24-cv-04777",
+    "jurisdiction": "US",
+    "region": "SDNY",
+    "date": "2024-06-24",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "UMG Recordings; Sony Music Entertainment; Warner Records",
+      "defendant": "Uncharted Labs, Inc. (Udio)"
+    },
+    "summary": "Parallel to the Suno action, targeting Udio's music-generation model on the same training-corpus theories.",
+    "significance": "See UMG v. Suno — parallel forum, same underlying question of whether music-generation training qualifies as fair use.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability", "Willful infringement"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=udio+umg&type=r" }
+    ]
+  },
+  {
+    "id": "dowjones-perplexity",
+    "type": "case",
+    "caption": "Dow Jones & Co. and NYP Holdings v. Perplexity AI, Inc.",
+    "court": "S.D.N.Y.",
+    "docket": "1:24-cv-07984",
+    "jurisdiction": "US",
+    "region": "SDNY",
+    "date": "2024-10-21",
+    "status": "active",
+    "tracks": ["ip"],
+    "trackLabels": ["IP — training data & output"],
+    "parties": {
+      "plaintiff": "Dow Jones & Company; NYP Holdings, Inc.",
+      "defendant": "Perplexity AI, Inc."
+    },
+    "summary": "News-publisher suit against a retrieval-augmented answer engine for copying and displaying copyrighted articles in its user-facing outputs. Squarely tests output-side infringement in RAG contexts.",
+    "significance": "The most consequential RAG-focused publisher suit. Distinct from training-corpus theories, this one turns on live retrieval and rendering — implicating both copyright and hot-news/misappropriation frames.",
+    "insurance": {
+      "lines": ["Tech E&O", "Media Liability"],
+      "triggers": ["Copyright infringement offense", "Misappropriation of ideas offense", "Wrongful act"],
+      "exclusions": ["IP exclusion", "Contractual liability", "Prior publication"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=perplexity+dow+jones&type=r" }
+    ]
+  },
+  {
+    "id": "musk-openai",
+    "type": "case",
+    "caption": "Musk v. Altman (re: OpenAI founding agreement)",
+    "court": "N.D. Cal. (refiled)",
+    "docket": "4:24-cv-04722",
+    "jurisdiction": "US",
+    "region": "NDCA",
+    "date": "2024-08-05",
+    "status": "active",
+    "tracks": ["contract"],
+    "trackLabels": ["Contract, indemnity, IP ownership", "Securities & D&O"],
+    "parties": {
+      "plaintiff": "Elon Musk; xAI; associated affiliates",
+      "defendant": "Samuel Altman; Gregory Brockman; OpenAI, Inc. and affiliates; Microsoft Corp."
+    },
+    "summary": "Federal action alleging breach of OpenAI's founding agreement to develop AGI for humanity, fraud, and RICO-adjacent claims tied to the for-profit conversion. Follows dismissal of an earlier state-court action.",
+    "significance": "The public case for D&O exposure on AI-governance disputes — mission drift, board oversight, disclosure of restructuring. A useful reference exposure when advising boards on AI-governance minutes and disclosures.",
+    "insurance": {
+      "lines": ["D&O", "Tech E&O (indirectly)"],
+      "triggers": ["Wrongful act", "Breach of fiduciary duty", "Misrepresentation"],
+      "exclusions": ["Insured-vs-insured", "Prior acts", "Fraud carve-out (final adjudication)", "Contractual liability"]
+    },
+    "sources": [
+      { "label": "CourtListener docket search", "url": "https://www.courtlistener.com/?q=musk+altman+openai&type=r" }
+    ]
+  },
+  {
+    "id": "mata-avianca",
+    "type": "sanction",
+    "caption": "Mata v. Avianca, Inc. (sanctions for AI-fabricated citations)",
+    "court": "S.D.N.Y.",
+    "docket": "1:22-cv-01461",
+    "jurisdiction": "US",
+    "region": "SDNY",
+    "date": "2023-06-22",
+    "status": "decided",
+    "tracks": ["sanction"],
+    "trackLabels": ["Hallucination sanctions"],
+    "parties": {
+      "plaintiff": "Roberto Mata",
+      "defendant": "Avianca, Inc."
+    },
+    "summary": "Court sanctioned plaintiff's counsel $5,000 for submitting a brief citing six non-existent cases fabricated by ChatGPT. The foundational judicial response to AI-hallucinated citations.",
+    "significance": "The case every subsequent hallucination-sanction opinion cites. Establishes the baseline expectation that Rule 11 duties apply to AI-assisted drafting without qualification.",
+    "insurance": {
+      "lines": ["Lawyers' Professional Liability"],
+      "triggers": ["Wrongful act in the rendition of legal services"],
+      "exclusions": ["Sanctions and fines (often excluded)", "Intentional / knowing conduct", "Loss of licensure"]
+    },
+    "sources": [
+      { "label": "CourtListener opinion", "url": "https://www.courtlistener.com/?q=mata+avianca&type=r" },
+      { "label": "Damien Charlotin — Hallucinations tracker", "url": "https://www.damiencharlotin.com/hallucinations/" }
+    ]
+  },
+  {
+    "id": "park-kim",
+    "type": "sanction",
+    "caption": "Park v. Kim (Second Circuit sanctions referral)",
+    "court": "2d Cir.",
+    "docket": "22-2057",
+    "jurisdiction": "US",
+    "region": "2Cir",
+    "date": "2024-01-30",
+    "status": "decided",
+    "tracks": ["sanction"],
+    "trackLabels": ["Hallucination sanctions"],
+    "parties": {
+      "plaintiff": "Park",
+      "defendant": "Kim"
+    },
+    "summary": "Second Circuit referred plaintiff's counsel to the court's grievance panel after finding an appellate brief cited fabricated authorities generated by ChatGPT. First appellate-level sanction of note.",
+    "significance": "Signals that hallucination sanctions are not confined to trial courts. Appellate exposure raises the professional-liability stakes materially.",
+    "insurance": {
+      "lines": ["Lawyers' Professional Liability"],
+      "triggers": ["Wrongful act in the rendition of legal services"],
+      "exclusions": ["Disciplinary proceedings", "Fines and penalties", "Intentional / knowing conduct"]
+    },
+    "sources": [
+      { "label": "CourtListener search", "url": "https://www.courtlistener.com/?q=park+v+kim+sanctions&type=r" },
+      { "label": "Damien Charlotin — Hallucinations tracker", "url": "https://www.damiencharlotin.com/hallucinations/" }
+    ]
+  },
+  {
+    "id": "wadsworth-walmart",
+    "type": "sanction",
+    "caption": "Wadsworth v. Walmart Inc. (sanctions for AI-fabricated citations)",
+    "court": "D. Wyo.",
+    "docket": "2:23-cv-118",
+    "jurisdiction": "US",
+    "region": "DWy",
+    "date": "2025-02-24",
+    "status": "decided",
+    "tracks": ["sanction"],
+    "trackLabels": ["Hallucination sanctions"],
+    "parties": {
+      "plaintiff": "Wadsworth (individual)",
+      "defendant": "Walmart Inc."
+    },
+    "summary": "District court sanctioned plaintiffs' counsel from a national plaintiffs' firm after motions in limine cited eight non-existent cases generated by an internal AI research tool. Sanctions included fines, revocation of pro hac vice, and referral to the state bar.",
+    "significance": "Notable because the fabricated citations came from a firm's own AI research platform, not a consumer chatbot. Raises E&O-relevant questions about a firm's supervisory obligations for AI tools deployed internally.",
+    "insurance": {
+      "lines": ["Lawyers' Professional Liability", "Tech E&O (of the AI-tool vendor)"],
+      "triggers": ["Wrongful act in the rendition of legal services", "Wrongful act (vendor side)"],
+      "exclusions": ["Sanctions and fines", "Disciplinary proceedings", "Intentional conduct"]
+    },
+    "sources": [
+      { "label": "CourtListener search", "url": "https://www.courtlistener.com/?q=wadsworth+walmart+sanctions&type=r" },
+      { "label": "Damien Charlotin — Hallucinations tracker", "url": "https://www.damiencharlotin.com/hallucinations/" }
+    ]
+  },
+  {
+    "id": "co-ai-act",
+    "type": "regulation",
+    "caption": "Colorado AI Act (SB24-205)",
+    "court": "Colorado General Assembly",
+    "docket": "SB24-205",
+    "jurisdiction": "US",
+    "region": "CO",
+    "date": "2024-05-17",
+    "status": "signed",
+    "tracks": ["bias", "regulation"],
+    "trackLabels": ["Discrimination & algorithmic bias", "Regulation — formal"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "First comprehensive US state AI law imposing duties on developers and deployers of high-risk AI systems to prevent algorithmic discrimination. Effective February 1, 2026 (with ongoing legislative debate about delay).",
+    "significance": "The first US state to enact an EU-AI-Act-style risk-based framework. Establishes duties of care, impact-assessment obligations, and a consumer right to challenge automated decisions.",
+    "insurance": {
+      "lines": ["Tech E&O", "EPL", "D&O"],
+      "triggers": ["Wrongful act", "Statutory-violation coverage where granted", "Employment-practices wrongful act"],
+      "exclusions": ["Statutory penalties / fines", "Intentional non-compliance", "Regulatory action exclusions"]
+    },
+    "sources": [
+      { "label": "Colorado General Assembly — SB24-205", "url": "https://leg.colorado.gov/bills/sb24-205" },
+      { "label": "NCSL AI Legislation Database", "url": "https://www.ncsl.org/financial-services/artificial-intelligence-legislation-database" }
+    ]
+  },
+  {
+    "id": "nyc-ll144",
+    "type": "regulation",
+    "caption": "NYC Local Law 144 — Automated Employment Decision Tools",
+    "court": "New York City Council",
+    "docket": "Int. No. 1894-A / LL 144-2021",
+    "jurisdiction": "US",
+    "region": "NYC",
+    "date": "2023-07-05",
+    "status": "effective",
+    "tracks": ["bias", "regulation"],
+    "trackLabels": ["Discrimination & algorithmic bias", "Regulation — formal"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "First-in-nation bias-audit requirement for employers using AI in hiring within New York City. Requires annual independent bias audits and pre-use candidate notice. Enforcement began July 5, 2023.",
+    "significance": "The template most subsequent US local AEDT laws pull from. Enforcement remains sparse but the notice and audit requirements have driven measurable market shifts among HR-tech vendors.",
+    "insurance": {
+      "lines": ["EPL", "Tech E&O"],
+      "triggers": ["Employment-practices wrongful act", "Wrongful act"],
+      "exclusions": ["Regulatory action", "Statutory penalties", "Punitive damages"]
+    },
+    "sources": [
+      { "label": "NYC DCWP AEDT rules", "url": "https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page" },
+      { "label": "BrightMine AI laws tracker", "url": "https://www.brightmine.com/us/resources/hr-compliance/ai-laws-by-state-and-locality/" }
+    ]
+  },
+  {
+    "id": "eu-ai-act",
+    "type": "regulation",
+    "caption": "EU AI Act (Regulation (EU) 2024/1689)",
+    "court": "European Parliament / Council",
+    "docket": "Reg (EU) 2024/1689",
+    "jurisdiction": "EU",
+    "region": "EU",
+    "date": "2024-08-01",
+    "status": "effective",
+    "tracks": ["bias", "regulation"],
+    "trackLabels": ["Regulation — formal (EU)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Risk-based EU-wide framework governing AI systems, with prohibitions on certain unacceptable-risk uses, extensive obligations for high-risk systems, general-purpose-AI-model duties, and substantial administrative fines. Phased application through 2027 with prohibitions applying from Feb 2025 and GPAI-model obligations from Aug 2025.",
+    "significance": "The centerpiece of global AI regulation. Extraterritorial application to non-EU providers whose systems reach EU users makes this a first-order compliance question for US-headquartered clients with any European touchpoint.",
+    "insurance": {
+      "lines": ["Tech E&O", "D&O", "Regulatory-defense endorsements"],
+      "triggers": ["Wrongful act", "Statutory-defense coverage where granted"],
+      "exclusions": ["Administrative fines / penalties (often excluded)", "Intentional non-compliance", "Territorial coverage limits"]
+    },
+    "sources": [
+      { "label": "EUR-Lex — Regulation (EU) 2024/1689", "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj" }
+    ]
+  },
+  {
+    "id": "trump-eo-ai",
+    "type": "regulation",
+    "caption": "Executive Order 14179 — Removing Barriers to American Leadership in AI",
+    "court": "President of the United States",
+    "docket": "EO 14179",
+    "jurisdiction": "US",
+    "region": "Federal",
+    "date": "2025-01-23",
+    "status": "effective",
+    "tracks": ["regulation"],
+    "trackLabels": ["Regulation — formal (US federal)"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Rescinded Executive Order 14110 (Biden AI Safety EO of Oct 2023) and directed a whole-of-government review of AI-related regulations to remove barriers to US AI dominance. Follow-on OMB and agency guidance materially reshapes the federal AI-governance posture.",
+    "significance": "The pivotal recent federal-policy reset. Every prior enterprise AI-governance program built to align with EO 14110 requires re-anchoring; carriers offering regulatory-defense endorsements are adjusting posture accordingly.",
+    "insurance": {
+      "lines": ["Regulatory-defense endorsements", "D&O"],
+      "triggers": ["Regulatory-action defense coverage where granted"],
+      "exclusions": ["Governmental action exclusions in some forms", "Fines and penalties"]
+    },
+    "sources": [
+      { "label": "White House / Federal Register", "url": "https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence" }
+    ]
+  },
+  {
+    "id": "bipa-sb2979",
+    "type": "regulation",
+    "caption": "Illinois BIPA Amendment (SB 2979) — per-scan damages limitation",
+    "court": "Illinois General Assembly",
+    "docket": "SB 2979",
+    "jurisdiction": "US",
+    "region": "IL",
+    "date": "2024-08-02",
+    "status": "signed",
+    "tracks": ["privacy", "regulation"],
+    "trackLabels": ["Privacy & biometrics", "Regulation — formal"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "Amended BIPA to clarify that a single violation of §15(b) or §15(d) yields one recovery per person per practice, not one per scan. Directly responds to Cothron v. White Castle and reshapes damages exposure in biometric class actions, including those against voice- and face-based AI systems.",
+    "significance": "Materially reduces the extreme statutory-damages ceilings that had driven BIPA settlements. Reshapes the loss-modeling for any AI system processing biometric identifiers of Illinois residents.",
+    "insurance": {
+      "lines": ["Cyber", "Tech E&O", "EPL", "General Liability"],
+      "triggers": ["Statutory-violation coverage where granted", "Wrongful act", "Personal-injury offense (privacy prong)"],
+      "exclusions": ["Statutory penalties / uninsurable damages", "BIPA-specific exclusions many carriers now file", "Prior acts"]
+    },
+    "sources": [
+      { "label": "Illinois General Assembly — SB 2979", "url": "https://www.ilga.gov/legislation/BillStatus.asp?DocNum=2979&GAID=17&SessionID=112&GA=103" }
+    ]
+  },
+  {
+    "id": "nist-ai-rmf-gai",
+    "type": "regulation",
+    "caption": "NIST AI RMF — Generative AI Profile (NIST-AI-600-1)",
+    "court": "NIST",
+    "docket": "NIST-AI-600-1",
+    "jurisdiction": "US",
+    "region": "Federal",
+    "date": "2024-07-26",
+    "status": "effective",
+    "tracks": ["regulation"],
+    "trackLabels": ["Standards & self-regulation"],
+    "parties": {
+      "plaintiff": "—",
+      "defendant": "—"
+    },
+    "summary": "NIST's Generative AI Profile of the AI Risk Management Framework identifies 12 risks unique to or amplified by generative AI and maps them to concrete governance actions. Non-binding but widely cited as the reasonable-care benchmark in emerging litigation and by insurers underwriting Tech E&O for AI providers.",
+    "significance": "Increasingly the go-to standard-of-care reference when defense counsel need to show a client took reasonable AI-governance steps. Expect to see it cited affirmatively in MTD briefing on negligence-based AI claims.",
+    "insurance": {
+      "lines": ["Tech E&O (underwriting reference)", "D&O (governance benchmark)"],
+      "triggers": ["—"],
+      "exclusions": ["—"]
+    },
+    "sources": [
+      { "label": "NIST AI RMF Generative AI Profile", "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" }
+    ]
+  },
+  {
+    "id": "pwc-digital-gateway",
+    "type": "datacenter",
+    "caption": "Prince William County — PW Digital Gateway rezoning litigation",
+    "court": "Prince William County Circuit Court (Va.)",
+    "docket": "Multiple filings",
+    "jurisdiction": "US",
+    "region": "VA",
+    "date": "2023-12-12",
+    "status": "ongoing",
+    "tracks": ["datacenter"],
+    "trackLabels": ["Data centers — environmental & land use"],
+    "parties": {
+      "plaintiff": "Neighborhood coalitions; Piedmont Environmental Council",
+      "defendant": "Prince William County Board of Supervisors; developers"
+    },
+    "summary": "Multiple citizen-suit challenges to the Dec 2023 rezoning approving the 2,100-acre PW Digital Gateway data-center corridor abutting the Manassas National Battlefield. Claims include procedural (open-meeting) violations and Chesapeake Bay Act compliance failures.",
+    "significance": "The leading US example of organized community opposition to hyperscale-data-center land-use approvals. Playbook of procedural, environmental, and cultural-resource claims is being replicated in other Virginia and Ohio hotspot counties.",
+    "insurance": {
+      "lines": ["AEC Professional Liability", "Environmental / Contractors Pollution", "Public-Officials Liability (for the county)"],
+      "triggers": ["Wrongful act in the rendition of professional services", "Pollution condition (where scheduled)", "Governmental-body wrongful act"],
+      "exclusions": ["Land-use / zoning exclusions in some AEC forms", "Punitive damages", "Prior knowledge"]
+    },
+    "sources": [
+      { "label": "datacentertracker.org", "url": "https://datacentertracker.org/" },
+      { "label": "ChatGPTIsEatingTheWorld — DC lawsuits tracker", "url": "https://chatgptiseatingtheworld.com/ai-data-center-bans-lawsuits-tracker/" }
+    ]
+  },
+  {
+    "id": "chesterton-in-dc",
+    "type": "datacenter",
+    "caption": "Chesterton, Indiana — data-center referendum & opposition",
+    "court": "Porter County / Indiana state courts",
+    "docket": "Various",
+    "jurisdiction": "US",
+    "region": "IN",
+    "date": "2024-06-01",
+    "status": "ongoing",
+    "tracks": ["datacenter"],
+    "trackLabels": ["Data centers — environmental & land use"],
+    "parties": {
+      "plaintiff": "Residents' groups; local coalitions",
+      "defendant": "Town of Chesterton; developer entities"
+    },
+    "summary": "Public opposition to proposed hyperscale data-center developments in Chesterton and adjacent Porter County jurisdictions. Includes a referendum-effort track, TIF-district challenges, and open-meetings act filings.",
+    "significance": "Representative of the Midwest wave of DC-opposition litigation now following the pattern established in Virginia. Watch for procedural claims to develop into environmental (water and power) claims as facilities move to operational stage.",
+    "insurance": {
+      "lines": ["AEC Professional Liability", "Public-Officials Liability", "Environmental"],
+      "triggers": ["Wrongful act", "Pollution condition", "Governmental-body wrongful act"],
+      "exclusions": ["Land-use / zoning exclusions", "Fines and penalties"]
+    },
+    "sources": [
+      { "label": "datacentertracker.org", "url": "https://datacentertracker.org/" },
+      { "label": "ChatGPTIsEatingTheWorld — DC lawsuits tracker", "url": "https://chatgptiseatingtheworld.com/ai-data-center-bans-lawsuits-tracker/" }
+    ]
+  },
+  {
+    "id": "peculiar-mo-dc",
+    "type": "datacenter",
+    "caption": "Peculiar, Missouri — Diode Ventures/Google data-center opposition",
+    "court": "Cass County / Missouri state courts",
+    "docket": "Various",
+    "jurisdiction": "US",
+    "region": "MO",
+    "date": "2024-09-01",
+    "status": "ongoing",
+    "tracks": ["datacenter"],
+    "trackLabels": ["Data centers — environmental & land use"],
+    "parties": {
+      "plaintiff": "Peculiar residents and adjoining property owners",
+      "defendant": "City of Peculiar; developer entities"
+    },
+    "summary": "Community opposition to a hyperscale data-center campus in Peculiar, focused on water withdrawal from strained regional supplies, grid-load impacts, and rezoning process concerns.",
+    "significance": "One of several Midwest and Great Plains sites where the water-use dimension is dominant in opposition. Expect utility rate-case and interconnection challenges to follow as operational demand ramps.",
+    "insurance": {
+      "lines": ["AEC Professional Liability", "Environmental", "Utility & energy lines"],
+      "triggers": ["Wrongful act", "Pollution condition", "Utility interconnection dispute coverage"],
+      "exclusions": ["Water-use exclusions in some environmental forms", "Land-use exclusions", "Utility-regulatory action"]
+    },
+    "sources": [
+      { "label": "datacentertracker.org", "url": "https://datacentertracker.org/" },
+      { "label": "ChatGPTIsEatingTheWorld — DC lawsuits tracker", "url": "https://chatgptiseatingtheworld.com/ai-data-center-bans-lawsuits-tracker/" }
+    ]
+  }
+]
+</script>
+
+<script id="pulseData" type="application/json">
+[
+  { "itemId": "thomson-ross", "why": "The first substantive US decision rejecting fair use for AI training on a competing corpus. Most-cited pro-plaintiff data point in the training-data docket." },
+  { "itemId": "mobley-workday", "why": "Class cert granted May 2025. The vendor-as-agent holding materially widens the target set from employers to HR-tech providers — a fundamental EPL and Tech E&O exposure shift." },
+  { "itemId": "trump-eo-ai", "why": "Rescinds EO 14110 and reorients federal AI-governance posture. Every enterprise program built to align with the prior EO needs re-anchoring." },
+  { "itemId": "walters-openai", "why": "First substantive US decision on generative-AI defamation. Summary judgment for OpenAI on actual-malice grounds — a defense-favorable data point for insurers." },
+  { "itemId": "dowjones-perplexity", "why": "The most consequential RAG-focused publisher suit. Tests output-side copyright infringement in live retrieval — distinct question from training-corpus theories." },
+  { "itemId": "bipa-sb2979", "why": "Damages-model reset for voice- and face-based AI systems reaching Illinois residents. Materially lowers BIPA-driven loss ceilings for downstream deployers." },
+  { "itemId": "pwc-digital-gateway", "why": "The template community-opposition suit for hyperscale data-center land-use. Playbook is being replicated across Virginia, Ohio, Indiana, and Missouri hotspots." }
+]
+</script>
+
+<script id="annotationsData" type="application/json">
+[
+  { "date": "2023-06-22", "label": "Mata v. Avianca sanctions" },
+  { "date": "2023-07-05", "label": "NYC LL 144 effective" },
+  { "date": "2023-10-30", "label": "Biden AI EO 14110" },
+  { "date": "2024-05-17", "label": "Colorado AI Act signed" },
+  { "date": "2024-08-01", "label": "EU AI Act in force" },
+  { "date": "2025-01-23", "label": "Trump AI EO 14179" },
+  { "date": "2025-02-24", "label": "Thomson Reuters SJ on training" }
+]
+</script>
+
+<script id="sourcesData" type="application/json">
+[
+  {
+    "name": "GWU Ethical Tech Initiative — AI Litigation Database",
+    "url": "https://blogs.gwu.edu/law-eti/ai-litigation-database/",
+    "desc": "Academic tracker of US AI-related lawsuits, curated by the Ethical Tech Initiative at GW Law. Broad coverage of foundational cases with case-page write-ups.",
+    "slice": "US AI litigation, broad",
+    "format": "Web + PDF"
+  },
+  {
+    "name": "Damien Charlotin — Hallucinations",
+    "url": "https://www.damiencharlotin.com/hallucinations/",
+    "desc": "Global tracker of court sanctions and referrals arising from AI-generated fake citations. The definitive source for hallucination-sanction data points.",
+    "slice": "AI-hallucination sanctions (global)",
+    "format": "Structured table"
+  },
+  {
+    "name": "Orrick — AI Law Center",
+    "url": "https://ai-law-center.orrick.com/",
+    "desc": "Orrick's AI law tracker and resource hub covering litigation, regulation, and enforcement developments. Firm perspective, high-quality synthesis.",
+    "slice": "AI law, broad, US + EU + UK",
+    "format": "Article-driven tracker"
+  },
+  {
+    "name": "NCSL — AI Legislation Database",
+    "url": "https://www.ncsl.org/financial-services/artificial-intelligence-legislation-database",
+    "desc": "National Conference of State Legislatures' comprehensive tracker of introduced and enacted AI legislation across all 50 states, DC, and Puerto Rico.",
+    "slice": "US state AI legislation",
+    "format": "Structured, filterable"
+  },
+  {
+    "name": "Troutman Pepper — State AI Law Tracker",
+    "url": "https://www.troutman.com/state-artificial-intelligence-law-tracker/",
+    "desc": "Firm tracker of enacted state AI laws with plain-language summaries and effective dates.",
+    "slice": "US state AI laws — enacted",
+    "format": "Article/tracker"
+  },
+  {
+    "name": "BrightMine — AI Laws by State and Locality",
+    "url": "https://www.brightmine.com/us/resources/hr-compliance/ai-laws-by-state-and-locality/",
+    "desc": "HR-compliance-oriented tracker of state and local AI laws affecting employment. Especially useful for EPL and Tech E&O underwriting on HR-tech.",
+    "slice": "US HR-related AI laws",
+    "format": "Structured HR resource"
+  },
+  {
+    "name": "Data Center Tracker (datacentertracker.org)",
+    "url": "https://datacentertracker.org/",
+    "desc": "Public map and dataset of proposed, approved, and operational hyperscale data-center projects across the US, with permitting and community-response signals.",
+    "slice": "US data-center projects",
+    "format": "Map + database"
+  },
+  {
+    "name": "Data Center Tracker — Legislation",
+    "url": "https://datacentertracker.org/legislation",
+    "desc": "State-by-state tracker of data-center-specific legislation covering tax incentives, moratoria, water- and power-use restrictions.",
+    "slice": "US data-center legislation",
+    "format": "Structured table"
+  },
+  {
+    "name": "ChatGPTIsEatingTheWorld — AI DC Bans & Lawsuits",
+    "url": "https://chatgptiseatingtheworld.com/ai-data-center-bans-lawsuits-tracker/",
+    "desc": "Franklin Graves' tracker of data-center bans, moratoria, and community lawsuits — the most current source on organized opposition litigation.",
+    "slice": "US data-center opposition",
+    "format": "List with source links"
+  },
+  {
+    "name": "ChatGPTIsEatingTheWorld (main)",
+    "url": "https://chatgptiseatingtheworld.com/",
+    "desc": "Franklin Graves' newsletter and blog on AI legal developments — one of the most useful signal sources for what's about to matter.",
+    "slice": "AI legal developments, US-focused",
+    "format": "Blog / newsletter"
+  }
+]
+</script>
+
+<script id="roadmapData" type="application/json">
+[
+  { "when": "Sprint 1", "title": "Foundation & The Pulse (v1)", "desc": "Real backend, admin UI for case entry, single-user auth, imports from CourtListener and EDGAR, Pulse with manual top-5 curation, priority-track backfill from post-ChatGPT era." },
+  { "when": "Sprint 2", "title": "Insurance layer & Timeline", "desc": "Full Timeline view, Case File drill-down, insurance-analysis fields wired into the schema (line + trigger + exclusion), Regulation entity, shareable read-only URLs." },
+  { "when": "MVP →", "title": "First usable version", "desc": "End of Sprint 2 is the true daily-use MVP: enter cases, see trends, drill in, share filtered views with clients." },
+  { "when": "Sprint 3", "title": "The Flow & The Atlas", "desc": "Custom D3 Sankey (claim → industry → coverage line → trigger → exclusion) and choropleth (US states + UK/EU countries with layer toggles for filing density, funded AI companies, hyperscale DC locations, AI-legislation status)." },
+  { "when": "Sprint 4", "title": "Intelligence layer", "desc": "Algorithmic anomaly detection (filing-velocity spikes, first-of-kind theories, plaintiff-firm expansion), LLM-drafted Pulse narrative with human-in-the-loop editing, corporate-signal ingestion (funding, M&A, 10-K risk-factor changes)." },
+  { "when": "v1.2+", "title": "SERFF filings ingestion", "desc": "Cross-state tracker of insurer form and rate filings on AI exclusions, endorsements, and rates. Cross-linked into The Flow so litigation activity in a state pairs with subsequent insurer wording responses. Deferred because state-by-state variation, PDF-heavy formats, and weak APIs make it expensive to build well; highest single differentiator for a policy-wording practice once built." },
+  { "when": "v1.2+", "title": "Judge-level analytics", "desc": "Motion-outcome rollups by judge for venue-selection intelligence and defense-strategy pattern-finding. Depends on rigorous motion-outcome tagging in the case corpus — benefits from waiting until the corpus is thicker." },
+  { "when": "v1.3+", "title": "The Network graph", "desc": "Force-directed graph of plaintiff firms ↔ defendants ↔ theories ↔ judges. High analytic value; better designed after v1 use reveals which relationships you actually care about." },
+  { "when": "v2", "title": "Weekly briefing & client exports", "desc": "Automated Monday digest email; client-shareable branded PDF exports of filtered slices; public-facing microsite for thought leadership; multi-user shared team space with role-based permissions." }
+]
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Theme toggle ----------
+  var themeToggle = document.getElementById('themeToggle');
+  function currentTheme() {
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if (explicit) return explicit;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  themeToggle.addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('ri.theme', next); } catch (e) { /* ignore */ }
+    renderTimeline(); // re-render for stroke/fill colors
+  });
+  try {
+    var stored = localStorage.getItem('ri.theme');
+    if (stored === 'dark' || stored === 'light') {
+      document.documentElement.setAttribute('data-theme', stored);
+    }
+  } catch (e) { /* ignore */ }
+
+  // ---------- Data ----------
+  var items = JSON.parse(document.getElementById('itemsData').textContent);
+  var pulse = JSON.parse(document.getElementById('pulseData').textContent);
+  var annotations = JSON.parse(document.getElementById('annotationsData').textContent);
+  var sources = JSON.parse(document.getElementById('sourcesData').textContent);
+  var roadmap = JSON.parse(document.getElementById('roadmapData').textContent);
+  var itemsById = {};
+  items.forEach(function (it) { itemsById[it.id] = it; });
+
+  document.getElementById('itemsCount').textContent = items.length;
+
+  // ---------- View switching ----------
+  var tabnav = document.getElementById('tabnav');
+  tabnav.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-view]');
+    if (!btn) return;
+    var view = btn.getAttribute('data-view');
+    Array.prototype.forEach.call(tabnav.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.view'), function (v) {
+      v.setAttribute('data-active', v.getAttribute('data-view') === view ? 'true' : 'false');
+    });
+    if (view === 'timeline') renderTimeline();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  });
+
+  // ---------- Format helpers ----------
+  function fmtDate(d) {
+    if (!d) return '';
+    var parts = d.split('-');
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[parseInt(parts[1], 10) - 1] + ' ' + parseInt(parts[2], 10) + ', ' + parts[0];
+  }
+  function typeLabel(t) {
+    switch (t) {
+      case 'case': return 'Litigation';
+      case 'sanction': return 'Sanction';
+      case 'regulation': return 'Regulation';
+      case 'datacenter': return 'Data-center';
+      default: return t;
+    }
+  }
+  function typeClass(t) {
+    return 'type-' + t;
+  }
+
+  // ---------- Pulse ----------
+  var pulseList = document.getElementById('pulseList');
+  pulse.forEach(function (p, i) {
+    var it = itemsById[p.itemId];
+    if (!it) return;
+    var li = document.createElement('li');
+    li.className = 'pulse-item';
+    li.innerHTML =
+      '<div class="pulse-num tabular">' + String(i + 1).padStart(2, '0') + '</div>' +
+      '<div class="pulse-body">' +
+        '<h3><button class="link-button" data-open-id="' + it.id + '">' + escapeHtml(it.caption) + '</button></h3>' +
+        '<p class="pulse-why">' + escapeHtml(p.why) + '</p>' +
+        '<div class="pulse-meta">' +
+          '<span class="mono">' + escapeHtml(it.court) + '</span>' +
+          '<span class="dot">·</span>' +
+          '<span class="mono">' + fmtDate(it.date) + '</span>' +
+          '<span class="dot">·</span>' +
+          '<span>' + typeLabel(it.type) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pulse-source">' +
+        (it.sources && it.sources[0] ? '<a href="' + escapeAttr(it.sources[0].url) + '" target="_blank" rel="noopener">Primary source ↗</a>' : '') +
+      '</div>';
+    pulseList.appendChild(li);
+  });
+
+  // ---------- Cases (filters + list) ----------
+  var filters = { type: new Set(), track: new Set(), juris: new Set() };
+  var filterBar = document.getElementById('filterBar');
+  filterBar.addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    var kind = chip.getAttribute('data-filter');
+    var val = chip.getAttribute('data-value');
+    var set = filters[kind];
+    if (set.has(val)) { set.delete(val); chip.setAttribute('aria-pressed', 'false'); }
+    else { set.add(val); chip.setAttribute('aria-pressed', 'true'); }
+    renderCases();
+  });
+  document.getElementById('filterClear').addEventListener('click', function () {
+    Object.keys(filters).forEach(function (k) { filters[k].clear(); });
+    Array.prototype.forEach.call(filterBar.querySelectorAll('.chip'), function (c) { c.setAttribute('aria-pressed', 'false'); });
+    renderCases();
+  });
+
+  function matchJuris(itemJuris, filterJuris) {
+    if (filterJuris === 'US') return itemJuris === 'US' || itemJuris === 'US-UK';
+    if (filterJuris === 'UK') return itemJuris === 'UK' || itemJuris === 'US-UK';
+    if (filterJuris === 'EU') return itemJuris === 'EU';
+    return false;
+  }
+
+  var caseList = document.getElementById('caseList');
+  var caseCount = document.getElementById('caseCount');
+  function renderCases() {
+    var filtered = items.filter(function (it) {
+      if (filters.type.size && !filters.type.has(it.type)) return false;
+      if (filters.track.size) {
+        var any = false;
+        it.tracks.forEach(function (t) { if (filters.track.has(t)) any = true; });
+        if (!any) return false;
+      }
+      if (filters.juris.size) {
+        var anyJ = false;
+        filters.juris.forEach(function (j) { if (matchJuris(it.jurisdiction, j)) anyJ = true; });
+        if (!anyJ) return false;
+      }
+      return true;
+    });
+    // Sort: most recent first
+    filtered.sort(function (a, b) { return b.date.localeCompare(a.date); });
+
+    caseCount.textContent = filtered.length === items.length
+      ? filtered.length + ' items in the tracker'
+      : 'Showing ' + filtered.length + ' of ' + items.length + ' items';
+
+    caseList.innerHTML = '';
+    filtered.forEach(function (it) {
+      var card = document.createElement('div');
+      card.className = 'case-card';
+      card.setAttribute('data-open-id', it.id);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      var trackPills = it.trackLabels.map(function (label, i) {
+        return '<span class="track-pill ' + typeClass(it.type) + '">' + escapeHtml(label) + '</span>';
+      }).join('');
+      card.innerHTML =
+        '<div class="case-caption">' + escapeHtml(it.caption) + '</div>' +
+        '<div class="case-status status-' + it.status + '">' + it.status + '</div>' +
+        '<div class="case-meta">' +
+          '<span>' + typeLabel(it.type) + '</span>' +
+          '<span class="dot">·</span>' +
+          '<span class="mono">' + escapeHtml(it.court) + '</span>' +
+          (it.docket ? '<span class="dot">·</span><span class="mono">' + escapeHtml(it.docket) + '</span>' : '') +
+          '<span class="dot">·</span>' +
+          '<span class="mono">' + fmtDate(it.date) + '</span>' +
+        '</div>' +
+        '<div class="case-tracks">' + trackPills + '</div>';
+      caseList.appendChild(card);
+    });
+  }
+  renderCases();
+
+  // ---------- Modal (Case File) ----------
+  var scrim = document.getElementById('modalScrim');
+  var modal = document.getElementById('modal');
+  var modalClose = document.getElementById('modalClose');
+  function openModal(id) {
+    var it = itemsById[id];
+    if (!it) return;
+    document.getElementById('modalEyebrow').innerHTML =
+      '<span class="track-pill ' + typeClass(it.type) + '">' + typeLabel(it.type) + '</span>' +
+      '<span>' + escapeHtml(it.court) + (it.docket ? ' · ' + escapeHtml(it.docket) : '') + '</span>';
+    document.getElementById('modalTitle').textContent = it.caption;
+    document.getElementById('modalMeta').innerHTML =
+      '<span><strong>Filed / effective:</strong> ' + fmtDate(it.date) + '</span>' +
+      '<span><strong>Jurisdiction:</strong> ' + escapeHtml(it.jurisdiction) + ' · ' + escapeHtml(it.region || '') + '</span>' +
+      '<span><strong>Status:</strong> ' + escapeHtml(it.status) + '</span>';
+    var body = document.getElementById('modalBody');
+    body.innerHTML = '';
+    body.appendChild(section('Summary', '<p>' + escapeHtml(it.summary) + '</p>'));
+    if (it.significance) body.appendChild(section('Why it matters', '<p>' + escapeHtml(it.significance) + '</p>'));
+    if (it.parties && (it.parties.plaintiff || it.parties.defendant)) {
+      var partiesHtml = '<ul>';
+      if (it.parties.plaintiff && it.parties.plaintiff !== '—') partiesHtml += '<li><strong>Plaintiff / petitioner:</strong> ' + escapeHtml(it.parties.plaintiff) + '</li>';
+      if (it.parties.defendant && it.parties.defendant !== '—') partiesHtml += '<li><strong>Defendant / respondent:</strong> ' + escapeHtml(it.parties.defendant) + '</li>';
+      partiesHtml += '</ul>';
+      body.appendChild(section('Parties', partiesHtml));
+    }
+    if (it.insurance) {
+      var ins = it.insurance;
+      var insHtml = '<div class="insurance-block">' +
+        insRow('Lines', ins.lines) +
+        insRow('Likely triggers', ins.triggers) +
+        insRow('Exclusions in play', ins.exclusions) +
+        '</div>';
+      body.appendChild(section('Insurance analysis (preliminary)', insHtml));
+    }
+    var sourcesEl = document.getElementById('modalSources');
+    sourcesEl.innerHTML = '<span class="label">Sources</span>' + (it.sources || []).map(function (s) {
+      return '<a href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener">' + escapeHtml(s.label) + ' ↗</a>';
+    }).join(' · ');
+    scrim.setAttribute('data-open', 'true');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+  function insRow(label, values) {
+    if (!values || !values.length || (values.length === 1 && values[0] === '—')) return '';
+    var tags = values.map(function (v) { return '<span class="tag">' + escapeHtml(v) + '</span>'; }).join('');
+    return '<div class="insurance-row"><div class="label">' + label + '</div><div class="value">' + tags + '</div></div>';
+  }
+  function section(title, html) {
+    var s = document.createElement('div');
+    s.className = 'modal-section';
+    s.innerHTML = '<h4>' + title + '</h4>' + html;
+    return s;
+  }
+  function closeModal() {
+    scrim.setAttribute('data-open', 'false');
+    document.body.style.overflow = '';
+  }
+  modalClose.addEventListener('click', closeModal);
+  scrim.addEventListener('click', function (e) { if (e.target === scrim) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && scrim.getAttribute('data-open') === 'true') closeModal(); });
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-open-id]');
+    if (el) {
+      var id = el.getAttribute('data-open-id');
+      openModal(id);
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      var el = e.target.closest('[data-open-id]');
+      if (el && el.classList.contains('case-card')) {
+        e.preventDefault();
+        openModal(el.getAttribute('data-open-id'));
+      }
+    }
+  });
+
+  // ---------- Timeline ----------
+  var TRACK_COLORS_LIGHT = { ip: '#a83a2c', privacy: '#3a6a7a', bias: '#b57a15', defamation: '#5a7a3a', contract: '#6f4a8a', datacenter: '#8a3f36', sanction: '#5a544a', regulation: '#3a6a7a' };
+  var TRACK_COLORS_DARK  = { ip: '#e08878', privacy: '#7ab4c8', bias: '#e0a04a', defamation: '#a8c67c', contract: '#b39ad0', datacenter: '#d47264', sanction: '#a8a196', regulation: '#7ab4c8' };
+  function palette() { return currentTheme() === 'dark' ? TRACK_COLORS_DARK : TRACK_COLORS_LIGHT; }
+
+  function renderTimeline() {
+    var svg = document.getElementById('timelineSvg');
+    var legend = document.getElementById('timelineLegend');
+    var colors = palette();
+
+    // Bucket by month per top track (litigation-facing tracks)
+    var trackOrder = ['ip', 'privacy', 'bias', 'defamation', 'contract', 'datacenter', 'sanction'];
+    var trackNames = { ip: 'IP', privacy: 'Privacy', bias: 'Bias', defamation: 'Defamation', contract: 'Contract/D&O', datacenter: 'Data-center', sanction: 'Sanctions', regulation: 'Regulation' };
+
+    // Determine month range from data
+    var dates = items.map(function (it) { return it.date; }).filter(Boolean).sort();
+    if (!dates.length) return;
+    var start = new Date(dates[0]);
+    start.setUTCDate(1);
+    var end = new Date(dates[dates.length - 1]);
+    end.setUTCDate(1);
+    // Extend one month
+    end.setUTCMonth(end.getUTCMonth() + 1);
+
+    var months = [];
+    var d = new Date(start);
+    while (d <= end) {
+      months.push(d.toISOString().slice(0, 7));
+      d.setUTCMonth(d.getUTCMonth() + 1);
+    }
+
+    // Init buckets
+    var buckets = {};
+    trackOrder.forEach(function (t) { buckets[t] = {}; months.forEach(function (m) { buckets[t][m] = 0; }); });
+
+    items.forEach(function (it) {
+      // Skip pure regulations from the stacked series; they're annotations
+      if (it.type === 'regulation') return;
+      var m = it.date.slice(0, 7);
+      // Pick a primary track for this item
+      var primary = it.tracks[0];
+      // Special case: sanction type overrides
+      if (it.type === 'sanction') primary = 'sanction';
+      if (it.type === 'datacenter') primary = 'datacenter';
+      if (!buckets[primary]) primary = 'ip';
+      buckets[primary][m] = (buckets[primary][m] || 0) + 1;
+    });
+
+    // SVG geometry
+    var W = 900, H = 320;
+    var padL = 40, padR = 20, padT = 30, padB = 40;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+    var xStep = plotW / Math.max(1, months.length - 1);
+
+    // Compute stacked max
+    var stackedTotals = months.map(function (m) {
+      return trackOrder.reduce(function (s, t) { return s + (buckets[t][m] || 0); }, 0);
+    });
+    var yMax = Math.max(3, Math.max.apply(null, stackedTotals));
+    // Round yMax up to nearest even
+    if (yMax % 2 !== 0) yMax += 1;
+
+    function x(i) { return padL + i * xStep; }
+    function y(v) { return padT + plotH - (v / yMax) * plotH; }
+
+    var svgNS = 'http://www.w3.org/2000/svg';
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // Grid
+    var gridGroup = document.createElementNS(svgNS, 'g');
+    gridGroup.setAttribute('class', 'timeline-grid');
+    for (var g = 0; g <= 4; g++) {
+      var gv = (yMax * g) / 4;
+      var line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', padL); line.setAttribute('x2', W - padR);
+      line.setAttribute('y1', y(gv)); line.setAttribute('y2', y(gv));
+      gridGroup.appendChild(line);
+    }
+    svg.appendChild(gridGroup);
+
+    // Stacked areas (paint each track as a filled area based on cumulative baseline)
+    var baseline = months.map(function () { return 0; });
+    trackOrder.forEach(function (t) {
+      var vals = months.map(function (m) { return buckets[t][m] || 0; });
+      var topPts = vals.map(function (v, i) { return { x: x(i), y: y(baseline[i] + v) }; });
+      var basePts = vals.map(function (v, i) { return { x: x(i), y: y(baseline[i]) }; }).reverse();
+      var allPts = topPts.concat(basePts);
+      var pathD = 'M ' + allPts.map(function (p) { return p.x.toFixed(1) + ' ' + p.y.toFixed(1); }).join(' L ') + ' Z';
+      var path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', pathD);
+      path.setAttribute('fill', colors[t]);
+      path.setAttribute('opacity', '0.72');
+      path.setAttribute('stroke', colors[t]);
+      path.setAttribute('stroke-width', '0.5');
+      svg.appendChild(path);
+      baseline = baseline.map(function (b, i) { return b + vals[i]; });
+    });
+
+    // Axis
+    var axisGroup = document.createElementNS(svgNS, 'g');
+    axisGroup.setAttribute('class', 'timeline-axis');
+    // X axis - years only, since months would be dense
+    var years = {};
+    months.forEach(function (m, i) {
+      var y_ = m.slice(0, 4);
+      if (!(y_ in years)) years[y_] = i;
+    });
+    Object.keys(years).forEach(function (yr) {
+      var i = years[yr];
+      var txt = document.createElementNS(svgNS, 'text');
+      txt.setAttribute('x', x(i));
+      txt.setAttribute('y', H - padB + 16);
+      txt.setAttribute('text-anchor', 'start');
+      txt.textContent = yr;
+      axisGroup.appendChild(txt);
+    });
+    // Y axis
+    for (var yi = 0; yi <= 4; yi++) {
+      var yv = (yMax * yi) / 4;
+      var yt = document.createElementNS(svgNS, 'text');
+      yt.setAttribute('x', padL - 6);
+      yt.setAttribute('y', y(yv) + 3);
+      yt.setAttribute('text-anchor', 'end');
+      yt.textContent = Math.round(yv);
+      axisGroup.appendChild(yt);
+    }
+    svg.appendChild(axisGroup);
+
+    // Annotations
+    annotations.forEach(function (a) {
+      var idx = months.indexOf(a.date.slice(0, 7));
+      if (idx < 0) return;
+      var ax = x(idx);
+      var line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('class', 'timeline-annotation-line');
+      line.setAttribute('x1', ax); line.setAttribute('x2', ax);
+      line.setAttribute('y1', padT - 8); line.setAttribute('y2', padT + plotH);
+      svg.appendChild(line);
+      var mark = document.createElementNS(svgNS, 'circle');
+      mark.setAttribute('class', 'timeline-annotation-marker');
+      mark.setAttribute('cx', ax); mark.setAttribute('cy', padT - 8); mark.setAttribute('r', 3);
+      svg.appendChild(mark);
+      var lbl = document.createElementNS(svgNS, 'text');
+      lbl.setAttribute('class', 'timeline-annotation-label');
+      lbl.setAttribute('x', ax + 4);
+      lbl.setAttribute('y', padT - 12);
+      lbl.setAttribute('transform', 'rotate(-14 ' + (ax + 4) + ' ' + (padT - 12) + ')');
+      lbl.textContent = a.label;
+      svg.appendChild(lbl);
+    });
+
+    // Legend
+    legend.innerHTML = trackOrder.map(function (t) {
+      return '<span class="legend-item"><span class="legend-swatch" style="background:' + colors[t] + '"></span>' + trackNames[t] + '</span>';
+    }).join('') + '<span class="legend-item"><span class="legend-swatch" style="background:' + colors.regulation + '"></span>Regulation (annotations)</span>';
+  }
+
+  // ---------- Sources ----------
+  var sourceGrid = document.getElementById('sourceGrid');
+  sources.forEach(function (s) {
+    var el = document.createElement('div');
+    el.className = 'source-card';
+    el.innerHTML =
+      '<h3><a href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener">' + escapeHtml(s.name) + ' ↗</a></h3>' +
+      '<p class="desc">' + escapeHtml(s.desc) + '</p>' +
+      '<div class="meta"><span><span class="k">Slice</span> ' + escapeHtml(s.slice) + '</span><span><span class="k">Format</span> ' + escapeHtml(s.format) + '</span></div>';
+    sourceGrid.appendChild(el);
+  });
+
+  // ---------- Roadmap ----------
+  var roadmapList = document.getElementById('roadmapList');
+  roadmap.forEach(function (r) {
+    var el = document.createElement('div');
+    el.className = 'roadmap-item';
+    el.innerHTML =
+      '<div class="roadmap-when">' + escapeHtml(r.when) + '</div>' +
+      '<div class="roadmap-body"><h4>' + escapeHtml(r.title) + '</h4><p>' + escapeHtml(r.desc) + '</p></div>';
+    roadmapList.appendChild(el);
+  });
+
+  // ---------- Escape helpers ----------
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  // Render timeline once on first show
+  // (renders when tab is clicked; also render on load if pulse is default)
+})();
+</script>
