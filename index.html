@@ -1038,6 +1038,116 @@ main {
 .path-step h4 { margin: 0 0 6px; font-family: "Newsreader", serif; font-variation-settings: "opsz" 24; font-weight: 500; font-size: 16px; color: var(--ink); }
 .path-step p { margin: 0; font-size: 13px; color: var(--muted-ink); max-width: 66ch; }
 
+/* --- Coverage Gaps / wishlist --- */
+.wl-lead {
+  color: var(--muted-ink);
+  max-width: 72ch;
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+.wl-category { margin-top: 40px; }
+.wl-category:first-of-type { margin-top: 24px; }
+.wl-category-header {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 32;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--ink);
+  margin: 0 0 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+.wl-category-desc { color: var(--muted-ink); font-size: 13px; margin: 6px 0 14px; max-width: 68ch; }
+.wl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+.wl-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wl-card.top { border-left: 3px solid var(--accent); }
+.wl-card-title {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 24;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1.25;
+}
+.wl-card-title a { color: inherit; text-decoration: none; }
+.wl-card-title a:hover { color: var(--accent); }
+.wl-priority {
+  display: inline-block;
+  font-family: "Archivo", sans-serif;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 2px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.wl-priority.top { background: var(--accent); color: var(--ground); }
+.wl-priority.rec { background: color-mix(in oklab, var(--info) 15%, transparent); color: var(--info); border: 1px solid color-mix(in oklab, var(--info) 35%, var(--rule)); }
+.wl-priority.ref { background: var(--surface-2); color: var(--muted-ink); border: 1px solid var(--rule); }
+.wl-priority.paid { background: color-mix(in oklab, var(--warn) 15%, transparent); color: var(--warn); border: 1px solid color-mix(in oklab, var(--warn) 35%, var(--rule)); }
+.wl-card-desc { color: var(--muted-ink); font-size: 13px; margin: 0; }
+.wl-card-why {
+  color: var(--ink);
+  font-size: 12px;
+  margin: 6px 0 0;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  border-left: 2px solid var(--accent-quiet);
+  line-height: 1.45;
+}
+.wl-card-why strong {
+  color: var(--accent-ink);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 2px;
+}
+.wl-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted-ink);
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.wl-legend .wl-priority { margin-right: 4px; }
+.wl-note {
+  margin-top: 32px;
+  padding: 14px 18px;
+  background: color-mix(in oklab, var(--info) 6%, var(--surface));
+  border: 1px solid color-mix(in oklab, var(--info) 25%, var(--rule));
+  border-radius: 3px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.wl-note strong { color: var(--info); }
+
 .comparison-table td.c, .comparison-table th.c { text-align: center; }
 .comparison-table td.c {
   font-family: "IBM Plex Mono", monospace;
@@ -1138,6 +1248,7 @@ main {
       <button role="tab" aria-selected="false" data-view="timeline">Timeline</button>
       <button role="tab" aria-selected="false" data-view="sources">Source Trackers</button>
       <button role="tab" aria-selected="false" data-view="roadmap">What's Next</button>
+      <button role="tab" aria-selected="false" data-view="wishlist">Coverage Gaps</button>
     </nav>
   </div>
 </header>
@@ -1766,6 +1877,250 @@ main {
       <h2>Detailed sprint plan</h2>
       <p>The concrete engineering roadmap underlying the tier structure above. The tier grid is the executive view; this is the working plan.</p>
       <div class="roadmap-list" id="roadmapList"></div>
+    </div>
+  </section>
+
+  <!-- Coverage Gaps view -->
+  <section class="view" data-view="wishlist">
+    <div class="view-head">
+      <span class="view-eyebrow">Coverage Gaps</span>
+      <h1 class="view-title">Sources worth adding — a scan of what's missing.</h1>
+      <p class="view-desc">The Source Trackers view lists what the tool cites today. This page lists high-quality sources not yet incorporated, ranked by fit to this firm's practice (US insurance-coverage, London and Germany client base, AEC data-center vertical). Not yet added to the tracker's active source list; call these out for the partnership to prioritize before the next data-integration cycle.</p>
+    </div>
+
+    <div class="wl-legend">
+      <span><span class="wl-priority top">Top 6</span>My picks for the biggest single upgrades to the source set.</span>
+      <span><span class="wl-priority rec">Recommended</span>Solid additions with real value.</span>
+      <span><span class="wl-priority ref">Reference</span>Primary sources worth pinning alongside curated trackers.</span>
+      <span><span class="wl-priority paid">Paid</span>Subscription required.</span>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Insurance-specific</h2>
+      <p class="wl-category-desc">The biggest current gap in our source list. Nothing in the tracker today speaks directly from an insurer's viewpoint — closest is the SERFF filings idea (deferred to Platinum). These sources fill that gap even without SERFF ingestion.</p>
+      <div class="wl-grid">
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://content.naic.org/cmte_h_big_data_ai_wg.htm" target="_blank" rel="noopener">NAIC AI Working Group ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">National Association of Insurance Commissioners. Issued the Dec 2023 Model Bulletin on Use of AI Systems by Insurers; tracks state-by-state adoption of the bulletin's principles.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Only insurance-industry-side source on AI governance. Direct precursor to SERFF-tracked filings. Essential for policy-wording work in the US market.</div>
+        </div>
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://www.lloyds.com/news-and-insights/futureset" target="_blank" rel="noopener">Lloyd's Futureset · Emerging Risks ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">Lloyd's own emerging-risks research arm. Publishes AI risk white papers, systemic-risk analyses, and coverage-implication briefings.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Direct London-market relevance for your UK clients. Lloyd's positions on AI risk propagate through the syndicate market — knowing them early matters.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.marshmclennan.com/insights/topics/artificial-intelligence.html" target="_blank" rel="noopener">Marsh McLennan AI Risk Insights ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Broker-side perspective on how AI risks are underwritten, priced, and layered across E&amp;O, Cyber, and D&amp;O programs.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Broker signal is often the earliest indicator of what carriers are quietly filing. Useful editorial input for the Pulse.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.aon.com" target="_blank" rel="noopener">Aon — AI Risk Practice ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Aon's dedicated AI risk publications and client advisories.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Cross-checks Marsh's read; two brokers' postures triangulate the market view better than one.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.swissre.com/institute/research/topics-and-risk-dialogues.html" target="_blank" rel="noopener">Swiss Re Institute — AI Research ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Reinsurer's research arm. Publishes substantive AI risk papers with actuarial depth.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Reinsurer view sets the aggregate-limits ceiling for primary carriers. Directly informs any consortium conversation with capacity-holders.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.munichre.com/en/insights.html" target="_blank" rel="noopener">Munich Re — AI Risk Research ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Companion to Swiss Re on the reinsurer side. Strong publication cadence on emerging tech risks.</p>
+          <div class="wl-card-why"><strong>Why include</strong>German-headquartered — additional relevance for your German client base.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.iii.org" target="_blank" rel="noopener">Insurance Information Institute (III) — AI hub ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Trade-association-level AI coverage. Aggregates industry positions.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Useful for baseline "what does the industry publicly say" framing. Not primary signal but good editorial context.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Global regulatory (US / UK / EU / Germany)</h2>
+      <p class="wl-category-desc">Fills the international coverage gap for London and Germany client work. If we add only one source from this whole page, White &amp; Case's tracker is the pick.</p>
+      <div class="wl-grid">
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://www.whitecase.com/insight-our-thinking/ai-watch-global-regulatory-tracker" target="_blank" rel="noopener">White &amp; Case — AI Watch: Global Regulatory Tracker ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">Genuinely the most comprehensive global AI regulation tracker I know of. Covers US federal, US state, EU, UK, Germany, Canada, Australia, Japan, China, Singapore, and more, each with structured summaries.</p>
+          <div class="wl-card-why"><strong>Why include</strong>If we add only one tracker from this page, this is it. Single biggest coverage upgrade for cross-border client work.</div>
+        </div>
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://oecd.ai" target="_blank" rel="noopener">OECD AI Policy Observatory ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">Intergovernmental AI policy and regulation database. Covers 70+ countries. Free, structured, machine-readable in parts — the closest thing to a public API for global AI policy.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Only source with real global reach and structured data. Foundation for any future automated ingestion of international regulation.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.dlapiper.com/en/insights/topics/ai-regulation" target="_blank" rel="noopener">DLA Piper Global AI Regulations Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Comparable comprehensiveness to White &amp; Case with different editorial voice; strong on financial services angles.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Cross-check against White &amp; Case; two firms tracking the same territory triangulate more reliably than one.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://digital-strategy.ec.europa.eu/en/policies/ai-office" target="_blank" rel="noopener">EU AI Office (DG CNECT) ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Official EU AI Act implementation body. Publishes GPAI Code of Practice, delegated acts, and interpretive guidance.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Primary source for every EU AI Act compliance question. Cite here, not through a law-firm summary, for authoritative reads.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://aistandardshub.org" target="_blank" rel="noopener">UK AI Standards Hub ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Alan Turing Institute-run. Tracks UK AI regulatory posture including CMA foundation-models work, ICO guidance, and Bletchley/Seoul commitments.</p>
+          <div class="wl-card-why"><strong>Why include</strong>UK-specific signal. Complements Ada Lovelace on the policy/standards side.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Additional law-firm trackers</h2>
+      <p class="wl-category-desc">Peer competitors to Orrick's AI Law Center. Each has a distinct editorial voice; useful cross-checks against Orrick and each other.</p>
+      <div class="wl-grid">
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://www.debevoisedatablog.com" target="_blank" rel="noopener">Debevoise AI Regulatory Tracker ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">One of the most-maintained big-firm trackers. Strong on financial services, cross-border, and enforcement. Debevoise Data Blog runs deep on AI-privacy intersections.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Best-maintained alternative to Orrick with a distinct enforcement lens. Insurance and financial-services angle is directly relevant.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.wsgr.com" target="_blank" rel="noopener">Wilson Sonsini AI Legal &amp; Regulatory Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Silicon Valley perspective on AI regulation. Strong on tech-company and startup viewpoints.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Balances the mid-Atlantic/big-firm perspective with a West Coast tech-industry read. Useful for advising defendant-side technology clients.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.lw.com/en/services/artificial-intelligence" target="_blank" rel="noopener">Latham &amp; Watkins AI Regulatory Guide ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Comprehensive multi-practice AI resource, updated regularly. Good depth on M&amp;A and transactional angles.</p>
+          <div class="wl-card-why"><strong>Why include</strong>M&amp;A/transactional angle is under-covered by the current source set. Latham fills it.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.clearygottlieb.com" target="_blank" rel="noopener">Cleary Gottlieb Global AI Regulation Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Cross-border coverage with strong European perspective.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Additional international triangulation. Cleary's European bench gives strong reads on EU and UK developments.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.bakerlaw.com" target="_blank" rel="noopener">BakerHostetler AI Enforcement Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Focused specifically on regulatory enforcement actions. Complements the general-tracker view.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Enforcement-specific angle means it's often the fastest source on FTC / SEC / EEOC actions. Complements Orrick's broader remit.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Academic and research</h2>
+      <p class="wl-category-desc">Longer editorial horizon than law-firm trackers. Useful for briefings, thought-leadership, and citing "the reasonable-care standard" in cases without established precedent.</p>
+      <div class="wl-grid">
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://aiindex.stanford.edu" target="_blank" rel="noopener">Stanford HAI — AI Index ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Annual comprehensive report (published each spring). Includes legal and regulatory sections with hard data and figures.</p>
+          <div class="wl-card-why"><strong>Why include</strong>The definitive citable dataset for AI trends in briefings. Especially good for framing "here's what the industry looks like right now" for clients.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://cltc.berkeley.edu" target="_blank" rel="noopener">Berkeley CLTC — AI Regulation Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Center for Long-Term Cybersecurity. Global AI regulation with some structured export.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Academic-quality data with a security/safety framing that complements the tort/insurance framing here.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.adalovelaceinstitute.org" target="_blank" rel="noopener">Ada Lovelace Institute (UK) ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">UK-focused AI policy and ethics research. Frequently cited by UK regulators.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Directly relevant to UK client work. Strong voice in UK AI policy debate — useful editorial signal.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://cset.georgetown.edu" target="_blank" rel="noopener">Georgetown CSET ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Center for Security and Emerging Technology. AI policy analysis with national-security framing.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Cross-references your export-controls track (BIS entity list, CFIUS review). Only academic source that meaningfully covers that angle.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://ainowinstitute.org" target="_blank" rel="noopener">AI Now Institute ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Algorithmic accountability research; strong on discrimination and civil-rights angles.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Plaintiff-side perspective on the bias/discrimination track. Useful counterweight to industry-side sources.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Content and copyright specific</h2>
+      <p class="wl-category-desc">Cross-check the copyright track. Franklin's copyright tracker is the strongest single source; these add plaintiff-side and industry-body perspectives.</p>
+      <div class="wl-grid">
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://authorsguild.org" target="_blank" rel="noopener">Authors Guild — AI Cases Tracker ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Plaintiff-organization tracker of author copyright cases against AI companies.</p>
+          <div class="wl-card-why"><strong>Why include</strong>The plaintiff-side view of the same cases GWU and Franklin track. Useful for anticipating theories the plaintiff bar will press.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://copyrightalliance.org" target="_blank" rel="noopener">The Copyright Alliance ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Content-industry positions on AI copyright policy.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Aggregates trade-association positions on AI copyright. Useful for framing rightsholder posture.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.riaa.com" target="_blank" rel="noopener">RIAA — AI resources ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Music industry positions on AI generative-model training and voice cloning.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Music vertical is a distinct front (UMG v. Suno, UMG v. Udio, Concord v. Anthropic). RIAA's positions signal where music-industry litigation goes next.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Data-center specific</h2>
+      <p class="wl-category-desc">Directly relevant to the AEC professional-liability practice. datacentertracker.org is already in the source list; these round out the trade and market view.</p>
+      <div class="wl-grid">
+        <div class="wl-card top">
+          <h3 class="wl-card-title"><a href="https://www.datacenterdynamics.com" target="_blank" rel="noopener">Data Center Dynamics ↗</a> <span class="wl-priority top">Top 6</span></h3>
+          <p class="wl-card-desc">The trade-press outlet of record for the data-center industry. Some content free; deeper analysis paywalled.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Fastest signal on new hyperscale project announcements, community-opposition stories, and grid interconnection disputes. Directly feeds the DC vertical.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.datacenterfrontier.com" target="_blank" rel="noopener">Data Center Frontier ↗</a> <span class="wl-priority rec">Recommended</span></h3>
+          <p class="wl-card-desc">Companion trade outlet, US-focused. Strong on power/grid and utility interconnection reporting.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Complements DCD with different editorial focus. Power and grid coverage particularly strong.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.datacenterhawk.com" target="_blank" rel="noopener">DataCenterHawk ↗</a> <span class="wl-priority paid">Paid</span></h3>
+          <p class="wl-card-desc">Subscription database of data-center projects globally. Deeper than datacentertracker.org.</p>
+          <div class="wl-card-why"><strong>Why include</strong>The paid alternative to datacentertracker.org. If the DC ingestion feature is truly Platinum-tier, this subscription (~$4K-8K/yr est.) is the pragmatic Gold-tier alternative we already flagged in the What's Next memo.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.jll.com/en-us/insights/market-perspectives/data-center-outlook" target="_blank" rel="noopener">JLL Data Center Outlook ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Real-estate firm's data-center market reports (twice-yearly).</p>
+          <div class="wl-card-why"><strong>Why include</strong>Real-estate perspective on hyperscale build trends. Occasionally covers legal/permitting themes and market concentration risk.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.cbre.com" target="_blank" rel="noopener">CBRE Data Center Reports ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Companion market-analysis publication.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Cross-checks JLL. Different geographies and different market-cycle framing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-category">
+      <h2 class="wl-category-header">Primary-source infrastructure</h2>
+      <p class="wl-category-desc">Not trackers, but authoritative primary sources every item's link should point at. Already used in some Case File source links; worth surfacing here as a coherent set.</p>
+      <div class="wl-grid">
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.federalregister.gov" target="_blank" rel="noopener">Federal Register ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">Daily journal of the US federal government. Free API for agency rulemakings, executive orders, notices.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Primary source for every US federal AI regulation item. Free API makes this the backbone of Sprint 4 regulatory ingestion.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.regulations.gov" target="_blank" rel="noopener">Regulations.gov ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">US federal rulemakings and public comments. Free API.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Public comment tracks reveal industry response before final rules. Useful early-signal source.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.legislation.gov.uk" target="_blank" rel="noopener">legislation.gov.uk ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">UK primary legislation and statutory instruments. Free API.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Authoritative source for every UK statute we cite. Direct benefit for London client work.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.gesetze-im-internet.de" target="_blank" rel="noopener">Gesetze im Internet ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">German federal statutes portal (English and German). For BGBl. references, see also bgbl.de.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Authoritative German statute citations for your Germany-based client work. Reduces reliance on secondary summaries.</div>
+        </div>
+        <div class="wl-card">
+          <h3 class="wl-card-title"><a href="https://www.bailii.org" target="_blank" rel="noopener">BAILII ↗</a> <span class="wl-priority ref">Reference</span></h3>
+          <p class="wl-card-desc">British and Irish Legal Information Institute. Free access to UK/Ireland case law.</p>
+          <div class="wl-card-why"><strong>Why include</strong>Primary source for UK case citations (Ayinde, Al-Haroun, Harber, Getty UK). Complements CourtListener for the US.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-note">
+      <strong>Note.</strong> None of these are in the current source list yet — this page is a queue for the partnership to prioritize. If we commit to Silver, my recommendation is to add the Top 6 in the first sprint (they're all article-page fetches, low ingest cost) and to leave the paid subscriptions (DataCenterHawk especially) for the Gold-tier data-integration conversation. A Silver ingest pipeline could reasonably absorb 15–20 total sources before the curation load becomes the binding constraint.
     </div>
   </section>
 </main>
