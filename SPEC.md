@@ -163,9 +163,9 @@ Rich structured metadata, one record per matter:
 - Private notes editor.
 - Source-doc links.
 
-### 6.6 Deferred to v2
+### 6.6 What's Next page
 
-- **The Network** — force-directed graph of plaintiff firms ↔ defendants ↔ theories ↔ judges. High analytic value but visually noisy; better as a v2 feature once you know which relationships you actually want to see.
+A first-class page in the app describing planned but not-yet-built features (see §10.4). Kept visible on the shared read-only views so clients and colleagues can see where the tool is headed, and so we have a public accountability marker for roadmap items.
 
 ## 7. Sourcing plan
 
@@ -222,38 +222,56 @@ Concrete choices for v1:
 
 ## 10. Staged build plan
 
-**Sprint 1 (weeks 1–2) — Foundation & first hero view.**
+Release milestones are defined by what you can use, not by calendar. Estimated calendar duration in parentheses assumes single-developer effort.
+
+### 10.1 MVP — end of Sprint 2 (~4 weeks)
+
+The tool is usable for daily practice. Case entry, trend visualization over time, drill-down with insurance analysis, shareable client views.
+
+**Sprint 1 — Foundation & first hero view (~2 weeks).**
 - Repository scaffold, Next.js app, Postgres schema for Case + Regulation + Signal + Firm + Company.
 - Admin UI for case entry (create/edit/delete, all fields from §5.1).
 - Auth (single user for now).
 - Import routines for CourtListener and EDGAR.
-- The Pulse view rendering from real data (no AI narrative yet — top-5 selection is manual for now).
+- The Pulse view rendering from real data — top-5 selection curated manually (AI narrative comes later).
 - Backfill: since post-ChatGPT (Nov 2022), highest-priority tracks first (IP — training data; Privacy & biometrics; Data centers).
 
-**Sprint 2 (weeks 3–4) — Second and third hero views.**
+**Sprint 2 — Insurance layer & trend view (~2 weeks).**
 - The Timeline (annotated trend chart).
 - The Case File drill-down.
-- Insurance-analysis fields wired into the schema and Case File.
+- Insurance-analysis fields wired into the schema and Case File (line + trigger + exclusions).
 - Regulation tracker entity implemented, cross-linked to cases.
 - Shareable read-only URL feature (scoped views excluding private data).
 
-**Sprint 3 (weeks 5–6) — Insurance layer and remaining views.**
-- The Flow (Sankey).
-- The Atlas (choropleth with layer toggles).
-- SERFF filings ingestion for insurer regulatory tracking.
-- Judge-level analytics rollups.
+### 10.2 v1.0 — end of Sprint 3 (~5 weeks)
 
-**Sprint 4 (weeks 7–8) — Intelligence.**
+Adds the two custom visualizations that unlock geographic and coverage-flow analysis.
+
+**Sprint 3 — Custom hero visualizations (~1 week).**
+- The Flow (Sankey: claim type → industry → coverage line → trigger → exclusion).
+- The Atlas (choropleth with toggleable layers: filing density, funded AI-company density, hyperscale DC locations, AI legislation status).
+
+### 10.3 v1.1 — end of Sprint 4 (~7 weeks)
+
+Adds the intelligence layer that turns The Pulse from manual-curation into semi-automated weekly narrative.
+
+**Sprint 4 — Intelligence (~2 weeks).**
 - Algorithmic anomaly detection (filing velocity spikes, first-of-kind claim types, plaintiff-firm expansion).
 - LLM-drafted Pulse narrative with human-in-the-loop editor.
-- Corporate signal ingestion (funding, M&A, 10-K changes).
+- Corporate signal ingestion (funding, M&A, 10-K risk-factor changes).
 
-**v2 candidates (post-v1).**
-- The Network graph.
-- Weekly briefing email.
-- Client-shareable branded PDF export.
-- Public-facing microsite.
-- Multi-user shared team space.
+### 10.4 "What's Next" — v1.2+ roadmap
+
+These are the features I've assessed as high-value but deferred to keep the MVP path clean. The app will surface a **What's Next** page describing this roadmap so users (and clients viewing shared links) see where the tool is headed.
+
+- **SERFF ingestion.** Insurer form/rate filings tracker across priority states (NY, CA, IL, TX, FL first), with extracted filed form language, filing type, carrier, line, regulator status. Cross-linked into The Flow so litigation activity in a state can be paired with subsequent insurer wording responses. See §7.1 for why this is expensive: state-by-state variation, mostly PDF, weak APIs, poor signal-to-noise. Highest differentiator for a policy-wording practice — but only pays off with meaningful state coverage, so it is treated as a phased add-on rather than a v1 blocker.
+- **Judge-level analytics.** Motion-outcome rollups by judge, for venue-selection intelligence and defense-strategy pattern-finding. Depends on rigorous motion tagging in the case entry workflow, so it also benefits from waiting until the case corpus is thicker.
+- **The Network graph** — force-directed graph of plaintiff firms ↔ defendants ↔ theories ↔ judges. High analytic value, visually noisy; better designed once you know which relationships you actually want to see.
+- **Weekly briefing email** — automated Monday digest built from the same Pulse candidates, with your final editorial pass before send.
+- **Client-shareable branded PDF export** — pick a slice, generate a branded briefing.
+- **Public-facing microsite** — separate deployment of the public-safe views for thought-leadership use.
+- **Multi-user shared team space** — internal team access with role-based permissions on private notes.
+- **Client-interest tagging** (§8) — private-within-private layer for client-identity information under attorney-client privilege.
 
 ## 11. Open questions to close before Sprint 1
 
