@@ -694,6 +694,233 @@ main {
 }
 .roadmap-body p { color: var(--muted-ink); margin: 0; font-size: 14px; max-width: 62ch; }
 
+/* --- Investment memo blocks --- */
+.section-block {
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+.section-block:first-of-type { border-top: none; padding-top: 4px; margin-top: 8px; }
+.section-block > h2 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 36;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 0 0 14px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.section-block > p, .section-block > ul.simple, .section-block > ol.simple {
+  color: var(--muted-ink);
+  max-width: 72ch;
+  margin: 0 0 12px;
+}
+.section-block > p strong, .section-block > li strong { color: var(--ink); font-weight: 600; }
+.section-block > ul.simple, .section-block > ol.simple { padding-left: 20px; font-size: 14px; }
+.section-block > ul.simple li, .section-block > ol.simple li { margin: 6px 0; max-width: 68ch; }
+
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.tier-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tier-card[data-tier="platinum"] { border-top-color: var(--muted-ink); }
+.tier-card .tier-eyebrow {
+  font-family: "Archivo", sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+.tier-card[data-tier="platinum"] .tier-eyebrow { color: var(--muted-ink); }
+.tier-card .tier-title {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 28;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+.tier-card .tier-cost {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  color: var(--ink);
+  padding: 8px 0;
+  border-top: 1px dashed var(--rule);
+  border-bottom: 1px dashed var(--rule);
+  margin: 8px 0 4px;
+}
+.tier-card ul { margin: 4px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted-ink); }
+.tier-card li { margin: 4px 0; }
+.tier-card .tier-status {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--good);
+  font-weight: 500;
+  margin-top: 8px;
+}
+.tier-card[data-tier="silver"] .tier-status,
+.tier-card[data-tier="gold"] .tier-status { color: var(--warn); }
+.tier-card[data-tier="platinum"] .tier-status { color: var(--critical); }
+
+.cost-table-wrap { overflow-x: auto; margin-top: 14px; }
+.cost-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.cost-table th, .cost-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+.cost-table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-ink);
+  font-weight: 600;
+  background: var(--surface);
+}
+.cost-table td.n, .cost-table th.n { text-align: right; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+.cost-table tr.total td { font-weight: 700; background: var(--surface-2); color: var(--ink); }
+.cost-table tr.subhead td { background: var(--surface-2); color: var(--muted-ink); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+
+.challenge-block {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--warn);
+  padding: 18px 22px;
+  border-radius: 3px;
+  margin-top: 18px;
+}
+.challenge-block h3 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 26;
+  font-weight: 500;
+  font-size: 18px;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.challenge-block .subtitle { color: var(--muted-ink); font-size: 14px; margin: 0 0 14px; }
+.challenge-block p { color: var(--muted-ink); font-size: 13px; margin: 0 0 10px; max-width: 68ch; }
+.challenge-block ul { margin: 8px 0 14px; padding-left: 20px; font-size: 13px; color: var(--muted-ink); }
+.challenge-block li { margin: 5px 0; max-width: 66ch; }
+.challenge-block .cost-callout,
+.challenge-block .alternative-callout {
+  padding: 12px 14px;
+  border-radius: 3px;
+  font-size: 13px;
+  color: var(--ink);
+  margin-top: 10px;
+  border: 1px solid var(--rule);
+}
+.challenge-block .cost-callout { background: color-mix(in oklab, var(--critical) 6%, var(--surface-2)); border-color: color-mix(in oklab, var(--critical) 20%, var(--rule)); }
+.challenge-block .cost-callout strong { color: var(--critical); }
+.challenge-block .alternative-callout { background: color-mix(in oklab, var(--good) 8%, var(--surface-2)); border-color: color-mix(in oklab, var(--good) 25%, var(--rule)); }
+.challenge-block .alternative-callout strong { color: var(--good); }
+
+.commercial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.commercial-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.commercial-card .unlock {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+.commercial-card h3 {
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 24;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.commercial-card p { color: var(--muted-ink); font-size: 13px; margin: 6px 0 0; max-width: 60ch; }
+
+.risks-list { display: grid; gap: 0; margin-top: 14px; }
+.risk-item {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--rule);
+  font-size: 13px;
+  color: var(--muted-ink);
+  align-items: baseline;
+}
+.risk-item:last-child { border-bottom: none; }
+.risk-item .risk-name { color: var(--ink); font-weight: 600; font-size: 13px; }
+.risk-item .risk-body { max-width: 66ch; }
+.risk-item .risk-body em { color: var(--good); font-style: normal; font-weight: 500; }
+
+.path-list {
+  counter-reset: pathstep;
+  padding: 0;
+  list-style: none;
+  margin: 14px 0 0;
+}
+.path-step {
+  counter-increment: pathstep;
+  padding: 16px 0 16px 48px;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+}
+.path-step:last-child { border-bottom: none; }
+.path-step::before {
+  content: counter(pathstep, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 14px;
+  font-family: "Newsreader", serif;
+  font-variation-settings: "opsz" 40;
+  font-weight: 300;
+  font-size: 26px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.path-step .path-when { color: var(--muted-ink); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.path-step h4 { margin: 0 0 6px; font-family: "Newsreader", serif; font-variation-settings: "opsz" 24; font-weight: 500; font-size: 16px; color: var(--ink); }
+.path-step p { margin: 0; font-size: 13px; color: var(--muted-ink); max-width: 66ch; }
+
+@media (max-width: 640px) {
+  .risk-item { grid-template-columns: 1fr; gap: 4px; }
+  .tier-grid { grid-template-columns: 1fr; }
+  .commercial-grid { grid-template-columns: 1fr; }
+}
+
 /* --- Disclaimer / footer --- */
 .disclaimer {
   background: color-mix(in oklab, var(--warn) 8%, var(--surface));
@@ -853,12 +1080,316 @@ main {
   <!-- Roadmap view -->
   <section class="view" data-view="roadmap">
     <div class="view-head">
-      <span class="view-eyebrow">What's Next</span>
-      <h1 class="view-title">The roadmap, in the open.</h1>
-      <p class="view-desc">Kept visible so clients and colleagues viewing the tool see where it's headed and can push back on priorities. See <code>SPEC.md</code> for the full plan.</p>
+      <span class="view-eyebrow">What's Next · Investment Memo</span>
+      <h1 class="view-title">Where continued investment takes the tracker.</h1>
+      <p class="view-desc">A decision document for the firm's partners. Four investment tiers, three of which fit inside a ~$50K first-year cash envelope. Year-one cost tables, honest treatment of the hard problems, and a ladder of commercial models the tool could eventually support.</p>
     </div>
-    <p class="roadmap-note">The tonight MVP proves the presentation and the coverage-overlay differentiator. Everything below is scoped work planned in sprints of one to two weeks each.</p>
-    <div class="roadmap-list" id="roadmapList"></div>
+
+    <div class="section-block">
+      <h2>Executive summary</h2>
+      <p>The Atheria Law AI Working Group has a working tracker of AI litigation, regulation, and insurance coverage — a single-file prototype with 150+ curated items across the leading public trackers, plus a coverage-overlay analysis (line + likely trigger + likely exclusions in play) that no third-party tracker offers.</p>
+      <p>Three things make it defensible against existing trackers:</p>
+      <ul class="simple">
+        <li><strong>Coverage overlay.</strong> No tracker in the market pairs case-level metadata with coverage-line, trigger-clause, and exclusion analysis. That's the actual work AI policy-wording attorneys do — captured in structured form.</li>
+        <li><strong>Data-center vertical.</strong> No AI tracker has depth here; no data-center tracker has AI-legal depth. The intersection is exactly this firm's practice.</li>
+        <li><strong>Editorial voice.</strong> The Pulse and Case File narratives are written from an underwriter and policy-wording perspective, not an academic one.</li>
+      </ul>
+      <p>The question this page answers: at each level of investment, what deliverable does the firm own, what does it cost to run, and what value comes back?</p>
+    </div>
+
+    <div class="section-block">
+      <h2>Investment tiers</h2>
+      <p>Four tiers. Bronze is what exists today. Silver, Gold, and Platinum are staged commitments. Platinum sits outside the $50K envelope and requires external co-funding — insurer consortium, subscription revenue, or grant capital.</p>
+      <div class="tier-grid">
+        <div class="tier-card" data-tier="bronze">
+          <div class="tier-eyebrow">Tier · Bronze</div>
+          <div class="tier-title">Working prototype</div>
+          <div class="tier-cost">~$500 / yr</div>
+          <ul>
+            <li>Static single-file HTML, ~150 items, deployed as artifact</li>
+            <li>Attorney-manual curation (~3 hrs/wk)</li>
+            <li>Daily internal reference; client-conversation support</li>
+            <li>No auth, no private notes in-tool</li>
+          </ul>
+          <div class="tier-status">Live now</div>
+        </div>
+        <div class="tier-card" data-tier="silver">
+          <div class="tier-eyebrow">Tier · Silver</div>
+          <div class="tier-title">Real backend + shareable client views</div>
+          <div class="tier-cost">~$8K – $14K yr 1</div>
+          <ul>
+            <li>Next.js + Postgres, auth, admin UI</li>
+            <li>Private notes, shareable read-only URLs</li>
+            <li>Timeline &amp; Case File as first-class views</li>
+            <li>Sprint 1–2, ~4 weeks contractor time</li>
+          </ul>
+          <div class="tier-status">Committable Q4 2026</div>
+        </div>
+        <div class="tier-card" data-tier="gold">
+          <div class="tier-eyebrow">Tier · Gold</div>
+          <div class="tier-title">Sankey, Atlas, LLM-assisted Pulse</div>
+          <div class="tier-cost">~$22K – $32K yr 1</div>
+          <ul>
+            <li>Custom Sankey (Flow) and choropleth (Atlas)</li>
+            <li>Algorithmic anomaly detection</li>
+            <li>LLM-drafted Pulse narrative with editorial pass</li>
+            <li>Corporate signals ingest (EDGAR, funding)</li>
+            <li>Cuts curation from 3 hrs/wk to ~1 hr/wk</li>
+          </ul>
+          <div class="tier-status">Committable Q1–Q2 2027</div>
+        </div>
+        <div class="tier-card" data-tier="platinum">
+          <div class="tier-eyebrow">Tier · Platinum</div>
+          <div class="tier-title">SERFF, DC ingestion, judge analytics</div>
+          <div class="tier-cost">$80K – $200K+</div>
+          <ul>
+            <li>Cross-state SERFF filings ingestion</li>
+            <li>Data-center automated ingestion (priority states)</li>
+            <li>Judge-level motion-outcome analytics</li>
+            <li>The Network graph</li>
+            <li>White-label licensing feature set</li>
+          </ul>
+          <div class="tier-status">Requires external co-funding</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>Year-one cash cost breakdown</h2>
+      <p>Rows compound: Silver includes Bronze work; Gold adds to Silver; Platinum adds to Gold. Attorney time is opportunity cost, not cash; shown separately.</p>
+      <div class="cost-table-wrap">
+        <table class="cost-table">
+          <thead>
+            <tr>
+              <th>Line item</th>
+              <th class="n">Bronze</th>
+              <th class="n">Silver</th>
+              <th class="n">Gold</th>
+              <th class="n">Platinum (adds)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Contractor engineering (build)</td>
+              <td class="n">$0</td>
+              <td class="n">$6K – $10K</td>
+              <td class="n">+$10K – $14K</td>
+              <td class="n">+$60K – $150K</td>
+            </tr>
+            <tr>
+              <td>Hosting &amp; database</td>
+              <td class="n">$0</td>
+              <td class="n">$360</td>
+              <td class="n">$600</td>
+              <td class="n">+$1,200</td>
+            </tr>
+            <tr>
+              <td>LLM API runtime</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$1,800 – $3,600</td>
+              <td class="n">+$3,600 – $9,600</td>
+            </tr>
+            <tr>
+              <td>Data subscriptions (LegiScan, DCT)</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$500 – $1,000</td>
+              <td class="n">+$2,000 – $5,000</td>
+            </tr>
+            <tr>
+              <td>Domain, tooling, misc</td>
+              <td class="n">$200</td>
+              <td class="n">$200</td>
+              <td class="n">$500</td>
+              <td class="n">+$500</td>
+            </tr>
+            <tr class="total">
+              <td>Year-one cash total</td>
+              <td class="n">~$200</td>
+              <td class="n">$8K – $14K</td>
+              <td class="n">$22K – $32K</td>
+              <td class="n">outside envelope</td>
+            </tr>
+            <tr class="subhead">
+              <td colspan="5">Not in cash budget — opportunity cost</td>
+            </tr>
+            <tr>
+              <td>Attorney curation time</td>
+              <td class="n">3 hrs/wk</td>
+              <td class="n">3 hrs/wk</td>
+              <td class="n">~1 hr/wk</td>
+              <td class="n">~1 hr/wk</td>
+            </tr>
+            <tr>
+              <td>Attorney review of LLM-drafted Pulse</td>
+              <td class="n">—</td>
+              <td class="n">—</td>
+              <td class="n">~30 min/wk</td>
+              <td class="n">~30 min/wk</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>Where the money would go if we tried to do everything</h2>
+      <p>Two features get asked about most: SERFF filings ingestion and data-center automated ingestion. Both would be uniquely valuable. Both are Platinum-tier because the underlying data is genuinely hostile to automation. Here's why in plain terms.</p>
+
+      <div class="challenge-block">
+        <h3>SERFF filings ingestion</h3>
+        <p class="subtitle">What insurers file with state DOIs — the earliest signal of new AI-related policy wording.</p>
+        <p>The value would be enormous: seeing every insurer's proposed AI exclusion, endorsement, or rate change in real time. No competitor tracker has this.</p>
+        <p>What makes it a Platinum-tier project:</p>
+        <ul>
+          <li><strong>Not one system, but 51.</strong> Every state (plus DC) runs its own SERFF implementation with a different search interface, filing categories, and approval workflow.</li>
+          <li><strong>Almost no APIs.</strong> Most states require scraping web forms; some IP-block automated access.</li>
+          <li><strong>PDF-heavy.</strong> ~90% of filings arrive as PDFs. Extracting the actual policy wording requires PDF extraction plus LLM reading.</li>
+          <li><strong>Terrible signal-to-noise.</strong> Most filings are routine rate changes. Isolating AI-related ones means reading filing descriptions with an LLM — millions of tokens per year to pull the ~2% that matter.</li>
+          <li><strong>Regional exceptions.</strong> California uses a partially separate system (CDI); NY DFS has its own posture.</li>
+          <li><strong>Confidentiality holds.</strong> Some filings are marked confidential and not publicly available at all.</li>
+        </ul>
+        <div class="cost-callout"><strong>Realistic to build well:</strong> 3–5 months of dedicated engineering ($40K – $75K) plus ~$100 – $200/mo ongoing LLM triage. Not achievable in a $50K first-year envelope.</div>
+        <div class="alternative-callout"><strong>Pragmatic Gold-tier alternative:</strong> manual quarterly SERFF sweeps by a paralegal or junior attorney across 3–5 priority states (NY, CA, IL, TX, FL), ~10–15 hours per sweep. Delivers roughly 60% of the value at a fraction of the cost.</div>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Data-center automated ingestion</h3>
+        <p class="subtitle">Hyperscale project activity, community opposition, and municipal legislation at the county level.</p>
+        <p>The value would be enormous for the AEC PL and environmental practice — knowing every hotspot before clients do.</p>
+        <p>What makes it also Platinum-tier:</p>
+        <ul>
+          <li><strong>~3,000 counties.</strong> Each posts agendas independently, with no standardization.</li>
+          <li><strong>The "data center" fact is inside the PDF, not the title.</strong> Meeting agendas rarely announce the subject; you have to read the packet.</li>
+          <li><strong>OCR reality.</strong> Many county PDFs are scanned images, not text-native. OCR quality varies widely.</li>
+          <li><strong>Court filings scattered.</strong> Community-opposition suits live in every state's own e-filing platform.</li>
+          <li><strong>Utility interconnection queues are at ISO level.</strong> PJM, MISO, ERCOT, CAISO — accessible but heavily interpretation-dependent.</li>
+          <li><strong>The good subscription trackers are gated.</strong> datacentertracker.org and DataCenterHawk do most of this work and charge for access.</li>
+        </ul>
+        <div class="cost-callout"><strong>Realistic to build well:</strong> 2–4 months of engineering ($30K – $60K) plus $100 – $200/mo LLM triage plus $6K – $15K/yr in subscription data feeds.</div>
+        <div class="alternative-callout"><strong>Pragmatic Gold-tier alternative:</strong> subscribe to datacentertracker.org (~$4K/yr) plus a weekly ~2-hour attorney synthesis pass into our tracker. Delivers roughly 70% of the value with paid-source coverage.</div>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Curation labor</h3>
+        <p class="subtitle">Coverage-line + trigger + exclusion analysis is the differentiator. It doesn't automate away.</p>
+        <p>Even at Gold-tier, someone has to make the final editorial call about which developments matter and what the coverage analysis says. LLM assistance cuts weekly curation load meaningfully — my estimate is from 3 hrs/wk (all human) to about 1 hr/wk (LLM-drafted, attorney-edited) — but does not go to zero. This is the reality of the coverage-overlay moat: it's judgment work, not classification work.</p>
+        <div class="alternative-callout"><strong>Positive framing:</strong> that irreducible attorney time is exactly what makes this defensible against pure-tech competitors. The moat is the editorial voice, not the pipeline.</div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>Commercial models</h2>
+      <p>Four paths, unlocked at successive tiers. Not mutually exclusive — many mature tools carry two or three simultaneously.</p>
+      <div class="commercial-grid">
+        <div class="commercial-card">
+          <span class="unlock">Unlocks at Bronze</span>
+          <h3>Internal tool + BD asset</h3>
+          <p>Sharpens the AI practice, deepens client relationships, generates content for firm publications. Value shows in matter generation and retention. Hardest to quantify, likely the most reliably recovered ROI. Available today.</p>
+        </div>
+        <div class="commercial-card">
+          <span class="unlock">Unlocks at Silver, best at Gold</span>
+          <h3>Insurer-sponsored consortium</h3>
+          <p>Two or three insurers each contribute ($25K – $50K each) toward Platinum-tier features (SERFF, DC ingestion) in exchange for early access, feature-set input, and a private data cut. Gives the firm channel-partner relationships with named carriers. Underwrites the Platinum tier without firm capital.</p>
+        </div>
+        <div class="commercial-card">
+          <span class="unlock">Unlocks at Gold</span>
+          <h3>Subscription product</h3>
+          <p>Target market: mid-market AI-practice firms, insurance brokerages, model-developer general-counsel offices. Priced ~$400 – $800/user/month. Break-even at 30 – 60 seats. Requires real go-to-market spend not modeled in the $50K envelope.</p>
+        </div>
+        <div class="commercial-card">
+          <span class="unlock">Unlocks at Platinum</span>
+          <h3>White-labeled tracker</h3>
+          <p>Licensed to insurers or brokerages under their brand. Revenue-share or flat license fee ($50K – $150K/yr per licensee). Highest-margin path but requires Platinum-tier data completeness. Depends on SERFF and DC ingest already being in production.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>Risks &amp; mitigants</h2>
+      <div class="risks-list">
+        <div class="risk-item">
+          <span class="risk-name">Data reliability</span>
+          <div class="risk-body">Seed items require Westlaw verification before client-facing use; ingest quality determines credibility. <em>Mitigation: strict primary-source citation on every item; no downstream distribution of unverified content.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Competing trackers</span>
+          <div class="risk-body">GWU, Orrick, Charlotin, ChatGPT-Is-Eating-the-World. <em>Mitigation: the coverage overlay is a defensible moat; positioning is complement, not replacement — we credit source trackers explicitly.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Cost overrun</span>
+          <div class="risk-body">Contractor scope creep in Silver/Gold sprints is the classic failure mode. <em>Mitigation: sprint-by-sprint pay-and-review, no lump-sum contract; SPEC.md fixes scope in advance.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Regulatory volatility</span>
+          <div class="risk-body">The Trump EO reset in Jan 2025 demonstrated how fast the ground moves. <em>Mitigation: the tracker's editorial voice becomes more valuable in flux, not less — volatility is a growth driver.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Attorney bandwidth</span>
+          <div class="risk-body">Curation labor is real, even at Gold. <em>Mitigation: LLM-drafted Pulse mitigates weekly overhead; ad-hoc research load stays attorney-manual and is billable to matters.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Partner engagement</span>
+          <div class="risk-body">If firm partners don't actually use the tool, the BD value evaporates. <em>Mitigation: monthly firm-wide "what moved this week" briefing driven from the Pulse; track engagement as a KPI.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Vendor / API dependency</span>
+          <div class="risk-body">CourtListener, EDGAR, LegiScan may change terms or degrade. <em>Mitigation: sources are diversified across three or four upstream feeds per topic; no single point of failure.</em></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2>Recommended path</h2>
+      <p>A staged commitment that lets the firm evaluate at each tier before releasing the next capital tranche.</p>
+      <ol class="path-list">
+        <li class="path-step">
+          <div class="path-when">Now — already achieved</div>
+          <h4>Bronze prototype live and shareable</h4>
+          <p>Show partners this artifact, gather reactions, decide on Silver commitment. Zero incremental cost.</p>
+        </li>
+        <li class="path-step">
+          <div class="path-when">Q4 2026 · ~$8K – $14K</div>
+          <h4>Commit to Silver — real backend and shareable client views</h4>
+          <p>4 weeks of contractor engineering. Deliverable: authenticated app with private notes, admin UI, shareable read-only URLs, Timeline and Case File. First point at which the firm has a durable asset it owns end-to-end.</p>
+        </li>
+        <li class="path-step">
+          <div class="path-when">Q1–Q2 2027 · additional ~$12K – $18K</div>
+          <h4>Commit to Gold if Silver adoption is real</h4>
+          <p>3–4 weeks additional. Deliverable: Sankey (Flow) + choropleth (Atlas), LLM-drafted Pulse with editorial review, corporate signals ingest. Adoption metric to justify: at least three firm attorneys logging in weekly.</p>
+        </li>
+        <li class="path-step">
+          <div class="path-when">Q3 2027 onward</div>
+          <h4>Insurer-consortium conversation for Platinum funding</h4>
+          <p>Approach 2–3 target insurers about co-funding SERFF and DC ingestion. Requires Gold in production and a demonstrable weekly-active-attorney metric. Firm capital commitment stops here; further tier depends on outside money.</p>
+        </li>
+        <li class="path-step">
+          <div class="path-when">2028</div>
+          <h4>Subscription-product decision</h4>
+          <p>Depends on Platinum data completeness and firm strategic posture on non-legal product ventures. Path stays optional — the tool is valuable as a BD asset even if subscription never happens.</p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h2>Open questions for the partnership</h2>
+      <ol class="simple">
+        <li><strong>Ownership.</strong> Does the firm own the tool as a firm asset, does the AI Working Group own it internally, or is it structured as a spinout from day one? This decision has tax and IP implications that ripple through everything else.</li>
+        <li><strong>Editorial governance.</strong> If more than one attorney maintains the Pulse, we need editorial standards — voice, tone, what warrants inclusion, how disagreements are resolved.</li>
+        <li><strong>Client-disclosure posture.</strong> What's shareable with clients as-is, versus what requires firm-review before external send? Should client-shareable URLs carry a firm disclaimer, or the Working Group's?</li>
+        <li><strong>Insurer relationships.</strong> Are there two or three specific carriers we'd approach for Platinum-tier co-funding? Timing of that approach matters — too early (pre-Gold) reduces credibility; too late gives up runway.</li>
+        <li><strong>Publication cadence.</strong> Do we start a public monthly "AI Working Group Briefing" now (Bronze), at Silver, or at Gold? Earlier is more work; later is less market presence.</li>
+        <li><strong>Ceiling on firm cash.</strong> Is the ~$50K envelope a hard cap, or is there appetite to go higher if adoption at Gold justifies it?</li>
+        <li><strong>Attorney-time accounting.</strong> Should curation hours be booked as marketing/BD overhead, or absorbed as personal-development time? This affects both partner incentives and internal cost-recovery.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h2>Detailed sprint plan</h2>
+      <p>The concrete engineering roadmap underlying the tier structure above. The tier grid is the executive view; this is the working plan.</p>
+      <div class="roadmap-list" id="roadmapList"></div>
+    </div>
   </section>
 </main>
 
