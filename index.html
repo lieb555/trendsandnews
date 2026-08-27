@@ -2,65 +2,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --ground: #f5f2ea;
-  --surface: #faf8f2;
-  --surface-2: #efeadf;
-  --ink: #1e1b17;
-  --muted-ink: #5a544a;
-  --faint-ink: #8a857c;
-  --rule: #e1dcd0;
-  --rule-strong: #cec6b5;
-  --accent: #a83a2c;
-  --accent-quiet: #c6867a;
-  --accent-ink: #6b241a;
-  --good: #5a7a3a;
-  --warn: #b57a15;
-  --critical: #9a2020;
-  --info: #3a6a7a;
-  --shadow: 0 1px 2px rgba(30, 27, 23, 0.04), 0 4px 12px rgba(30, 27, 23, 0.06);
-  --shadow-modal: 0 8px 24px rgba(30, 27, 23, 0.12), 0 24px 64px rgba(30, 27, 23, 0.16);
+  --ground: #ffffff;
+  --surface: #f7f7f5;
+  --surface-2: #eeeeeb;
+  --ink: #0a0a0a;
+  --muted-ink: #6b6b6b;
+  --faint-ink: #a0a09d;
+  --rule: #e5e5e2;
+  --rule-strong: #cccccc;
+  --accent: #00a651;
+  --accent-quiet: #7ec89a;
+  --accent-ink: #00753a;
+  --good: #2c7d3d;
+  --warn: #b8801a;
+  --critical: #b93030;
+  --info: #2a5a7d;
+  --shadow: 0 1px 2px rgba(10, 10, 10, 0.04), 0 4px 12px rgba(10, 10, 10, 0.06);
+  --shadow-modal: 0 8px 24px rgba(10, 10, 10, 0.12), 0 24px 64px rgba(10, 10, 10, 0.16);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #151310;
-    --surface: #1e1b17;
-    --surface-2: #26221d;
-    --ink: #f0ebe0;
-    --muted-ink: #a8a196;
-    --faint-ink: #766f65;
-    --rule: #3a3530;
-    --rule-strong: #4c463f;
-    --accent: #d47264;
-    --accent-quiet: #8a3f36;
-    --accent-ink: #e88f81;
-    --good: #8fb066;
-    --warn: #e0a04a;
-    --critical: #e06060;
-    --info: #7ab4c8;
+    --ground: #0d0d0d;
+    --surface: #171717;
+    --surface-2: #212121;
+    --ink: #f5f5f5;
+    --muted-ink: #a8a8a8;
+    --faint-ink: #666666;
+    --rule: #2b2b2b;
+    --rule-strong: #3d3d3d;
+    --accent: #17c56a;
+    --accent-quiet: #3d7a55;
+    --accent-ink: #4dd580;
+    --good: #6fa876;
+    --warn: #e0b040;
+    --critical: #e26565;
+    --info: #6fa5c8;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
     --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.6);
   }
 }
 :root[data-theme="dark"] {
-  --ground: #151310;
-  --surface: #1e1b17;
-  --surface-2: #26221d;
-  --ink: #f0ebe0;
-  --muted-ink: #a8a196;
-  --faint-ink: #766f65;
-  --rule: #3a3530;
-  --rule-strong: #4c463f;
-  --accent: #d47264;
-  --accent-quiet: #8a3f36;
-  --accent-ink: #e88f81;
-  --good: #8fb066;
-  --warn: #e0a04a;
-  --critical: #e06060;
-  --info: #7ab4c8;
+  --ground: #0d0d0d;
+  --surface: #171717;
+  --surface-2: #212121;
+  --ink: #f5f5f5;
+  --muted-ink: #a8a8a8;
+  --faint-ink: #666666;
+  --rule: #2b2b2b;
+  --rule-strong: #3d3d3d;
+  --accent: #17c56a;
+  --accent-quiet: #3d7a55;
+  --accent-ink: #4dd580;
+  --good: #6fa876;
+  --warn: #e0b040;
+  --critical: #e26565;
+  --info: #6fa5c8;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.6);
 }
@@ -112,25 +112,29 @@ a:hover { text-decoration-color: var(--accent); }
   flex-wrap: wrap;
 }
 .brand-mark {
-  font-family: "Newsreader", serif;
-  font-variation-settings: "opsz" 48;
-  font-weight: 600;
+  font-family: "Archivo", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 800;
   font-size: 22px;
   color: var(--ink);
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.4em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 6px;
 }
-.brand-mark::before {
+.brand-mark .law {
+  color: var(--muted-ink);
+  font-weight: 600;
+  margin-left: 6px;
+  letter-spacing: 0.06em;
+}
+.brand-mark::after {
   content: "";
-  width: 8px;
-  height: 8px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
   background: var(--accent);
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 2px;
-  transform: translateY(-2px);
 }
 .brand-sub {
   color: var(--muted-ink);
@@ -140,7 +144,6 @@ a:hover { text-decoration-color: var(--accent); }
   font-size: 15px;
   font-style: italic;
   letter-spacing: 0.005em;
-  margin-left: -4px;
 }
 .brand-tag {
   color: var(--faint-ink);
@@ -151,6 +154,7 @@ a:hover { text-decoration-color: var(--accent); }
 }
 @media (max-width: 720px) {
   .brand-tag { display: none; }
+  .brand-sub { font-size: 13px; }
 }
 .brand-actions {
   margin-left: auto;
@@ -340,9 +344,9 @@ main {
 }
 .chip:hover { color: var(--ink); border-color: var(--ink); }
 .chip[aria-pressed="true"] {
-  background: var(--accent);
+  background: var(--accent-ink);
   color: var(--ground);
-  border-color: var(--accent);
+  border-color: var(--accent-ink);
 }
 .filter-divider { width: 1px; height: 18px; background: var(--rule-strong); margin: 0 4px; }
 .filter-clear {
@@ -438,7 +442,7 @@ main {
 }
 .track-pill.type-regulation { color: var(--info); border-color: color-mix(in oklab, var(--info) 30%, var(--rule)); }
 .track-pill.type-sanction { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 30%, var(--rule)); }
-.track-pill.type-datacenter { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 30%, var(--rule)); }
+.track-pill.type-datacenter { color: var(--critical); border-color: color-mix(in oklab, var(--critical) 30%, var(--rule)); }
 
 /* --- Modal (Case File) --- */
 .modal-scrim {
@@ -709,7 +713,7 @@ main {
 <header class="site-header">
   <div class="site-header-inner">
     <div class="brand">
-      <span class="brand-mark">Atheria Law</span>
+      <span class="brand-mark">Atheria<span class="law">Law</span></span>
       <span class="brand-sub">Artificial Intelligence Working Group</span>
       <span class="brand-tag">Trend tracker — litigation, regulation &amp; insurance coverage overlay</span>
       <div class="brand-actions">
@@ -831,7 +835,7 @@ main {
 
 <footer class="site-footer">
   <p>Atheria Law · Artificial Intelligence Working Group — trend tracker MVP for AI litigation, regulation, and insurance coverage. Curated for demonstration; primary sources govern.</p>
-  <p>Editor: lieberknecht@gmail.com · Draft build 2026-08-27</p>
+  <p>Editor: Nick Lieberknecht · Draft build 2026-08-27</p>
 </footer>
 
 <script id="itemsData" type="application/json">
@@ -1893,8 +1897,8 @@ main {
   });
 
   // ---------- Timeline ----------
-  var TRACK_COLORS_LIGHT = { ip: '#a83a2c', privacy: '#3a6a7a', bias: '#b57a15', defamation: '#5a7a3a', contract: '#6f4a8a', datacenter: '#8a3f36', sanction: '#5a544a', regulation: '#3a6a7a' };
-  var TRACK_COLORS_DARK  = { ip: '#e08878', privacy: '#7ab4c8', bias: '#e0a04a', defamation: '#a8c67c', contract: '#b39ad0', datacenter: '#d47264', sanction: '#a8a196', regulation: '#7ab4c8' };
+  var TRACK_COLORS_LIGHT = { ip: '#b8383a', privacy: '#2a7d8a', bias: '#b8801a', defamation: '#7d3a8a', contract: '#2a5a8a', datacenter: '#7d5a3a', sanction: '#4a4a4a', regulation: '#2a5a8a' };
+  var TRACK_COLORS_DARK  = { ip: '#e07878', privacy: '#5ec0d0', bias: '#e0b040', defamation: '#c078d0', contract: '#6a9cd0', datacenter: '#c09468', sanction: '#a8a8a8', regulation: '#6a9cd0' };
   function palette() { return currentTheme() === 'dark' ? TRACK_COLORS_DARK : TRACK_COLORS_LIGHT; }
 
   function renderTimeline() {
