@@ -452,6 +452,62 @@ def run_probe(token, probe, days, max_pages, debug=False):
     return probe, collected, total
 
 
+def syntax_check(token):
+    """
+    Run #2 produced a self-contradiction: P3 found 93 AI-sanctions opinions
+    by full-text search, but probe_recall() found 0 of 6 named cases —
+    including Mata v. Avianca, which is among the most-discussed opinions of
+    2023 and is certainly in CourtListener's corpus. A mechanism that works
+    in P3 cannot be genuinely blind in probe B, so the difference is in how
+    probe B asks, not in what the corpus holds.
+
+    This isolates the query grammar by asking for the same case six ways.
+    Whichever forms return hits tell us what the `q` syntax actually is,
+    which matters far beyond this one probe: every stream in the production
+    pipeline is a `q` string.
+    """
+    print("=" * 72)
+    print("SYNTAX CHECK — how does CourtListener want to be asked?")
+    print("=" * 72)
+    print("  Same case, six query forms. Any form returning 0 for a case this")
+    print("  famous is a broken query, not an empty corpus.")
+    print()
+
+    variants = [
+        ("bare term, opinions",        {"type": "o", "q": "Avianca"}),
+        ("quoted phrase, opinions",    {"type": "o", "q": '"Mata v. Avianca"'}),
+        ("two bare terms, opinions",   {"type": "o", "q": "Mata Avianca"}),
+        ("caseName bare, opinions",    {"type": "o", "q": "caseName:Avianca"}),
+        ("caseName quoted (probe B)",  {"type": "o", "q": 'caseName:("Mata v. Avianca")'}),
+        ("bare term, dockets",         {"type": "r", "q": "Avianca"}),
+    ]
+
+    results = []
+    for label, params in variants:
+        data = api_get(token, params)
+        if data is None:
+            print(f"    {label:30s} REQUEST FAILED")
+            results.append((label, params["q"], None))
+            continue
+        count = data.get("count")
+        hits = data.get("results") or []
+        flag = "  <-- probe B used this" if "probe B" in label else ""
+        print(f"    {label:30s} {str(count):>6} matches{flag}")
+        if hits:
+            print(f"        top: {normalize_result(hits[0])['caseName'][:60]}")
+        results.append((label, params["q"], count))
+    print()
+    working = [r for r in results if r[2]]
+    if working:
+        print(f"  Query forms that work: {len(working)}/{len(variants)}")
+        print(f"  -> use `{working[0][1]}`-style queries in the pipeline")
+    else:
+        print("  No form returned anything. The problem is not the grammar —")
+        print("  re-check the endpoint and the corpus coverage.")
+    print()
+    return results
+
+
 def probe_recall(token, max_pages, debug=False):
     """
     The decisive experiment. For each sanctions case the metadata filter
@@ -491,7 +547,14 @@ def probe_recall(token, max_pages, debug=False):
     return found, len(KNOWN_MISSES)
 
 
-def live_run(token, days, max_pages, debug):
+def live_run(token, days, max_pages, debug, syntax_only=False):
+    # The syntax check runs first because it gates how everything after it
+    # should be read: if the query grammar is wrong, a zero result anywhere
+    # below means nothing at all.
+    syntax_check(token)
+    if syntax_only:
+        return
+
     print("=" * 72)
     print("PROBE A — server-side queries")
     print("=" * 72)
@@ -539,10 +602,13 @@ def main():
                     help="skip the API entirely; just measure recall against our corpus")
     ap.add_argument("--debug", action="store_true",
                     help="dump the raw first API response to diagnose shape mismatches")
+    ap.add_argument("--syntax-only", action="store_true",
+                    help="only run the query-grammar check (6 requests, ~1 minute)")
     args = ap.parse_args()
 
     print()
-    recall_check()
+    if not args.syntax_only:
+        recall_check()
 
     if args.recall_only:
         print("(--recall-only: skipping live API run)")
@@ -558,7 +624,7 @@ def main():
         print("=" * 72)
         return
 
-    live_run(token, args.days, args.max_pages, args.debug)
+    live_run(token, args.days, args.max_pages, args.debug, args.syntax_only)
 
 
 if __name__ == "__main__":

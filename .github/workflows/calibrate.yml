@@ -33,6 +33,11 @@ on:
         type: boolean
         required: false
         default: false
+      syntax_only:
+        description: "Only check the query grammar (6 requests, ~1 min)"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   calibrate:
@@ -70,6 +75,7 @@ jobs:
           ARGS="--days ${{ inputs.days }} --max-pages ${{ inputs.max_pages }}"
           if [ "${{ inputs.debug }}" = "true" ]; then ARGS="$ARGS --debug"; fi
           if [ "${{ inputs.recall_only }}" = "true" ]; then ARGS="$ARGS --recall-only"; fi
+          if [ "${{ inputs.syntax_only }}" = "true" ]; then ARGS="$ARGS --syntax-only"; fi
           echo "Running: python3 scripts/calibrate_courtlistener.py $ARGS"
           echo
           python3 scripts/calibrate_courtlistener.py $ARGS 2>&1 | tee /tmp/calibration.log
