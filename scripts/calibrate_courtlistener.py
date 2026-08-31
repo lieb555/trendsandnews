@@ -505,6 +505,52 @@ def syntax_check(token):
         print("  No form returned anything. The problem is not the grammar —")
         print("  re-check the endpoint and the corpus coverage.")
     print()
+
+    # Run #3 turned up something worse than the broken probe B. These two
+    # returned an identical count AND an identical top hit:
+    #     "Mata v. Avianca"  -> 42
+    #      Mata Avianca      -> 42
+    # and neither top hit was Mata v. Avianca. If the quotes were doing
+    # phrase matching those numbers could not match, so the quotes appear to
+    # be doing nothing. That would mean every probe in PROBES is running
+    # loose term-matching rather than the phrase-matching it was written to
+    # do — which is exactly what P2's 1,265 noisy hits look like.
+    #
+    # This is worth pinning down precisely, because "artificial intelligence"
+    # matching any document containing both words somewhere is a completely
+    # different filter from one matching the phrase.
+    print("=" * 72)
+    print("PHRASE SEMANTICS — do quotes actually mean anything?")
+    print("=" * 72)
+    print("  If quoting changes nothing, every probe is looser than written.")
+    print()
+
+    phrase_tests = [
+        ('quoted phrase',    '"artificial intelligence"'),
+        ('unquoted, 2 terms', 'artificial intelligence'),
+        ('one term only',    'artificial'),
+        ('other term only',  'intelligence'),
+    ]
+    counts = {}
+    for label, q in phrase_tests:
+        data = api_get(token, {"type": "o", "q": q})
+        n = data.get("count") if data else None
+        counts[label] = n
+        print(f"    {label:22s} {str(n):>9}   q={q}")
+    print()
+
+    quoted = counts.get("quoted phrase")
+    unquoted = counts.get("unquoted, 2 terms")
+    if quoted is not None and unquoted is not None:
+        if quoted == unquoted:
+            print("  VERDICT: quotes are being ignored. The probes are matching")
+            print("  documents that contain the words, not the phrase. Every")
+            print("  precision number from run #2 is therefore a floor, not a")
+            print("  measurement, and P2's 1,265 hits are explained.")
+        elif quoted < unquoted:
+            print(f"  VERDICT: quotes work — the phrase is {unquoted - quoted} narrower.")
+            print("  The probes mean what they say; P2 is genuinely just too broad.")
+    print()
     return results
 
 
