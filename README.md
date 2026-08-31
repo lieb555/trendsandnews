@@ -62,17 +62,53 @@ response so the fix is usually a one-line correction to `fetch_page()` or
 - **Precision** — of what the filter surfaces, how much is genuinely relevant?
   Judged by reading the sample it prints.
 
-### Result so far
+### What the calibration runs established
 
-Run against our 103 federal corpus items:
+Four runs against the live service, 31 Aug 2026. Each killed one wrong
+assumption, which is cheaper than discovering them after building the
+pipeline.
+
+**The API shape was right** — v4 `/search/`, `Token` auth, `type=r` for RECAP
+dockets, `type=o` for opinion full text, `filed_after`, cursor pagination.
+None of this is guesswork any more.
+
+**CourtListener throttles search at 5 requests/minute.** This is the binding
+constraint on the whole design. Paging the docket firehose and filtering it
+locally — the original plan — needs roughly 15 hours of continuous polling to
+cover one 90-day window. Run #1 scanned 100 dockets and kept 0, which is the
+arithmetic working correctly rather than the filter failing. **The filter
+therefore lives server-side**, as a `q` query the service answers with matches
+only: a handful of requests per run instead of thousands.
+
+**Quoted phrases do real phrase matching**, and the pipeline's precision rests
+on it:
 
 ```
-litigation (AI-as-subject)   97% recall   35/36
-sanctions  (AI-as-conduct)   15% recall   10/67
+"artificial intelligence"      448 matches
+ artificial intelligence     7,172 matches      16x looser
 ```
 
-The gap is structural, not a tuning problem, and it changed the ingestion
-design from one stream to three. See [`SPEC.md` §5.1a](SPEC.md).
+**`caseName:Term` works; `caseName:("X v. Y")` returns nothing** — the "v."
+defeats it. A run that reported 0/6 known cases as unreachable was measuring
+this bug, not the corpus.
+
+Lane by lane, over a 90-day window:
+
+| Probe | Scope | Matches | Verdict |
+|---|---|---|---|
+| Known AI defendants by name | dockets | 43 | **Production-ready.** ~100% precision |
+| AI-as-subject keywords | dockets | 1,265 | Too broad; needs a second predicate |
+| Sanctions | opinion full text | 93 | Works — reaches what metadata cannot |
+| Data centres | dockets | 149 | Poor precision; "data center" is too generic |
+
+Two findings worth the attorney's attention rather than the engineer's. The
+sanctions hits are almost entirely **state appellate** courts — Virginia Court
+of Appeals, Florida DCA, Pennsylvania Superior, Iowa Court of Appeals — which
+is both a signal about where this is surfacing and the reason 93 sits so far
+below Charlotin's 1,980. And the recall gap between lanes remains structural:
+docket metadata reaches AI-as-subject litigation at 97% and sanctions at 15%,
+because in a sanctions case the AI fact exists nowhere in the metadata, only
+inside the judge's written order. See [`SPEC.md` §5.1a](SPEC.md).
 
 ---
 

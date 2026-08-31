@@ -410,13 +410,16 @@ PROBES = [
 # missed. Querying each by name answers the question the aggregate numbers
 # cannot: is the AI fact *findable* by full-text search, or is it genuinely
 # out of reach of any automated ingest?
+# Run #3 established the working form: `caseName:Term` matches, while
+# `caseName:("X v. Y")` returns nothing — the "v." defeats it. So each case
+# is identified by one distinctive surname rather than a full caption.
 KNOWN_MISSES = [
-    "Gauthier v. Goodyear",
-    "Frier v. Hingiss",
-    "Whaley v. Experian",
-    "Morgan v. Community Against Violence",
-    "Wadsworth v. Walmart",
-    "Mata v. Avianca",
+    ("Gauthier v. Goodyear Tire", "Gauthier"),
+    ("Frier v. Hingiss", "Hingiss"),
+    ("Whaley v. Experian", "Whaley"),
+    ("Morgan v. Community Against Violence", "Morgan"),
+    ("Wadsworth v. Walmart", "Wadsworth"),
+    ("Mata v. Avianca", "Avianca"),
 ]
 
 
@@ -506,19 +509,19 @@ def syntax_check(token):
         print("  re-check the endpoint and the corpus coverage.")
     print()
 
-    # Run #3 turned up something worse than the broken probe B. These two
-    # returned an identical count AND an identical top hit:
-    #     "Mata v. Avianca"  -> 42
-    #      Mata Avianca      -> 42
-    # and neither top hit was Mata v. Avianca. If the quotes were doing
-    # phrase matching those numbers could not match, so the quotes appear to
-    # be doing nothing. That would mean every probe in PROBES is running
-    # loose term-matching rather than the phrase-matching it was written to
-    # do — which is exactly what P2's 1,265 noisy hits look like.
+    # Run #3 made it look as though quotes were inert: "Mata v. Avianca" and
+    # Mata Avianca both returned 42 with the same top hit. Run #4 tested that
+    # directly and disproved it —
+    #     "artificial intelligence"  ->     448
+    #      artificial intelligence   ->   7,172
+    # a 16x narrowing, so quoting is doing real phrase matching. The run #3
+    # coincidence was almost certainly "v." being stripped as punctuation,
+    # leaving a two-word phrase whose documents happen to be the same set.
     #
-    # This is worth pinning down precisely, because "artificial intelligence"
-    # matching any document containing both words somewhere is a completely
-    # different filter from one matching the phrase.
+    # Conclusion: the probes mean what they say. P1's 43 and P3's 93 are
+    # measurements, not floors, and P2's 1,265 is genuine breadth rather than
+    # a syntax accident. Kept as a permanent regression check, since the whole
+    # pipeline's precision rests on this behaviour holding.
     print("=" * 72)
     print("PHRASE SEMANTICS — do quotes actually mean anything?")
     print("=" * 72)
@@ -568,8 +571,8 @@ def probe_recall(token, max_pages, debug=False):
     print()
 
     found = 0
-    for name in KNOWN_MISSES:
-        params = {"type": "o", "q": f'caseName:("{name}")', "order_by": "dateFiled desc"}
+    for name, term in KNOWN_MISSES:
+        params = {"type": "o", "q": f"caseName:{term}", "order_by": "dateFiled desc"}
         data = api_get(token, params, debug=False)
         if data is None:
             print(f"    {name:42s} request failed")
