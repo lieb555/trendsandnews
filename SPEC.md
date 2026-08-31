@@ -1,292 +1,363 @@
-# AI Litigation & Insurance Trends Tracker — v1 Specification
+# Atheria Law · AI Working Group Trend Tracker — Technical Specification
+
+_Revision 2. Supersedes the v1 spec of 2026-08-27. Owner: Nick Lieberknecht._
+
+**What changed in this revision.** v1 specified a Next.js + Postgres application built in presentation-first tiers. That architecture was driven by one requirement — private notes attached to case records — which implied authentication, which implied a backend. The Claude artifact runtime's `db` capability provides authenticated, per-viewer-private persistent storage directly, so the backend requirement is removed. This revision replaces the app-first plan with a **pipeline-first** architecture that reaches self-updating status in roughly a third of the effort.
+
+---
+
+## 1. Goals, in priority order
+
+1. **Stay current with minimal recurring input.** Target steady state: ~20 minutes per week reviewing and merging an automated batch.
+2. **Preserve the coverage overlay as the differentiator.** Every item carries lines of insurance implicated, likely trigger clauses, and likely exclusions in play. No competing tracker does this.
+3. **Be cheap to operate and cheap to change.** Both in cash and in Claude credits.
+4. **Serve two lenses on one corpus** — the litigator's view (theories, rulings, plaintiff-bar patterns) and the underwriter's view (coverage lines, triggers, exclusions).
+5. **Support private and team annotation** without standing up infrastructure.
+
+Non-goals for this revision: public microsite (see §7.3 for why it conflicts), multi-tenant SaaS, exhaustive corpus coverage.
+
+---
+
+## 2. Architecture
+
+### 2.1 The shape
+
+```
+Git repo (private)                 GitHub Actions            Claude Artifact
+┌────────────────────────┐        ┌────────────────┐        ┌──────────────────┐
+│ data/items/YYYY.json   │───┐    │ weekly cron    │        │ Tracker UI       │
+│ data/taxonomy.json     │   │    │                │        │                  │
+│ data/landmarks.json    │   ├───▶│ 1. fetch       │──PR──▶ │ db capability:   │
+│ data/sources.json      │   │    │ 2. dedupe      │ review │  ├ notes/shared  │
+│ templates/index.html.j2│───┘    │ 3. triage      │ +merge │  └ data/users/   │
+│ scripts/ingest/*.py    │        │ 4. enrich      │   │    │       {self}/    │
+│ scripts/build.py       │        │ 5. open PR     │   │    │       notes/     │
+└────────────────────────┘        └────────────────┘   │    └──────────────────┘
+                                                        │             ▲
+                                                        └── rebuild ──┘
+```
+
+Three planes, deliberately decoupled:
+
+- **Data plane** — JSON in git. Versioned, diffable, reviewable. Never loaded wholesale.
+- **Pipeline plane** — deterministic Python plus batched LLM calls, running on GitHub's runners.
+- **Presentation plane** — a Jinja template compiled to a single HTML artifact.
+
+### 2.2 Why this rather than an app
+
+| Requirement | v1 answer | v2 answer |
+|---|---|---|
+| Authentication | Auth.js + session store | Artifact runtime — every viewer is a signed-in org member |
+| Private notes | Postgres table + row-level auth | `db` at `data/users/{self}/notes/` — private even from the owner |
+| Team notes | Postgres + permissions | `db` at `notes/shared/` with write gated to editors |
+| Persistence | Managed Postgres, ~$19/mo | Included in the artifact runtime |
+| Hosting | Vercel, ~$20/mo | Included |
+| Version history | Application-level audit table | Git, free |
+| Shareable filtered views | Server-rendered scoped routes | URL query params on a static page |
+
+The backend earned its place in v1 only because of notes. With that requirement met by the runtime, nothing else in the product justifies the operational surface.
+
+### 2.3 Repository layout
+
+```
+trendsandnews/
+├── CLAUDE.md                      # schema, taxonomy, conventions, invariants
+├── .claude/
+│   ├── skills/
+│   │   ├── add-source/            # recipe: wire up a new ingest source
+│   │   ├── weekly-pulse/          # recipe: draft the editorial narrative
+│   │   └── verify-batch/          # recipe: run verification on new items
+│   └── settings.json              # permission allowlist for routine commands
+├── data/
+│   ├── items/
+│   │   ├── 2023.json              # sharded by year — no file exceeds ~40KB
+│   │   ├── 2024.json
+│   │   ├── 2025.json
+│   │   └── 2026.json
+│   ├── taxonomy.json              # tracks, coverage lines, triggers, exclusions
+│   ├── landmarks.json             # milestone timeline events
+│   └── sources.json               # source-tracker directory + wishlist
+├── private/                       # gitignored — never enters a build
+│   └── notes-export.json          # optional local backup of db notes
+├── scripts/
+│   ├── ingest/
+│   │   ├── courtlistener.py
+│   │   ├── federal_register.py
+│   │   ├── openstates.py
+│   │   └── charlotin.py
+│   ├── dedupe.py
+│   ├── enrich.py                  # batched Anthropic API calls
+│   └── build.py                   # data + template → dist/index.html
+├── templates/
+│   └── index.html.j2              # ~16KB: CSS, app JS, view shells
+└── .github/workflows/
+    ├── ingest.yml                 # weekly cron → opens PR
+    └── deploy.yml                 # on merge to main → build + publish
+```
+
+**Invariant: no file in `data/` or `templates/` exceeds ~50KB.** This is the credit-efficiency constraint that makes everything else affordable. The current single-file artifact is 550KB and costs ~137k tokens to open; after the split, a presentation change costs ~16k and a data change costs ~30k.
+
+---
+
+## 3. Data model
+
+### 3.1 Item
+
+One record per matter, statute, sanction, or data-center dispute.
+
+```jsonc
+{
+  "id": "bartz-anthropic",              // stable slug, never reused
+  "type": "case",                       // case | sanction | regulation | datacenter
+  "caption": "Bartz v. Anthropic PBC",
+  "court": "N.D. Cal.",
+  "docket": "3:24-cv-05417",
+  "jurisdiction": "US",                 // US | UK | EU | INT
+  "region": "NDCA",
+  "date": "2024-08-19",
+  "status": "decided",
+  "tracks": ["ip"],                     // keys into taxonomy.json
+  "trackLabels": ["IP — training data & output"],
+  "parties": { "plaintiff": "...", "defendant": "..." },
+  "summary": "...",
+  "significance": "...",
+  "insurance": {
+    "lines":      ["Tech E&O", "Media Liability"],
+    "triggers":   ["Copyright infringement offense", "Wrongful act"],
+    "exclusions": ["IP exclusion", "Willful infringement"]
+  },
+  "sources": [{ "label": "...", "url": "..." }],
 
-_Draft for review. Written 2026-08-27. Owner: lieberknecht@gmail.com._
+  // Provenance — new in v2, required for every pipeline-ingested item
+  "provenance": {
+    "source": "courtlistener",          // which ingest module produced it
+    "fetchedAt": "2026-09-01T06:00:00Z",
+    "enrichedBy": "claude-haiku-4-5",   // model that drafted summary/overlay
+    "reviewStatus": "pending",          // pending | reviewed | verified
+    "reviewedBy": null,
+    "confidence": 0.82                  // triage confidence, 0–1
+  }
+}
+```
 
-## 1. One-line description
+`provenance` is the key addition. It lets the UI distinguish machine-drafted items from attorney-verified ones, and lets the review workflow track what still needs eyes.
 
-A dynamic, interactive tracker of AI-related litigation, regulation, and insurance developments — designed for a practicing attorney whose work spans AI law, professional liability for architectural/engineering/construction firms building data centers, and insurance policy wording for a US, UK, and German client base.
+### 3.2 Review status ladder
 
-## 2. Goals
+| Status | Meaning | UI treatment |
+|---|---|---|
+| `pending` | Machine-ingested, not yet reviewed | Amber badge; excluded from client-shareable views |
+| `reviewed` | Attorney skimmed; caption and claims look right | No badge |
+| `verified` | Checked against Westlaw or primary source | Green check |
 
-- Surface trends fast enough to inform live client advice.
-- Support two lenses on the same dataset: the **litigator's view** (theories, rulings, plaintiff-bar patterns) and the **underwriter's view** (coverage lines implicated, likely triggers, likely exclusions).
-- Present information dynamically and interactively — not as static reports.
-- Start private (authenticated), keep a path open to a public-facing microsite later.
+This replaces the blanket "verify first" disclaimer with a per-item signal, which is both more honest and more useful.
 
-## 3. Users & primary use cases
+### 3.3 Companion entities
 
-**Primary user (v1):** the attorney, working alone.
+- **Landmark** — milestone timeline event. Fields: `date`, `label`, `description`, optional `itemId` linking to a case record.
+- **Source** — tracker directory entry. Fields: `name`, `url`, `desc`, `slice`, `format`, `status` (`active` | `wishlist`), `priority`.
+- **Taxonomy** — the stable classification vocabulary: 14 litigation tracks, data-center sub-tracks, coverage lines, trigger clauses, exclusion categories. Single source of truth for both the UI filters and the LLM enrichment prompt.
 
-**Read patterns:**
-- Daily: "What moved this week?" (open The Pulse view first).
-- Ad hoc: research memos, client questions, wording-review support (drill into individual cases and coverage analysis).
-- Monthly: recurring client briefings (export a filtered dashboard slice as a shareable read-only URL, or grab chart snippets for a client update deck).
+---
 
-**Future users (out of scope for v1 but designed-for):**
-- Small internal team, shared workspace with private notes.
-- Selectively client-shareable read-only views.
-- Public microsite for thought leadership.
+## 4. Taxonomy
 
-## 4. Topic taxonomy
+Unchanged from v1 in substance; now externalized to `data/taxonomy.json` so the UI and the enrichment prompt read the same file.
 
-### 4.1 Litigation tracks (14)
+**Litigation tracks (14):** IP — training data & output · Privacy & biometrics · Defamation & hallucination · Discrimination & algorithmic bias · Product liability & chatbot harm · Consumer protection & AI-washing · Securities & D&O · Contract, indemnity, IP ownership · Data centers · AI-specific criminal & fraud · Judge-level analytics (cross-cutting) · Employment/labor & AI · Export controls & national security · Cross-border enforcement
 
-Each track is a first-class filter across every view.
+**Data-center sub-tracks (4):** Construction & AEC E&O · Environmental & land use · Power & grid · Security & operational
 
-1. **IP — training data & output** — copyright infringement in training corpora, output infringement, DMCA §1202 CMI, right of publicity/deepfakes, database rights (EU), TDM exceptions.
-2. **Privacy & biometrics** — BIPA (Illinois), GDPR, UK DPA, CCPA/CPRA, wiretap and two-party consent (transcription, session replay), voice cloning.
-3. **Defamation & hallucination** — false statements from generative output, false light, negligent misstatement (UK).
-4. **Discrimination & algorithmic bias** — hiring, lending, insurance underwriting, EEOC, NYC Local Law 144, Colorado AI Act, EU AI Act high-risk classification disputes.
-5. **Product liability & negligence** — AI-as-defective-product, chatbot harm, autonomous system defects.
-6. **Consumer protection & AI-washing** — FTC §5, state UDAP, SEC AI-washing enforcement, ASA (UK).
-7. **Securities & D&O** — 10b-5 on AI disclosures, board oversight failures, derivative suits.
-8. **Contract, indemnity, IP ownership** — SaaS/model licensing disputes, vendor↔customer indemnity fights, ownership of AI-generated work.
-9. **Data centers** — sub-tracked below (§4.2) given practice focus.
-10. **AI-specific criminal & fraud** — deepfake fraud, voice-clone extortion, election interference.
-11. **Judge-level analytics** — motion-outcome patterns by judge (venue-selection intelligence). Not its own claim type; a cross-cutting analytic layer.
-12. **Employment/labor & AI** — unionization tied to AI (WGA/SAG-style), worker-displacement claims, workplace surveillance.
-13. **Export controls & national security** — BIS entity list updates, CFIUS reviews of AI transactions, sanctions.
-14. **Cross-border enforcement** — EU AI Act extraterritoriality, UK regulator action against US-headquartered providers.
+**Regulation track:** formal (statutes, rules, enforcement) · voluntary commitments · standards & frameworks · insurer regulatory filings
 
-### 4.2 Data-center sub-tracks
+**Coverage lines:** Tech E&O · Cyber · D&O · Media Liability · General Liability · Product Liability · EPL · Property · AEC Professional Liability · Lawyers' Professional Liability · Excess
 
-Given the practice focus on AEC professional liability, this vertical carries its own sub-taxonomy:
+---
 
-- **Construction & AEC E&O** — defect claims, delay disputes, professional liability against architects/engineers/contractors on hyperscale builds.
-- **Environmental & land use** — water usage, cooling, noise, air permits, NEPA/CEQA, community opposition, zoning appeals.
-- **Power & grid disputes** — PPA fights, interconnection queue litigation, curtailment, colocation with generation, nuclear restarts.
-- **Security & operational** — physical and cyber incidents at data centers, SLA disputes, tenant-vs-operator liability.
+## 5. Ingestion pipeline
 
-### 4.3 Regulation & self-regulation (parallel track)
+### 5.1 Sources, by automation feasibility
 
-- **Formal** — statutes, agency rules, enforcement actions (US federal + state; UK; EU with Germany explicitly).
-- **Voluntary commitments** — White House voluntary commitments, Frontier Model Forum outputs, Seoul/Bletchley commitments, model spec disclosures.
-- **Standards & frameworks** — NIST AI RMF, ISO 42001, CEN-CENELEC harmonized standards under EU AI Act.
-- **Insurer regulatory filings** — state DOI form/rate filings for AI exclusions and endorsements (SERFF), Lloyd's market bulletins.
+| Source | Access | Automatable | Phase |
+|---|---|---|---|
+| CourtListener / RECAP | Free API | Yes | 2 |
+| Federal Register | Free API | Yes | 2 |
+| Regulations.gov | Free API | Yes | 3 |
+| EUR-Lex | Free API | Yes | 3 |
+| legislation.gov.uk | Free API | Yes | 3 |
+| Open States | Free API | Yes | 3 |
+| EDGAR | Free, structured | Yes | 3 |
+| Charlotin hallucinations | CSV export | Semi — periodic manual export | 2 |
+| Curated trackers (GWU, Orrick, White & Case…) | Web pages | No — used as discovery signal | ongoing |
+| SERFF | State-by-state, PDF-heavy | Hard — see §9 | deferred |
+| County planning boards | ~3,000 sites, PDF | Hard — see §9 | deferred |
 
-### 4.4 Signal layer (context annotations)
+### 5.2 Stage design
 
-Adjacent events that annotate the litigation and regulation timelines without being cases themselves:
+Each stage is a pure function over files. Any stage can be re-run without side effects.
 
-- Regulator investigations (FTC CIDs, SEC comment letters, EU AI Office inquiries, state AG civil investigative demands).
-- Cease-and-desist and pre-suit demand letters.
-- Corporate signals — funding rounds, M&A, model releases, layoffs, 10-K/20-F risk-factor changes on AI.
-- Academic & policy papers — working papers, law review articles, think-tank reports as leading indicators of legal theories.
+1. **Fetch** — per-source module writes raw responses to a scratch directory. Rate-limited, retried, cached by URL.
+2. **Normalize** — map source-specific shapes to the item schema. No LLM.
+3. **Dedupe** — match against existing corpus on docket number, then normalized caption + court + date. Report near-misses for human check rather than auto-merging.
+4. **Pre-filter** — deterministic rules (source, keyword, date window, court) drop roughly 80% of candidates before any model call. **This is the single largest cost lever in the pipeline.**
+5. **Triage** — Haiku, batched: is this AI-related and significant, which track, confidence score. Cheap classification.
+6. **Enrich** — Sonnet, batched, only on triage survivors: summary, significance, draft coverage overlay.
+7. **Propose** — write new items to their year shard, open a PR.
 
-## 5. Data model
+### 5.3 The weekly loop
 
-### 5.1 Core entity: `Case`
+**Monday 06:00 UTC, automated.** Stages 1–7 run. PR opens titled e.g. *"12 new items: 4 IP · 3 sanctions · 2 data-center · 3 regulation"*, body summarizing each item with its triage confidence.
 
-Rich structured metadata, one record per matter:
+**Monday morning, attorney.** Review the diff. Fix or drop anything wrong. Merge. Target: 20 minutes.
 
-- **Identity** — caption, docket number, court, jurisdiction, filing date, status.
-- **Parties** — plaintiff(s), defendant(s), plaintiff firm(s), defense firm(s), industry classification of each defendant.
-- **Judge** — assigned judge (feeds judge-level analytics).
-- **Claims** — array of claim tags drawn from the taxonomy (§4.1), each with claim-specific fields (e.g., BIPA §15(a)/(b)/(c)/(d) subsection tags).
-- **Relief sought** — damages, injunctive, deletion/disgorgement of model, class certification.
-- **Motion history** — MTD, class cert, summary judgment, etc., each with date, outcome, and one-paragraph note.
-- **Damages theory** — statutory, actual, disgorgement, willful multiplier.
-- **Insurance analysis** — for each case, structured:
-  - Coverage line(s) likely to respond (Tech E&O, Cyber, D&O, GL, Media, EPL, Property, AEC PL).
-  - Likely trigger clause(s) (e.g., "wrongful act", "personal injury offense", "security failure").
-  - Likely exclusions in play (bodily injury, IP, contractual liability, war/terrorism, silent AI).
-  - Free-text underwriting analysis.
-- **Source docs** — links to complaint, key motions, key rulings (CourtListener/RECAP where available).
-- **Private notes** — attorney work-product, unlimited free text.
-- **Related** — linked case IDs for consolidated / follow-on / co-defendant relationships.
+**On merge.** `deploy.yml` runs `build.py` and republishes the artifact.
 
-### 5.2 Companion entities
+Nothing publishes without a merge. The PR is the editorial gate.
 
-- **Regulation** — statute, agency guidance, enforcement action, voluntary commitment, standard, or insurer filing. Fields: jurisdiction, issuer, date, type, one-paragraph summary, source link, tags cross-referencing claim tracks.
-- **Signal** — a corporate event, investigation, C&D, or academic paper. Fields: date, type, actor, one-paragraph summary, source link, related-case links.
-- **Firm** — plaintiff and defense firms, normalized (feeds the plaintiff-bar campaign analytics).
-- **Company** — model developers, deployers, data-center operators, with metadata for funding, HQ, sector (feeds geographic overlay).
+---
 
-### 5.3 Cross-cutting tags
+## 6. Enrichment (the LLM layer)
 
-- Jurisdiction (federal circuit, state, country).
-- Industry defendant type (foundation model, deployer-by-sector, data-center operator, AEC).
-- Coverage line implicated (see §5.1).
-- Priority flag (my watchlist).
-- Client-relevance flag — deferred pending confidentiality decision (§8).
+### 6.1 Cost discipline
 
-## 6. Presentation — the five hero views
+Four multiplicative savings, in order of impact:
 
-### 6.1 The Pulse (default landing view)
+1. **Pre-filter before any model call** (§5.2 stage 4) — free, removes ~80%.
+2. **Tier the models.** Haiku for triage; Sonnet only for items that pass. Triage is classification; enrichment is analysis.
+3. **Batch API.** Weekly ingestion is never latency-sensitive.
+4. **Prompt caching.** The taxonomy prompt is large and completely stable across calls.
 
-**Question answered:** "What moved this week?"
+**Estimated steady-state runtime cost: low hundreds of dollars per year.** The v1 spec estimated $1,800–3,600/year; that figure assumed an unfiltered firehose with Sonnet on everything and no batching or caching. Verify current model pricing before restating externally.
 
-- Algorithmic anomaly detection (filing velocity spikes, first-of-kind claim types, plaintiff-firm expansion into new theories) feeds a candidate list.
-- LLM drafts a narrative summary of the week's shifts.
-- I do final human curation before it publishes (a lightweight editor UI: accept/edit/discard each candidate).
-- Output: top-5 things that moved this week — new filings of note, novel theories, high-signal rulings, regulator moves, notable settlements. Single scroll.
-- Toggleable "past four weeks" and "past twelve weeks" retrospective views.
+### 6.2 What the model drafts vs. what the attorney owns
 
-### 6.2 The Atlas (map view)
+| Output | Drafted by | Owned by |
+|---|---|---|
+| Relevance and track classification | Haiku | Spot-checked |
+| Case summary | Sonnet | Skimmed |
+| Significance paragraph | Sonnet | Skimmed |
+| **Coverage overlay** | Sonnet, from taxonomy | **Attorney edits — this is the moat** |
+| Weekly Pulse narrative | Sonnet | **Attorney edits** |
+| Verification against Westlaw | — | **Attorney, sampled not exhaustive** |
 
-**Question answered:** "Where is risk concentrated relative to capital?"
+The coverage overlay is judgment work. LLM drafting from a stable taxonomy should land close, but the analysis is the product and it carries the attorney's name.
 
-- Choropleth of US states + UK/EU countries.
-- Toggleable layers:
-  - Filing density (by claim track).
-  - Funded AI-company density.
-  - Hyperscale data-center locations.
-  - State- and country-level AI legislation status.
-- Click a region → drill into its cases, filings, regulatory activity.
+---
 
-### 6.3 The Flow (Sankey diagram) — the underwriter's hero view
+## 7. Notes, via the `db` capability
 
-**Question answered:** "Where does litigation load onto policy lines, and where are the coverage fights?"
+### 7.1 Two layers
 
-- Sankey: claim type → industry defendant → coverage line → likely trigger → likely exclusion.
-- Widths proportional to case counts.
-- Filter by jurisdiction, date range, case status.
-- Click any node → filtered case list.
+```js
+capabilities: {
+  db: {
+    rules: [
+      { path: "",                    read: "interact", write: "admin"    },
+      { path: "data/users/{self}",   write: "interact"                   }
+    ]
+  }
+}
+```
 
-### 6.4 The Timeline (annotated trend chart) — the litigator's hero view
+- **Team notes** — `notes/shared/<itemId>`. Readable by every viewer, writable by editors (`admin`). For working-group annotations that colleagues should see.
+- **Private notes** — `data/users/{self}/notes/<itemId>`. Writable and readable only by that viewer. Private from the owner as a runtime guarantee, not a policy promise.
 
-**Question answered:** "How are legal theories heating up or cooling down against the regulatory backdrop?"
+### 7.2 UI
 
-- Filings-per-month per claim type (stacked or overlaid).
-- Vertical annotations for landmark rulings, statutes, regulatory events.
-- Toggle regulation as an overlay track.
-- Hover for annotation detail; click through to source.
+The Case File modal gains a Notes section with two tabs — **Team** and **Private**. Both are plain textareas with debounced autosave. Private is the default tab.
 
-### 6.5 The Case File (drill-down)
+### 7.3 The tradeoff to know about
 
-**Question answered:** "Everything about this one matter."
+Declaring `db` makes the artifact **organization-internal — it cannot be shared publicly.** That is acceptable for internal use and for sharing within the org, and it forecloses the public-microsite path *for this artifact*. If a public version is ever wanted, it is a second artifact built from the same data with the capability omitted and notes excluded. Cheap to add; noted here because it interacts with the commercial options in the partner memo.
 
-- Full metadata (§5.1).
-- Motion timeline visualized.
-- Insurance analysis panel (line + trigger + exclusions).
-- Related-cases panel driven by shared claim types, firms, industries.
-- Private notes editor.
-- Source-doc links.
+### 7.4 Durability
 
-### 6.6 What's Next page
+`db` survives republishes and sessions and is not browser-local. Notes are not in git, so they are not covered by repo backups — `scripts/export_notes.py` writing to `private/notes-export.json` is a Phase 4 nicety, not a launch blocker.
 
-A first-class page in the app describing planned but not-yet-built features (see §10.4). Kept visible on the shared read-only views so clients and colleagues can see where the tool is headed, and so we have a public accountability marker for roadmap items.
+---
 
-## 7. Sourcing plan
+## 8. Presentation
 
-### 7.1 Automated feeds
+Current views are retained: **The Pulse** · **Cases & Regulation** · **Timeline** · **Source Trackers** · **What's Next** · **Coverage Gaps**.
 
-- **CourtListener / RECAP API** — federal docket coverage, free, well-documented.
-- **State court RSS** — where available (Illinois for BIPA, California, New York, Delaware, Texas prioritized).
-- **EDGAR** — securities filings and disclosures relevant to AI disclosures and 10-K risk-factor tracking.
-- **EUR-Lex** — EU legislative and enforcement documents.
-- **UK courts and tribunals** — public feeds; supplement with BAILII.
-- **SERFF (state-by-state)** — insurer form and rate filings; scraping is uneven, some manual entry expected.
-- **PACER** — for federal filings that don't reach CourtListener quickly enough (small per-page cost).
+The template becomes a Jinja file (~16KB) rendering from the data files. Two changes worth making during the split:
 
-### 7.2 Curated inputs
+- **Review-status badges** surfaced in the case list and Case File, per §3.2.
+- **Provenance line** in the Case File footer: which source, when fetched, which model drafted it, review state.
 
-- Newsletters and trackers already followed (to be listed by you; I'll build ingestion for the ones with usable feeds).
-- Manual case entry through the admin UI for anything above.
-- Westlaw — remains your deep-reading environment; not scraped (ToS).
+Deferred, unchanged from v1: the Flow (Sankey) and the Atlas (choropleth). Both are presentation upgrades, not capability upgrades, and belong after automation rather than before it.
 
-### 7.3 Coverage & completeness posture
+---
 
-- v1 does not attempt to be exhaustive. It aims to be **reliably current on the tracks you care about**, with completeness improving over time.
-- Every record shows its source and last-updated timestamp so you can trust what's on the page.
+## 9. The hard problems
 
-## 8. Confidentiality & auth
+Unchanged in substance from v1, with one softened judgment.
 
-**Decision made:** private notes live in the tool from day one → auth required from day one.
+**SERFF filings.** 51 separate state implementations, almost no APIs, ~90% PDF, and ~2% of filings are AI-relevant. Building it well is 3–5 months of dedicated engineering. Pragmatic alternative: quarterly manual sweeps of 3–5 priority states.
 
-Architecture:
+**Data-center ingestion.** ~3,000 counties, no standardization, the relevant fact usually inside a scanned PDF rather than in the agenda title, opposition suits scattered across every state's e-filing system.
 
-- Single-tenant authenticated app.
-- Private data (notes, private tags, watchlists) never leaves the authenticated area.
-- Shareable read-only URLs generate scoped public views that exclude private fields.
-- **Deferred:** whether to add per-case "client interest" tagging (would require an additional confidentiality layer — private area within the private area — to protect client-identity information under attorney-client privilege). Design placeholders for this now; implement when needed.
+**Softened judgment:** v1 treated data-center ingestion as an all-or-nothing mega-project. Once the pipeline exists, adding scrapers for **6–8 hotspot counties** (Loudoun, Prince William, Fauquier VA; Licking OH; Coweta GA; Maricopa AZ) is incremental work — days, not months. It is *national* coverage that is out of scale, not *useful* coverage. Reclassify from deferred to Phase 5.
 
-## 9. Tech stack
+**Curation labor.** Irreducible. LLM drafting cuts weekly load meaningfully but never to zero, because the coverage overlay is judgment. This is a feature: it is what makes the product defensible against a pure-technology competitor.
 
-**Chosen path:** Option C, staged — Next.js + Postgres, deployed to Vercel or Fly.io.
+---
 
-Reasoning:
+## 10. Sequencing
 
-- Every v1 requirement (auth, private notes, coverage-line tagging with triggers/exclusions, algorithmic + AI-drafted Pulse, shareable-URL feature, path to public microsite) needs a real backend.
-- Static-site and no-code paths would each need a rebuild to grow into these requirements.
-- Estimated hosting cost at low volume: $20–40/month.
+| Phase | Delivers | Est. hours |
+|---|---|---|
+| **1 — Split** | Data out of HTML; `build.py`; `CLAUDE.md`; project skills. Nothing user-visible changes; every later session gets ~8× cheaper. | 8–12 |
+| **2 — Pipeline** | CourtListener + Federal Register ingest; dedupe; `ingest.yml` cron; PR review loop. **Tool becomes self-updating.** | 12–16 |
+| **3 — Enrichment** | Batched triage + drafting; provenance and review-status surfaced in UI. | 8–12 |
+| **4 — Notes** | `db` capability; team and private notes in the Case File modal. | 6–10 |
+| | **Self-updating tracker with annotation** | **35–50** |
+| 5 — Breadth | More sources (Regulations.gov, EUR-Lex, Open States, EDGAR); hotspot-county DC scrapers. | 10–20 |
+| 6 — Presentation | Flow (Sankey), Atlas (choropleth), Network graph. | 12–20 |
 
-Concrete choices for v1:
+At ~10 hrs/week, Phases 1–4 land in **8–12 weeks**. Order matters: the tool is self-updating after Phase 2, so everything later is improvement on a working system rather than a prerequisite.
 
-- **Framework:** Next.js (App Router) — TypeScript throughout.
-- **Database:** Postgres (Neon or Supabase for managed hosting).
-- **ORM:** Drizzle or Prisma.
-- **Auth:** Auth.js (NextAuth) with email/password or magic-link.
-- **Visualization:** D3 for the Sankey and choropleth (custom); Recharts for the timeline/trend charts.
-- **AI-drafted Pulse narrative:** Anthropic Messages API with prompt caching.
+---
 
-## 10. Staged build plan
+## 11. Economics
 
-Release milestones are defined by what you can use, not by calendar. Estimated calendar duration in parentheses assumes single-developer effort.
+### 11.1 Cash, year one
 
-### 10.1 MVP — end of Sprint 2 (~4 weeks)
+| Line | Amount |
+|---|---|
+| Hosting | $0 — artifact runtime |
+| Database | $0 — `db` capability |
+| Claude Code (build) | $0 incremental on existing Pro; ~$200–400 if Max for 2–3 peak months |
+| Anthropic API (pipeline runtime) | Low hundreds — see §6.1 |
+| GitHub Actions | $0 — free tier is ample |
+| Data subscriptions (optional) | $0–4,000 depending on DataCenterHawk decision |
+| **Total** | **~$400–1,000 without paid data feeds** |
 
-The tool is usable for daily practice. Case entry, trend visualization over time, drill-down with insurance analysis, shareable client views.
+### 11.2 Attorney time
 
-**Sprint 1 — Foundation & first hero view (~2 weeks).**
-- Repository scaffold, Next.js app, Postgres schema for Case + Regulation + Signal + Firm + Company.
-- Admin UI for case entry (create/edit/delete, all fields from §5.1).
-- Auth (single user for now).
-- Import routines for CourtListener and EDGAR.
-- The Pulse view rendering from real data — top-5 selection curated manually (AI narrative comes later).
-- Backfill: since post-ChatGPT (Nov 2022), highest-priority tracks first (IP — training data; Privacy & biometrics; Data centers).
+| | Build phase | Steady state |
+|---|---|---|
+| Engineering | ~10 hrs/week for 8–12 weeks | ~1 hr/month maintenance |
+| Curation | current ~3 hrs/week | ~20 min/week review |
+| Editorial (Pulse) | — | ~15 min/week |
 
-**Sprint 2 — Insurance layer & trend view (~2 weeks).**
-- The Timeline (annotated trend chart).
-- The Case File drill-down.
-- Insurance-analysis fields wired into the schema and Case File (line + trigger + exclusions).
-- Regulation tracker entity implemented, cross-linked to cases.
-- Shareable read-only URL feature (scoped views excluding private data).
+### 11.3 Credit efficiency
 
-### 10.2 v1.0 — end of Sprint 3 (~5 weeks)
+| Task | Now | After Phase 1 |
+|---|---|---|
+| Presentation change | ~137k tokens | ~16k |
+| Data change | ~137k tokens | ~30k (one shard) |
+| Add an ingest source | full re-derivation | one skill load |
 
-Adds the two custom visualizations that unlock geographic and coverage-flow analysis.
+`CLAUDE.md` and the project skills remove the per-session re-derivation of schema, taxonomy, and conventions, which has been a large share of historical spend.
 
-**Sprint 3 — Custom hero visualizations (~1 week).**
-- The Flow (Sankey: claim type → industry → coverage line → trigger → exclusion).
-- The Atlas (choropleth with toggleable layers: filing density, funded AI-company density, hyperscale DC locations, AI legislation status).
+---
 
-### 10.3 v1.1 — end of Sprint 4 (~7 weeks)
+## 12. Open questions
 
-Adds the intelligence layer that turns The Pulse from manual-curation into semi-automated weekly narrative.
-
-**Sprint 4 — Intelligence (~2 weeks).**
-- Algorithmic anomaly detection (filing velocity spikes, first-of-kind claim types, plaintiff-firm expansion).
-- LLM-drafted Pulse narrative with human-in-the-loop editor.
-- Corporate signal ingestion (funding, M&A, 10-K risk-factor changes).
-
-### 10.4 "What's Next" — v1.2+ roadmap
-
-These are the features I've assessed as high-value but deferred to keep the MVP path clean. The app will surface a **What's Next** page describing this roadmap so users (and clients viewing shared links) see where the tool is headed.
-
-- **SERFF ingestion.** Insurer form/rate filings tracker across priority states (NY, CA, IL, TX, FL first), with extracted filed form language, filing type, carrier, line, regulator status. Cross-linked into The Flow so litigation activity in a state can be paired with subsequent insurer wording responses. See §7.1 for why this is expensive: state-by-state variation, mostly PDF, weak APIs, poor signal-to-noise. Highest differentiator for a policy-wording practice — but only pays off with meaningful state coverage, so it is treated as a phased add-on rather than a v1 blocker.
-- **Data-center automated ingestion.** Pipelines pulling data-center project activity from county planning boards, utility interconnection queues, and trade journalism across hotspot states (VA, TX, GA, OH, IN, MO, AZ first). Data-center *content* is already a v1 filter track with hand-curated seed items; what's deferred is *automation* of that ingest. The underlying data is more scattered than SERFF — thousands of counties without APIs, PDF-heavy meeting minutes, and no unified data model — so the pipeline is a separate multi-sprint project. Cross-linked into the Atlas map (project locations, opposition density) and the Flow (AEC PL / environmental / public-officials coverage lines).
-- **Judge-level analytics.** Motion-outcome rollups by judge, for venue-selection intelligence and defense-strategy pattern-finding. Depends on rigorous motion tagging in the case entry workflow, so it also benefits from waiting until the case corpus is thicker.
-- **The Network graph** — force-directed graph of plaintiff firms ↔ defendants ↔ theories ↔ judges. High analytic value, visually noisy; better designed once you know which relationships you actually want to see.
-- **Weekly briefing email** — automated Monday digest built from the same Pulse candidates, with your final editorial pass before send.
-- **Client-shareable branded PDF export** — pick a slice, generate a branded briefing.
-- **Public-facing microsite** — separate deployment of the public-safe views for thought-leadership use.
-- **Multi-user shared team space** — internal team access with role-based permissions on private notes.
-- **Client-interest tagging** (§8) — private-within-private layer for client-identity information under attorney-client privilege.
-
-## 11. Open questions to close before Sprint 1
-
-1. **The "something else" additional topic.** You selected "Something else" on the additional-topics question — what is it? (I want to name it explicitly in the taxonomy before building the schema.)
-2. **Curated inputs.** Which newsletters and trackers do you rely on today? I'll assess which have usable feeds for ingestion vs. which we treat as human-curated inputs.
-3. **Hosting choice.** Vercel or Fly.io for the app; Neon or Supabase for Postgres. Happy to pick if you have no preference — Vercel + Neon is the lowest-friction default.
-4. **Domain.** Do you want to point a domain at this from day one (even while it's private), or run it under a Vercel/Fly subdomain until it opens up?
-5. **AI-summary source-of-record.** When the AI drafts the Pulse narrative, do you want to see and edit its citations/sources at the sentence level (higher trust, slower), or accept/edit at the paragraph level (faster, less granular auditability)?
-6. **Client-interest tagging (§8, deferred).** Whether to design the extra confidentiality layer now or defer — my recommendation is design placeholders now, don't implement until you need it.
-
-## 12. Non-goals for v1
-
-- Exhaustive coverage. Reliability on the priority tracks first; the long tail fills in over time.
-- Substitute for Westlaw. This is a trends and coverage tool; deep case reading still happens in Westlaw.
-- Automated legal advice. AI-drafted summaries are Pulse-only, always human-reviewed, never client-facing without your review.
-- Public-facing microsite (v2).
-- Multi-user team space (v2).
+1. **Review-status backfill.** The existing 263 items have no `provenance`. Do we backfill them all as `pending`, or grandfather the hand-curated ones as `reviewed`?
+2. **Charlotin refresh cadence.** The CSV is a manual export. Monthly? Quarterly? Or ask whether an API exists.
+3. **Notes backup.** Is `db`-only durability acceptable, or is `export_notes.py` a Phase 4 requirement rather than a nicety?
+4. **Team-notes membership.** Who gets editor access to the artifact, and does that list change how the shared-notes rules should be written?
+5. **Public microsite.** Confirm it stays out of scope, given §7.3. If it is wanted later, plan for a second build target.
+6. **Pulse cadence.** Weekly with the ingest batch, or monthly as a fuller briefing?

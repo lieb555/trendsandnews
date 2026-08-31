@@ -1365,6 +1365,9 @@ main {
         <li><strong>Editorial voice.</strong> The Pulse and Case File narratives are written from an underwriter and policy-wording perspective, not an academic one.</li>
       </ul>
       <p>The question this page answers: at each level of investment, what deliverable does the firm own, what does it cost to run, and what value comes back?</p>
+      <div class="wl-note" style="margin-top: 18px;">
+        <strong>Revision note.</strong> This memo was rewritten after an architecture review. The earlier version specified a custom web application (Next.js + PostgreSQL) built in presentation-first tiers, costing 100–160 hours before the tool could update itself. That architecture existed to satisfy one requirement — private notes attached to case records — which implied user accounts, which implied a server. The Claude artifact runtime turns out to provide authenticated, per-user-private storage directly. Removing the server requirement collapses the build to roughly a third of the effort and reorders the work so the tool becomes self-updating first rather than last. Cost figures throughout have been revised down accordingly.
+      </div>
     </div>
 
     <div class="section-block">
@@ -1498,178 +1501,187 @@ main {
 
     <div class="section-block">
       <h2>Investment tiers</h2>
-      <p>Four tiers. Bronze is what exists today. Silver, Gold, and Platinum are staged commitments. Platinum's scale is materially larger than the first three and would require external co-funding — insurer consortium, subscription revenue, or grant capital.</p>
-      <p>The primary build model is <strong>you writing this yourself using Claude Code</strong>, not a hired contractor. Tiers below show self-build effort (hours of your time, cash close to zero) with the contractor cash cost as a benchmark so partners can see the value the tool represents even without spending firm capital.</p>
+      <p>Four stages. Stage 1 is what exists today. Stages 2 and 3 are staged commitments of attorney time. Stage 4 is materially larger than the first three and would require external co-funding — insurer consortium, subscription revenue, or grant capital.</p>
+      <p>Stages are defined by <strong>how much the tool maintains itself</strong>, not by how elaborate it looks. That reframe matters: the earlier version of this memo sequenced by visual polish, which meant the firm would have paid for two tiers of presentation work before the tool could update without manual effort. Presentation improvements are now treated as ongoing increments rather than gates.</p>
+      <p>The build model is <strong>Nick building this using Claude Code</strong>, not a hired contractor. Each stage shows hours of attorney time and cash cost, with a contractor benchmark so partners can gauge the market value of the asset regardless of who builds it.</p>
       <div class="tier-grid">
         <div class="tier-card" data-tier="bronze">
-          <div class="tier-eyebrow">Tier · Bronze</div>
-          <div class="tier-title">Working prototype</div>
-          <div class="tier-cost">~$200 cash · already built</div>
-          <div class="tier-cost-secondary">Contractor benchmark: n/a</div>
+          <div class="tier-eyebrow">Stage 1</div>
+          <div class="tier-title">Hand-curated</div>
+          <div class="tier-cost">~$200/yr · already built</div>
+          <div class="tier-cost-secondary">Curation load: ~3 hrs/week</div>
           <ul>
-            <li>Static single-file HTML, 150+ items, deployed as artifact</li>
-            <li>Attorney-manual curation (~3 hrs/wk)</li>
-            <li>Daily internal reference; client-conversation support</li>
-            <li>No auth, no private notes in-tool</li>
+            <li>263 items across litigation, regulation, sanctions, data centers</li>
+            <li>Coverage overlay on every case</li>
+            <li>Six views including Timeline and this memo</li>
+            <li>Every update requires manual work</li>
           </ul>
           <div class="tier-status">Live now</div>
         </div>
         <div class="tier-card" data-tier="silver">
-          <div class="tier-eyebrow">Tier · Silver</div>
-          <div class="tier-title">Real backend + shareable client views</div>
-          <div class="tier-cost">~100–160 hrs your time · ~$560 cash yr 1</div>
-          <div class="tier-cost-secondary">Contractor benchmark: $8K – $14K</div>
+          <div class="tier-eyebrow">Stage 2</div>
+          <div class="tier-title">Self-updating</div>
+          <div class="tier-cost">20–28 hrs · ~$0 cash</div>
+          <div class="tier-cost-secondary">Contractor benchmark: $2.5K – $3.5K</div>
           <ul>
-            <li>Next.js + Postgres, auth, admin UI</li>
-            <li>Private notes, shareable read-only URLs</li>
-            <li>Timeline &amp; Case File as first-class views</li>
-            <li>10–16 weeks at ~10 hrs/wk</li>
-            <li>Claude Code on Pro plan sufficient</li>
+            <li>Data separated from presentation; automated site build</li>
+            <li>CourtListener and Federal Register ingest on a weekly schedule</li>
+            <li>New items arrive as a pull request for review</li>
+            <li><strong>Curation load drops to ~20 min/week</strong></li>
+            <li>No server, no database, no hosting cost</li>
           </ul>
-          <div class="tier-status">Committable Q4 2026</div>
+          <div class="tier-status">The critical unlock</div>
         </div>
         <div class="tier-card" data-tier="gold">
-          <div class="tier-eyebrow">Tier · Gold</div>
-          <div class="tier-title">Sankey, Atlas, LLM-assisted Pulse</div>
-          <div class="tier-cost">+160–240 hrs · ~$3.7K – $5.4K cash yr 1</div>
-          <div class="tier-cost-secondary">Contractor benchmark: +$10K – $14K</div>
+          <div class="tier-eyebrow">Stage 3</div>
+          <div class="tier-title">Enriched &amp; annotated</div>
+          <div class="tier-cost">14–22 hrs · ~$150–500/yr</div>
+          <div class="tier-cost-secondary">Contractor benchmark: $2K – $3K</div>
           <ul>
-            <li>Custom Sankey (Flow) and choropleth (Atlas)</li>
-            <li>Algorithmic anomaly detection</li>
-            <li>LLM-drafted Pulse narrative with editorial pass</li>
-            <li>Corporate signals ingest (EDGAR, funding)</li>
-            <li>Cuts curation from 3 hrs/wk to ~1 hr/wk</li>
-            <li>May need Max plan for 2–3 peak sprint months</li>
+            <li>Machine-drafted summaries and coverage overlays for review</li>
+            <li>Per-item review status: pending, reviewed, verified</li>
+            <li>Private notes and shared team notes attached to cases</li>
+            <li>Weekly Pulse narrative drafted for editorial pass</li>
           </ul>
-          <div class="tier-status">Committable Q1–Q2 2027</div>
+          <div class="tier-status">Adds the annotation layer</div>
         </div>
         <div class="tier-card" data-tier="platinum">
-          <div class="tier-eyebrow">Tier · Platinum</div>
-          <div class="tier-title">SERFF, DC ingestion, judge analytics</div>
-          <div class="tier-cost">Not self-buildable</div>
-          <div class="tier-cost-secondary">Contractor path: $80K – $200K+</div>
+          <div class="tier-eyebrow">Stage 4</div>
+          <div class="tier-title">Deep verticals</div>
+          <div class="tier-cost">Requires external funding</div>
+          <div class="tier-cost-secondary">Contractor path: $70K – $150K+</div>
           <ul>
-            <li>Cross-state SERFF filings ingestion</li>
-            <li>Data-center automated ingestion (priority states)</li>
+            <li>Cross-state SERFF insurer filings ingestion</li>
+            <li>National data-center coverage</li>
             <li>Judge-level motion-outcome analytics</li>
-            <li>The Network graph</li>
             <li>White-label licensing feature set</li>
           </ul>
-          <div class="tier-status">Requires external co-funding</div>
+          <div class="tier-status">Insurer consortium or revenue</div>
         </div>
       </div>
+      <p style="margin-top: 16px;"><strong>Ongoing increments, not gated stages:</strong> additional sources (Regulations.gov, EUR-Lex, Open States, EDGAR — 10–20 hrs), hotspot-county data-center scrapers (see revised assessment below), and richer visualizations (Sankey, choropleth, network graph — 12–20 hrs). Each is independently useful once Stage 2 exists and none blocks the others.</p>
     </div>
 
     <div class="section-block">
       <h2>Year-one cash cost breakdown</h2>
-      <p>Rows compound: Silver includes Bronze; Gold adds to Silver; Platinum adds to Gold. Two totals shown at the bottom — the recommended self-build path (you writing this via Claude Code) and the contractor path (benchmark only). Attorney time is opportunity cost, not cash; shown separately.</p>
+      <p>Stages compound. The striking result of the architecture review is how much of the earlier budget was infrastructure that is no longer needed: hosting, database, and authentication are all provided by the artifact runtime at no cost. What remains is a modest API bill for the machine-drafting layer.</p>
       <div class="cost-table-wrap">
         <table class="cost-table">
           <thead>
             <tr>
               <th>Line item</th>
-              <th class="n">Bronze</th>
-              <th class="n">Silver</th>
-              <th class="n">Gold</th>
-              <th class="n">Platinum (adds)</th>
+              <th class="n">Stage 1</th>
+              <th class="n">Stage 2</th>
+              <th class="n">Stage 3</th>
+              <th class="n">Stage 4 (adds)</th>
             </tr>
           </thead>
           <tbody>
             <tr class="subhead">
-              <td colspan="5">Self-build path — via Claude Code (recommended)</td>
+              <td colspan="5">Build effort — Nick, via Claude Code</td>
             </tr>
             <tr>
-              <td>Your engineering time</td>
+              <td>Attorney engineering time</td>
               <td class="n">0 hrs</td>
-              <td class="n">100 – 160 hrs</td>
-              <td class="n">+160 – 240 hrs</td>
+              <td class="n">20 – 28 hrs</td>
+              <td class="n">+14 – 22 hrs</td>
               <td class="n">out of scope</td>
             </tr>
             <tr>
-              <td>Claude Code plan (build tool)</td>
-              <td class="n">Pro — $20/mo</td>
+              <td>Claude Code plan</td>
+              <td class="n">Pro, existing</td>
               <td class="n">Pro sufficient</td>
-              <td class="n">Max $100/mo × 2–3 mo peak</td>
-              <td class="n">—</td>
-            </tr>
-            <tr>
-              <td>Incremental Claude Code cash</td>
-              <td class="n">$0</td>
-              <td class="n">$0</td>
-              <td class="n">$200 – $400</td>
+              <td class="n">Pro sufficient</td>
               <td class="n">—</td>
             </tr>
             <tr class="subhead">
-              <td colspan="5">Runtime &amp; operating (both paths)</td>
+              <td colspan="5">Infrastructure — eliminated by the artifact runtime</td>
             </tr>
             <tr>
-              <td>Hosting &amp; database</td>
+              <td>Web hosting</td>
               <td class="n">$0</td>
-              <td class="n">$360</td>
-              <td class="n">$600</td>
-              <td class="n">+$1,200</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
             </tr>
             <tr>
-              <td>Anthropic API — deployed app runtime</td>
+              <td>Database</td>
               <td class="n">$0</td>
               <td class="n">$0</td>
-              <td class="n">$1,800 – $3,600</td>
-              <td class="n">+$3,600 – $9,600</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
             </tr>
             <tr>
-              <td>Data subscriptions (LegiScan, DCT)</td>
+              <td>Authentication / user accounts</td>
               <td class="n">$0</td>
               <td class="n">$0</td>
-              <td class="n">$500 – $1,000</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+            </tr>
+            <tr>
+              <td>Scheduled job runner</td>
+              <td class="n">—</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+            </tr>
+            <tr class="subhead">
+              <td colspan="5">Recurring operating cost</td>
+            </tr>
+            <tr>
+              <td>Anthropic API — machine drafting</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$150 – $500</td>
+              <td class="n">+$400 – $1,200</td>
+            </tr>
+            <tr>
+              <td>Data subscriptions (optional)</td>
+              <td class="n">$0</td>
+              <td class="n">$0</td>
+              <td class="n">$0 – $4,000</td>
               <td class="n">+$2,000 – $5,000</td>
             </tr>
             <tr>
               <td>Domain, tooling, misc</td>
               <td class="n">$200</td>
               <td class="n">$200</td>
-              <td class="n">$500</td>
+              <td class="n">$200</td>
               <td class="n">+$500</td>
             </tr>
             <tr class="total">
-              <td>Year-1 cash total — self-build path</td>
+              <td>Year-1 cash total</td>
               <td class="n">~$200</td>
-              <td class="n">~$560</td>
-              <td class="n">$3.7K – $5.4K</td>
-              <td class="n">outside envelope</td>
+              <td class="n">~$200</td>
+              <td class="n">$350 – $700</td>
+              <td class="n">requires funding</td>
             </tr>
             <tr class="subhead">
-              <td colspan="5">Contractor benchmark (for comparison only)</td>
+              <td colspan="5">Contractor benchmark — market value if outsourced</td>
             </tr>
             <tr>
               <td>Contractor engineering @ ~$120/hr</td>
               <td class="n">$0</td>
-              <td class="n">$6K – $10K</td>
-              <td class="n">+$10K – $14K</td>
-              <td class="n">+$60K – $150K</td>
-            </tr>
-            <tr class="total">
-              <td>Year-1 cash total — contractor path</td>
-              <td class="n">~$200</td>
-              <td class="n">$8K – $14K</td>
-              <td class="n">$22K – $32K</td>
-              <td class="n">outside envelope</td>
+              <td class="n">$2.5K – $3.5K</td>
+              <td class="n">+$2K – $3K</td>
+              <td class="n">+$70K – $150K</td>
             </tr>
             <tr class="subhead">
-              <td colspan="5">Attorney opportunity cost (not cash)</td>
+              <td colspan="5">Attorney time — opportunity cost, not cash</td>
             </tr>
             <tr>
-              <td>Curation time</td>
-              <td class="n">3 hrs/wk</td>
-              <td class="n">3 hrs/wk</td>
-              <td class="n">~1 hr/wk</td>
-              <td class="n">~1 hr/wk</td>
+              <td>Weekly curation</td>
+              <td class="n">~3 hrs</td>
+              <td class="n">~20 min</td>
+              <td class="n">~20 min</td>
+              <td class="n">~20 min</td>
             </tr>
             <tr>
-              <td>Review of LLM-drafted Pulse</td>
-              <td class="n">—</td>
-              <td class="n">—</td>
-              <td class="n">~30 min/wk</td>
-              <td class="n">~30 min/wk</td>
+              <td>Weekly editorial (Pulse)</td>
+              <td class="n">included above</td>
+              <td class="n">included above</td>
+              <td class="n">~15 min</td>
+              <td class="n">~15 min</td>
             </tr>
           </tbody>
         </table>
@@ -1677,59 +1689,74 @@ main {
     </div>
 
     <div class="section-block">
-      <h2>What "software engineering" costs when you build it yourself</h2>
-      <p>The recommended path is you writing this using Claude Code, not hiring a contractor. The tier grid and cost table show both models — self-build as primary, contractor as benchmark. Here's what each means and where the Claude costs go.</p>
+      <h2>How the architecture works — and why it costs so little</h2>
+      <p>The design separates three things that the earlier plan had fused together. That separation is what makes the tool cheap to run, cheap to change, and able to update itself.</p>
 
       <div class="challenge-block">
-        <h3>Self-build via Claude Code (primary path)</h3>
-        <p>You direct Claude Code to write and iterate on the app. Your role is architectural and editorial — you set the goals, review the output, catch the mistakes. You don't write code line-by-line; you review what Claude drafts and course-correct.</p>
+        <h3>Three planes, decoupled</h3>
         <ul>
-          <li><strong>Silver:</strong> 100–160 hours over 10–16 weeks (~10 hrs/wk). Includes framework choices, database schema, admin UI, auth, initial deployment.</li>
-          <li><strong>Gold:</strong> +160–240 hours over another 3–4 months. Sankey and choropleth take longer than they look because they need design taste, not just code.</li>
-          <li><strong>Rate multiplier vs a contractor:</strong> ~2× the contractor hours to account for framework ramp-up, context-switching from legal work, and QA/review iterations. A skilled contractor is faster on pure execution; you have the advantage of understanding the domain deeply.</li>
-          <li><strong>Cash cost:</strong> essentially $0 for Silver (existing Pro plan). Maybe $200–$400 for Gold's peak weeks if you upgrade to Max plan for 2–3 months.</li>
+          <li><strong>The data.</strong> Case records live as structured files in a private repository, split by year. Every change is versioned and reviewable, the way a document management system tracks revisions — but automatically.</li>
+          <li><strong>The pipeline.</strong> Scripts that fetch from court and regulatory sources, remove duplicates, and propose additions. These run on free infrastructure on a schedule. No server to maintain.</li>
+          <li><strong>The presentation.</strong> A template that compiles the data into the tracker interface. Roughly 3% the size of the current combined file, so changing how something looks no longer means touching the entire corpus.</li>
         </ul>
+        <p>The current tool is one 550KB file in which case data and application code are interleaved. That is workable at 263 items and becomes unmanageable well before 1,000.</p>
       </div>
 
       <div class="challenge-block">
-        <h3>Contractor path (benchmark only)</h3>
-        <p>The contractor prices in the table show what it would cost if the firm hired a US-based mid-market freelance developer to do this work instead. Included so the partnership can see the market value of what you're producing.</p>
+        <h3>The weekly loop</h3>
+        <p>Once Stage 2 is in place, the recurring rhythm is:</p>
         <ul>
-          <li><strong>Rate assumption:</strong> ~$120/hour. Standard for a US mid-level to senior full-stack contractor (Next.js + Postgres + auth).</li>
-          <li><strong>Alternatives:</strong> agencies ($150–$200/hr, more oversight); offshore contractors ($40–$80/hr, more coordination overhead); fixed-price milestone contracts (~1.5–2× hourly equivalent to cover their risk).</li>
-          <li><strong>When to actually hire one:</strong> if the partnership decides your time is better spent on billable work than on building. At a partner billable rate of $500–$800/hour, the raw math already favors that — but the tool's value depends on the coverage-overlay editorial voice, which is yours specifically, not a contractor's.</li>
-          <li><strong>Hybrid option:</strong> pay a contractor for the mechanical parts (Postgres schema, auth, admin scaffolding) — maybe $4K–$6K — while you handle the AI-legal architecture. Cuts self-build hours by ~30%.</li>
+          <li><strong>Monday, automated.</strong> The pipeline pulls new filings from CourtListener and the Federal Register, discards duplicates and irrelevant matter, and opens a proposed batch for review — for example, <em>"12 new items: 4 IP · 3 sanctions · 2 data-center · 3 regulation."</em></li>
+          <li><strong>Monday, Nick.</strong> Review the proposed batch, correct or drop anything wrong, approve. Target: 20 minutes.</li>
+          <li><strong>On approval.</strong> The tracker rebuilds and republishes automatically.</li>
         </ul>
+        <p>Nothing reaches the published tracker without attorney approval. The review step is the editorial gate, and it is deliberately the only recurring obligation.</p>
       </div>
 
       <div class="challenge-block">
-        <h3>Claude cost dimensions — plan for both separately</h3>
-        <p>Two Claude cost dimensions, unrelated to each other. Partners should see them as separate line items so neither is confused with the other.</p>
-        <p><strong>1. Claude Code for building the app.</strong> Weekly usage caps apply on all plans.</p>
+        <h3>Why there is no server bill</h3>
+        <p>The earlier plan budgeted for web hosting, a managed database, and an authentication system — the standard cost of a custom application. Those existed to support one feature: private notes attached to case records.</p>
+        <p>The Claude artifact platform provides all three directly. Every viewer is an authenticated member of the firm's organization, and the platform gives each viewer a private storage area that <strong>the tool's own owner cannot read</strong>. That is a platform guarantee rather than a policy promise, which is a stronger position for attorney work-product than a self-hosted database would be.</p>
+        <p>Two note layers become available at no infrastructure cost:</p>
         <ul>
-          <li><strong>Pro plan ($20/mo):</strong> sufficient for ~10–15 hours/week of active Claude Code work. Fine for Silver at a moderate pace, and for steady-state maintenance.</li>
-          <li><strong>Max plan ($100/mo):</strong> substantially higher caps. Recommended for concentrated Gold-tier sprints or if you compress the timeline to finish faster.</li>
-          <li><strong>Max plan ($200/mo):</strong> highest tier. Only worth it if you're doing 30+ hours/week of intensive coding — unlikely for this project's pace.</li>
-          <li><strong>Peak-usage tactic:</strong> upgrade to $100/mo Max for 2–3 sprint-heavy months, then step back to Pro for steady-state. That's the ~$200–$400 line item in the cost table.</li>
+          <li><strong>Team notes</strong> — shared annotations visible to the working group.</li>
+          <li><strong>Private notes</strong> — individual work-product, visible only to its author.</li>
         </ul>
-        <p><strong>2. Anthropic API for the deployed app's runtime</strong> — completely separate from Claude Code. Gold's LLM-drafted Pulse and anomaly detection call the API on a schedule from the deployed application.</p>
+        <div class="cost-callout"><strong>The one tradeoff:</strong> a tracker that uses this storage is organization-internal and cannot be published to the open web. That forecloses the public-microsite option <em>for this version</em>. If a public edition is ever wanted, it is a second build from the same data with notes omitted — inexpensive, but worth deciding deliberately.</div>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Where the operating cost actually goes</h3>
+        <p>The only meaningful recurring cost is the machine-drafting layer at Stage 3: reading new filings and producing draft summaries and coverage analysis for review. Four design choices keep it small:</p>
         <ul>
-          <li>Modeled at ~$150–$300/month at moderate ingest volume, using Haiku 4.5 for triage and Sonnet for narrative drafting with prompt caching.</li>
-          <li>The firm (or a firm-issued API key) pays this, not your personal plan. It's a real cash line in the annual budget.</li>
-          <li>If the tool eventually goes to subscription or white-label, this line scales with usage — but so does revenue, so it becomes a variable cost tracked against seat count.</li>
+          <li><strong>Filter before analyzing.</strong> Rules based on source, court, date, and keyword discard roughly 80% of candidates at no cost, before anything is sent to a model.</li>
+          <li><strong>Match the model to the task.</strong> A fast, inexpensive model decides whether an item is relevant; only survivors go to a more capable model for analysis.</li>
+          <li><strong>Process in batches.</strong> Weekly ingestion is never time-sensitive, which qualifies it for substantially discounted batch processing.</li>
+          <li><strong>Reuse the stable instructions.</strong> The classification vocabulary is large and unchanging, so it is cached rather than re-sent on every call.</li>
+        </ul>
+        <div class="cost-callout"><strong>Correction to the prior estimate:</strong> the earlier version of this memo put this line at $1,800–$3,600 per year. That figure assumed no filtering, the most capable model on every item, and no batching or caching. With the design above the realistic figure is <strong>in the low hundreds of dollars per year</strong> — roughly an order of magnitude lower.</div>
+      </div>
+
+      <div class="challenge-block">
+        <h3>Contractor benchmark, for comparison</h3>
+        <p>The benchmark figures assume a US-based mid-market freelance developer at roughly $120/hour. They are included so the partnership can judge the market value of the asset, not because hiring one is recommended.</p>
+        <ul>
+          <li><strong>Stage 2:</strong> $2,500 – $3,500 if outsourced.</li>
+          <li><strong>Stage 3:</strong> a further $2,000 – $3,000.</li>
+          <li><strong>Why build in-house anyway:</strong> the coverage overlay is the differentiator, and it depends on insurance-coverage judgment a general software contractor does not have. The mechanical parts are the cheap parts; the analysis is the product.</li>
         </ul>
       </div>
     </div>
 
     <div class="section-block">
       <h2>Where the money would go if we tried to do everything</h2>
-      <p>Two features get asked about most: SERFF filings ingestion and data-center automated ingestion. Both would be uniquely valuable. Both are Platinum-tier because the underlying data is genuinely hostile to automation. Here's why in plain terms.</p>
+      <p>Two features get asked about most: SERFF filings ingestion and data-center automated ingestion. Both would be uniquely valuable. Both sit at Stage 4 because the underlying data is genuinely hostile to automation. Here's why in plain terms.</p>
 
       <div class="challenge-block">
         <h3>SERFF filings ingestion</h3>
         <p class="subtitle">What insurers file with state DOIs — the earliest signal of new AI-related policy wording.</p>
         <p>The value would be enormous: seeing every insurer's proposed AI exclusion, endorsement, or rate change in real time. No competitor tracker has this.</p>
-        <p>What makes it a Platinum-tier project:</p>
+        <p>What makes it a Stage 4 project:</p>
         <ul>
           <li><strong>Not one system, but 51.</strong> Every state (plus DC) runs its own SERFF implementation with a different search interface, filing categories, and approval workflow.</li>
           <li><strong>Almost no APIs.</strong> Most states require scraping web forms; some IP-block automated access.</li>
@@ -1739,14 +1766,14 @@ main {
           <li><strong>Confidentiality holds.</strong> Some filings are marked confidential and not publicly available at all.</li>
         </ul>
         <div class="cost-callout"><strong>Realistic to build well:</strong> 3–5 months of dedicated engineering ($40K – $75K) plus ~$100 – $200/mo ongoing LLM triage. An order of magnitude larger than the self-build tiers.</div>
-        <div class="alternative-callout"><strong>Pragmatic Gold-tier alternative:</strong> manual quarterly SERFF sweeps by a paralegal or junior attorney across 3–5 priority states (NY, CA, IL, TX, FL), ~10–15 hours per sweep. Delivers roughly 60% of the value at a fraction of the cost.</div>
+        <div class="alternative-callout"><strong>Pragmatic interim alternative:</strong> manual quarterly SERFF sweeps by a paralegal or junior attorney across 3–5 priority states (NY, CA, IL, TX, FL), ~10–15 hours per sweep. Delivers roughly 60% of the value at a fraction of the cost.</div>
       </div>
 
       <div class="challenge-block">
         <h3>Data-center automated ingestion</h3>
         <p class="subtitle">Hyperscale project activity, community opposition, and municipal legislation at the county level.</p>
         <p>The value would be enormous for the AEC PL and environmental practice — knowing every hotspot before clients do.</p>
-        <p>What makes it also Platinum-tier:</p>
+        <p>What makes national coverage a Stage 4 project:</p>
         <ul>
           <li><strong>~3,000 counties.</strong> Each posts agendas independently, with no standardization.</li>
           <li><strong>The "data center" fact is inside the PDF, not the title.</strong> Meeting agendas rarely announce the subject; you have to read the packet.</li>
@@ -1755,14 +1782,15 @@ main {
           <li><strong>Utility interconnection queues are at ISO level.</strong> PJM, MISO, ERCOT, CAISO — accessible but heavily interpretation-dependent.</li>
           <li><strong>The good subscription trackers are gated.</strong> datacentertracker.org and DataCenterHawk do most of this work and charge for access.</li>
         </ul>
-        <div class="cost-callout"><strong>Realistic to build well:</strong> 2–4 months of engineering ($30K – $60K) plus $100 – $200/mo LLM triage plus $6K – $15K/yr in subscription data feeds.</div>
-        <div class="alternative-callout"><strong>Pragmatic Gold-tier alternative:</strong> subscribe to datacentertracker.org (~$4K/yr) plus a weekly ~2-hour attorney synthesis pass into our tracker. Delivers roughly 70% of the value with paid-source coverage.</div>
+        <div class="cost-callout"><strong>National coverage, built well:</strong> 2–4 months of engineering ($30K – $60K) plus ongoing processing and $6K – $15K/yr in subscription data feeds.</div>
+        <div class="alternative-callout"><strong>Revised assessment — this was previously too pessimistic.</strong> The earlier memo treated data-center ingestion as all-or-nothing. It isn't. Once the Stage 2 pipeline exists, adding scrapers for the <strong>six to eight counties that actually matter</strong> — Loudoun, Prince William and Fauquier in Virginia; Licking County, Ohio; Coweta County, Georgia; Maricopa County, Arizona — is incremental work measured in days, not months. It is <em>national</em> coverage that is out of scale, not <em>useful</em> coverage. Reclassified from Stage 4 to an ongoing increment after Stage 2.</div>
+        <div class="alternative-callout"><strong>Interim option either way:</strong> subscribe to datacentertracker.org (~$4K/yr) plus a weekly ~2-hour attorney synthesis pass. Delivers roughly 70% of the value immediately with no engineering at all.</div>
       </div>
 
       <div class="challenge-block">
         <h3>Curation labor</h3>
         <p class="subtitle">Coverage-line + trigger + exclusion analysis is the differentiator. It doesn't automate away.</p>
-        <p>Even at Gold-tier, someone has to make the final editorial call about which developments matter and what the coverage analysis says. LLM assistance cuts weekly curation load meaningfully — my estimate is from 3 hrs/wk (all human) to about 1 hr/wk (LLM-drafted, attorney-edited) — but does not go to zero. This is the reality of the coverage-overlay moat: it's judgment work, not classification work.</p>
+        <p>Even at Stage 3, someone has to make the final editorial call about which developments matter and what the coverage analysis says. Machine assistance cuts the weekly load substantially — from roughly 3 hours (all human) to about 20 minutes of review plus 15 minutes of editorial — but never to zero. This is the reality of the coverage-overlay moat: it is judgment work, not classification work.</p>
         <div class="alternative-callout"><strong>Positive framing:</strong> that irreducible attorney time is exactly what makes this defensible against pure-tech competitors. The moat is the editorial voice, not the pipeline.</div>
       </div>
     </div>
@@ -1772,24 +1800,29 @@ main {
       <p>Four paths, unlocked at successive tiers. Not mutually exclusive — many mature tools carry two or three simultaneously.</p>
       <div class="commercial-grid">
         <div class="commercial-card">
-          <span class="unlock">Unlocks at Bronze</span>
+          <span class="unlock">Available now</span>
           <h3>Internal tool + BD asset</h3>
           <p>Sharpens the AI practice, deepens client relationships, generates content for firm publications. Value shows in matter generation and retention. Hardest to quantify, likely the most reliably recovered ROI. Available today.</p>
         </div>
         <div class="commercial-card">
-          <span class="unlock">Unlocks at Silver, best at Gold</span>
+          <span class="unlock">Unlocks at Stage 2, best at Stage 3</span>
           <h3>Insurer-sponsored consortium</h3>
-          <p>Two or three insurers each contribute ($25K – $50K each) toward Platinum-tier features (SERFF, DC ingestion) in exchange for early access, feature-set input, and a private data cut. Gives the firm channel-partner relationships with named carriers. Underwrites the Platinum tier without firm capital.</p>
+          <p>Two or three insurers each contribute ($25K – $50K each) toward Stage 4 features (SERFF, national DC coverage) in exchange for early access, feature-set input, and a private data cut. Gives the firm channel-partner relationships with named carriers. Underwrites Stage 4 without firm capital.</p>
         </div>
         <div class="commercial-card">
-          <span class="unlock">Unlocks at Gold</span>
+          <span class="unlock">Unlocks at Stage 3</span>
           <h3>Subscription product</h3>
           <p>Target market: mid-market AI-practice firms, insurance brokerages, model-developer general-counsel offices. Priced ~$400 – $800/user/month. Break-even at 30 – 60 seats. Requires real go-to-market spend beyond what's modeled in the tiers above.</p>
         </div>
         <div class="commercial-card">
-          <span class="unlock">Unlocks at Platinum</span>
+          <span class="unlock">Unlocks at Stage 4</span>
           <h3>White-labeled tracker</h3>
-          <p>Licensed to insurers or brokerages under their brand. Revenue-share or flat license fee ($50K – $150K/yr per licensee). Highest-margin path but requires Platinum-tier data completeness. Depends on SERFF and DC ingest already being in production.</p>
+          <p>Licensed to insurers or brokerages under their brand. Revenue-share or flat license fee ($50K – $150K/yr per licensee). Highest-margin path but requires Stage 4 data completeness. Depends on SERFF and national DC ingest already being in production.</p>
+        </div>
+        <div class="commercial-card">
+          <span class="unlock">Architectural note</span>
+          <h3>The public-edition question</h3>
+          <p>Because the notes feature makes this version organization-internal, a public-facing edition would be a separate build from the same corpus with notes omitted. That is inexpensive to produce but should be a deliberate decision rather than an assumption — it affects whether the tool is positioned as an internal asset or a marketing surface.</p>
         </div>
       </div>
     </div>
@@ -1806,8 +1839,20 @@ main {
           <div class="risk-body">GWU, Orrick, Charlotin, ChatGPT-Is-Eating-the-World. <em>Mitigation: the coverage overlay is a defensible moat; positioning is complement, not replacement — we credit source trackers explicitly.</em></div>
         </div>
         <div class="risk-item">
-          <span class="risk-name">Cost overrun</span>
-          <div class="risk-body">Contractor scope creep in Silver/Gold sprints is the classic failure mode. <em>Mitigation: sprint-by-sprint pay-and-review, no lump-sum contract; SPEC.md fixes scope in advance.</em></div>
+          <span class="risk-name">Effort overrun</span>
+          <div class="risk-body">Build phases running long is the classic failure mode, and attorney hours are the scarce resource here rather than cash. <em>Mitigation: phases are independently useful and independently abandonable. If Phase 1 lands and Phase 2 stalls, the tool is still better off than today. No phase is a sunk prerequisite for a benefit that only arrives later.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Platform dependency</span>
+          <div class="risk-body">The architecture relies on the Claude artifact runtime for hosting, authentication, and note storage. If that platform changes materially, those pieces need replacing. <em>Mitigation: the corpus itself lives in a private git repository in an open format and is fully portable. Only the presentation layer and notes are platform-coupled; the asset that took real work to build is not.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Source API changes</span>
+          <div class="risk-body">CourtListener, Federal Register, and similar feeds can change formats or terms. <em>Mitigation: one self-contained module per source, so a break is isolated and repairable in hours; the pipeline continues on remaining sources meanwhile.</em></div>
+        </div>
+        <div class="risk-item">
+          <span class="risk-name">Machine-drafted error reaching a client</span>
+          <div class="risk-body">Stage 3 introduces drafted analysis that could be wrong. <em>Mitigation: per-item review status, with pending items excluded from client-shareable views by default. Nothing publishes without attorney approval of the weekly batch.</em></div>
         </div>
         <div class="risk-item">
           <span class="risk-name">Regulatory volatility</span>
@@ -1833,49 +1878,56 @@ main {
       <p>A staged commitment that lets the firm evaluate at each tier before releasing the next capital tranche.</p>
       <ol class="path-list">
         <li class="path-step">
-          <div class="path-when">Now — already achieved</div>
-          <h4>Bronze prototype live and shareable</h4>
-          <p>Show partners this artifact, gather reactions, decide on Silver commitment. Zero incremental cost.</p>
+          <div class="path-when">Complete</div>
+          <h4>Stage 1 — hand-curated prototype, live and shareable</h4>
+          <p>263 items with coverage analysis, six views, published and viewable at a link. Circulate to partners for reaction. Zero incremental cost.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">Q4 2026 · ~$560 cash + ~100–160 hrs my time</div>
-          <h4>Build Silver via Claude Code — real backend, private notes, shareable client views</h4>
-          <p>10–16 weeks at ~10 hrs/wk. Deliverable: authenticated app with private notes, admin UI, shareable read-only URLs, Timeline and Case File. First point at which the firm has a durable asset it owns end-to-end. Contractor benchmark for comparison: $8K–$14K if outsourced.</p>
+          <div class="path-when">2–3 weeks · 8–12 hrs · no cash cost</div>
+          <h4>Separate the data from the presentation</h4>
+          <p>Nothing partners will see changes. Case data moves out of the single monolithic file into structured, versioned records; a build script reassembles the tracker. This is unglamorous and it is the highest-leverage step available — it makes every later change roughly eight times cheaper and stops the file being risky to edit as the corpus grows.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">Q1–Q2 2027 · ~$3K–$5K cash + ~160–240 additional hrs</div>
-          <h4>Build Gold via Claude Code if Silver adoption is real</h4>
-          <p>Another 3–4 months. Deliverable: Sankey (Flow) + choropleth (Atlas), LLM-drafted Pulse with editorial review, corporate signals ingest. May require Max plan for 2–3 peak months (~$200–$400 additional). Adoption metric to justify: at least three firm attorneys logging in weekly. Contractor benchmark: $10K–$14K if outsourced.</p>
+          <div class="path-when">3–4 weeks · 12–16 hrs · no cash cost</div>
+          <h4>Stage 2 — the tool starts updating itself</h4>
+          <p>Automated weekly pull from CourtListener and the Federal Register, with new items arriving as a batch for approval. <strong>This is the decision point that matters most:</strong> after it, the tracker stays current on about 20 minutes of attorney time per week instead of three hours. Everything after this is improvement on a working system rather than a prerequisite.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">Q3 2027 onward</div>
-          <h4>Insurer-consortium conversation for Platinum funding</h4>
-          <p>Approach 2–3 target insurers about co-funding SERFF and DC ingestion. Requires Gold in production and a demonstrable weekly-active-attorney metric. My time commitment stops scaling here; further tier depends on outside money and on hiring contractors properly.</p>
+          <div class="path-when">3–4 weeks · 14–22 hrs · $150–500/yr</div>
+          <h4>Stage 3 — machine drafting and the notes layer</h4>
+          <p>Draft summaries and coverage analysis prepared for review rather than written from scratch; per-item review status so machine-drafted and attorney-verified records are visibly distinct; private and team notes attached to cases. Worth committing once Stage 2 has run for a few weeks and the batch quality is known.</p>
         </li>
         <li class="path-step">
-          <div class="path-when">2028</div>
-          <h4>Subscription-product decision</h4>
-          <p>Depends on Platinum data completeness and firm strategic posture on non-legal product ventures. Path stays optional — the tool is valuable as an internal + BD asset even if subscription never happens.</p>
+          <div class="path-when">Ongoing, as useful</div>
+          <h4>Breadth and polish, in any order</h4>
+          <p>Additional sources (Regulations.gov, EUR-Lex, Open States, EDGAR); scrapers for the six to eight data-center counties that matter; richer visualizations. Each is independently valuable and none blocks the others. Sequence by what the practice needs at the time.</p>
+        </li>
+        <li class="path-step">
+          <div class="path-when">When Stage 3 is proven</div>
+          <h4>Stage 4 conversation with insurers</h4>
+          <p>Approach two or three carriers about co-funding SERFF ingestion and national data-center coverage. Requires a working tool and a demonstrable usage record. Firm capital commitment does not need to scale past Stage 3 — Stage 4 is contingent on outside money.</p>
         </li>
       </ol>
+      <p style="margin-top: 18px;"><strong>Total firm commitment through Stage 3: roughly 35–50 hours of attorney time and under $1,000 in the first year.</strong> The earlier version of this memo asked for 260–400 hours and $22,000–$32,000 to reach a comparable point.</p>
     </div>
 
     <div class="section-block">
       <h2>Open questions for the partnership</h2>
       <ol class="simple">
-        <li><strong>Ownership.</strong> Does the firm own the tool as a firm asset, does the AI Working Group own it internally, or is it structured as a spinout from day one? This decision has tax and IP implications that ripple through everything else.</li>
-        <li><strong>Editorial governance.</strong> If more than one attorney maintains the Pulse, we need editorial standards — voice, tone, what warrants inclusion, how disagreements are resolved.</li>
-        <li><strong>Client-disclosure posture.</strong> What's shareable with clients as-is, versus what requires firm-review before external send? Should client-shareable URLs carry a firm disclaimer, or the Working Group's?</li>
-        <li><strong>Insurer relationships.</strong> Are there two or three specific carriers we'd approach for Platinum-tier co-funding? Timing of that approach matters — too early (pre-Gold) reduces credibility; too late gives up runway.</li>
-        <li><strong>Publication cadence.</strong> Do we start a public monthly "AI Working Group Briefing" now (Bronze), at Silver, or at Gold? Earlier is more work; later is less market presence.</li>
-        <li><strong>Cash-commitment ceiling.</strong> What's the firm's appetite for cash investment across the year — and does that number change if adoption at Gold justifies going further?</li>
-        <li><strong>Attorney-time accounting.</strong> Should curation hours be booked as marketing/BD overhead, or absorbed as personal-development time? This affects both partner incentives and internal cost-recovery.</li>
+        <li><strong>Ownership.</strong> Does the firm own the tool as a firm asset, does the AI Working Group own it internally, or is it structured as a spinout? This has tax and IP implications that ripple through everything else.</li>
+        <li><strong>Who gets access.</strong> The notes layer distinguishes viewers who can read from those who can edit. Which attorneys should have edit rights, and does anyone outside the Working Group get read access?</li>
+        <li><strong>Public edition, yes or no.</strong> The notes feature makes this version organization-internal. If a public thought-leadership edition is wanted, it is a second build from the same data — cheap, but it should be a deliberate decision rather than a default.</li>
+        <li><strong>Editorial governance.</strong> If more than one attorney maintains the Pulse or writes team notes, we need standards — voice, what warrants inclusion, how disagreements are resolved.</li>
+        <li><strong>Verification posture.</strong> Stage 3 introduces per-item review status. What does the firm require before an item can appear in something client-facing — attorney skim, or full verification against primary sources?</li>
+        <li><strong>Client-disclosure posture.</strong> What is shareable with clients as-is, versus what requires firm review before external send? Should shared views carry a firm disclaimer or the Working Group's?</li>
+        <li><strong>Insurer relationships.</strong> Are there two or three specific carriers we would approach for Stage 4 co-funding? Timing matters — too early reduces credibility; too late gives up runway.</li>
+        <li><strong>Attorney-time accounting.</strong> Should the weekly review be booked as marketing/BD overhead or absorbed as professional development? This affects both partner incentives and internal cost recovery.</li>
       </ol>
     </div>
 
     <div class="section-block">
-      <h2>Detailed sprint plan</h2>
-      <p>The concrete engineering roadmap underlying the tier structure above. The tier grid is the executive view; this is the working plan.</p>
+      <h2>Detailed build plan</h2>
+      <p>The concrete engineering roadmap underlying the stages above. The stage grid is the executive view; this is the working plan, with hour estimates per phase. Full technical detail lives in <code>SPEC.md</code> in the repository.</p>
       <div class="roadmap-list" id="roadmapList"></div>
     </div>
   </section>
@@ -2072,7 +2124,7 @@ main {
         <div class="wl-card">
           <h3 class="wl-card-title"><a href="https://www.datacenterhawk.com" target="_blank" rel="noopener">DataCenterHawk ↗</a> <span class="wl-priority paid">Paid</span></h3>
           <p class="wl-card-desc">Subscription database of data-center projects globally. Deeper than datacentertracker.org.</p>
-          <div class="wl-card-why"><strong>Why include</strong>The paid alternative to datacentertracker.org. If the DC ingestion feature is truly Platinum-tier, this subscription (~$4K-8K/yr est.) is the pragmatic Gold-tier alternative we already flagged in the What's Next memo.</div>
+          <div class="wl-card-why"><strong>Why include</strong>The paid alternative to datacentertracker.org. Full national DC ingestion is a Stage 4 project, but this subscription (~$4K-8K/yr est.) delivers most of the value immediately with no engineering — the interim option flagged in the What's Next memo.</div>
         </div>
         <div class="wl-card">
           <h3 class="wl-card-title"><a href="https://www.jll.com/en-us/insights/market-perspectives/data-center-outlook" target="_blank" rel="noopener">JLL Data Center Outlook ↗</a> <span class="wl-priority ref">Reference</span></h3>
@@ -2120,7 +2172,7 @@ main {
     </div>
 
     <div class="wl-note">
-      <strong>Note.</strong> None of these are in the current source list yet — this page is a queue for the partnership to prioritize. If we commit to Silver, my recommendation is to add the Top 6 in the first sprint (they're all article-page fetches, low ingest cost) and to leave the paid subscriptions (DataCenterHawk especially) for the Gold-tier data-integration conversation. A Silver ingest pipeline could reasonably absorb 15–20 total sources before the curation load becomes the binding constraint.
+      <strong>Note.</strong> None of these are in the current source list yet — this page is a queue for the partnership to prioritize. Once the Stage 2 pipeline exists, my recommendation is to add the Top 6 first — they are all article-page fetches with low ingest cost — and to leave the paid subscriptions (DataCenterHawk especially) for the Stage 3 conversation. The pipeline could reasonably absorb 15–20 total sources before curation load becomes the binding constraint.
     </div>
   </section>
 </main>
@@ -13823,16 +13875,71 @@ main {
 
 <script id="roadmapData" type="application/json">
 [
-  { "when": "Sprint 1", "title": "Foundation & The Pulse (v1)", "desc": "Real backend, admin UI for case entry, single-user auth, imports from CourtListener and EDGAR, Pulse with manual top-5 curation, priority-track backfill from post-ChatGPT era." },
-  { "when": "Sprint 2", "title": "Insurance layer & Timeline", "desc": "Full Timeline view, Case File drill-down, insurance-analysis fields wired into the schema (line + trigger + exclusion), Regulation entity, shareable read-only URLs." },
-  { "when": "MVP →", "title": "First usable version", "desc": "End of Sprint 2 is the true daily-use MVP: enter cases, see trends, drill in, share filtered views with clients." },
-  { "when": "Sprint 3", "title": "The Flow & The Atlas", "desc": "Custom D3 Sankey (claim → industry → coverage line → trigger → exclusion) and choropleth (US states + UK/EU countries with layer toggles for filing density, funded AI companies, hyperscale DC locations, AI-legislation status)." },
-  { "when": "Sprint 4", "title": "Intelligence layer", "desc": "Algorithmic anomaly detection (filing-velocity spikes, first-of-kind theories, plaintiff-firm expansion), LLM-drafted Pulse narrative with human-in-the-loop editing, corporate-signal ingestion (funding, M&A, 10-K risk-factor changes)." },
-  { "when": "v1.2+", "title": "SERFF filings ingestion", "desc": "Cross-state tracker of insurer form and rate filings on AI exclusions, endorsements, and rates. Cross-linked into The Flow so litigation activity in a state pairs with subsequent insurer wording responses. Deferred because state-by-state variation, PDF-heavy formats, and weak APIs make it expensive to build well; highest single differentiator for a policy-wording practice once built." },
-  { "when": "v1.2+", "title": "Data-center automated ingestion", "desc": "Pipelines pulling data-center project activity from county planning boards, utility interconnection queues, and trade journalism across hotspot states (VA, TX, GA, OH, IN, MO, AZ first). The DC content is already a v1 filter track curated by hand; what's deferred is automating that ingest. Underlying data is more scattered than SERFF — thousands of counties without APIs, PDF-heavy meeting minutes — so it is treated as its own multi-sprint project. Cross-linked into the Atlas (project + opposition density) and the Flow (AEC PL, environmental, and public-officials coverage lines)." },
-  { "when": "v1.2+", "title": "Judge-level analytics", "desc": "Motion-outcome rollups by judge for venue-selection intelligence and defense-strategy pattern-finding. Depends on rigorous motion-outcome tagging in the case corpus — benefits from waiting until the corpus is thicker." },
-  { "when": "v1.3+", "title": "The Network graph", "desc": "Force-directed graph of plaintiff firms ↔ defendants ↔ theories ↔ judges. High analytic value; better designed after v1 use reveals which relationships you actually care about." },
-  { "when": "v2", "title": "Weekly briefing & client exports", "desc": "Automated Monday digest email; client-shareable branded PDF exports of filtered slices; public-facing microsite for thought leadership; multi-user shared team space with role-based permissions." }
+  {
+    "when": "Phase 1",
+    "title": "Separate data from presentation",
+    "desc": "Case records move out of the single 550KB file into structured, versioned records split by year. A build script reassembles the tracker from data plus template. Add project conventions and repeatable recipes so future work does not re-derive context. Nothing user-visible changes; every subsequent change becomes roughly eight times cheaper and the corpus stops being risky to edit. 8-12 hours."
+  },
+  {
+    "when": "Phase 2",
+    "title": "First automated sources and the weekly review loop",
+    "desc": "CourtListener and Federal Register ingest modules; deduplication against the existing corpus; deterministic pre-filtering; a scheduled weekly job that opens a reviewable batch of proposed additions; automatic rebuild and republish on approval. 12-16 hours."
+  },
+  {
+    "when": "Stage 2 reached",
+    "title": "The tool now updates itself",
+    "desc": "Weekly curation load drops from roughly three hours to about twenty minutes of review. This is the decision point that matters most; everything after it is improvement on a working system rather than a prerequisite."
+  },
+  {
+    "when": "Phase 3",
+    "title": "Machine drafting and review status",
+    "desc": "Batched classification and drafting: a fast model decides relevance and track, a more capable model drafts summary, significance, and coverage overlay for attorney review. Per-item provenance and review status (pending, reviewed, verified) surfaced in the interface so machine-drafted and attorney-verified records are visibly distinct. 8-12 hours."
+  },
+  {
+    "when": "Phase 4",
+    "title": "Notes layer - private and team",
+    "desc": "Two note layers via the artifact platform's storage capability: shared team annotations visible to the working group, and private per-attorney work-product that the tool's owner cannot read. Both attached to case records in the Case File view. No server or database required. 6-10 hours."
+  },
+  {
+    "when": "Stage 3 reached",
+    "title": "Enriched, annotated, self-maintaining",
+    "desc": "Total firm commitment to this point: roughly 35-50 hours of attorney time and under $1,000 in first-year cash. The earlier plan reached a comparable point at 260-400 hours and $22,000-$32,000."
+  },
+  {
+    "when": "Ongoing",
+    "title": "Additional sources",
+    "desc": "Regulations.gov, EUR-Lex, legislation.gov.uk, Open States, and EDGAR. Each is a free public API and a self-contained module. Roughly 2-4 hours each once the pipeline pattern exists. 10-20 hours for the set."
+  },
+  {
+    "when": "Ongoing",
+    "title": "Hotspot data-center scrapers",
+    "desc": "Revised assessment: adding the six to eight counties that actually drive data-center litigation - Loudoun, Prince William, Fauquier, Licking, Coweta, Maricopa - is incremental work measured in days once the pipeline exists. It is national coverage that is out of scale, not useful coverage. Previously misclassified as a deferred mega-project."
+  },
+  {
+    "when": "Ongoing",
+    "title": "Richer visualizations",
+    "desc": "The Flow (Sankey mapping claim type to coverage line to trigger to exclusion), the Atlas (choropleth of filing density against AI-company and data-center concentration), and the Network graph. Presentation upgrades rather than capability upgrades; deliberately sequenced after automation. 12-20 hours."
+  },
+  {
+    "when": "Stage 4",
+    "title": "SERFF insurer filings ingestion",
+    "desc": "Cross-state tracker of insurer form and rate filings on AI exclusions and endorsements. Genuinely hard: 51 separate state systems, almost no APIs, roughly 90% PDF, and about 2% of filings relevant. Highest single differentiator for a policy-wording practice once built. Requires external co-funding. Interim alternative: quarterly manual sweeps of three to five priority states."
+  },
+  {
+    "when": "Stage 4",
+    "title": "National data-center coverage",
+    "desc": "Full coverage across roughly 3,000 counties, as distinct from the hotspot subset above. Scanned PDFs, no standardization, opposition suits scattered across every state e-filing system. Requires external co-funding or a paid data subscription."
+  },
+  {
+    "when": "Stage 4",
+    "title": "Judge-level analytics",
+    "desc": "Motion-outcome rollups by judge for venue-selection intelligence. Depends on rigorous motion tagging across a thicker corpus, so it benefits from waiting regardless of funding."
+  },
+  {
+    "when": "Optional",
+    "title": "Public edition and client exports",
+    "desc": "A separate build from the same corpus with notes omitted, publishable to the open web for thought leadership. Plus branded briefing exports and an automated weekly digest. Inexpensive once the pipeline exists; should be a deliberate positioning decision rather than a default."
+  }
 ]
 </script>
 
