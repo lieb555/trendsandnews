@@ -20,9 +20,9 @@ on:
         required: false
         default: "90"
       max_pages:
-        description: "Max API pages to scan (each ~20 results)"
+        description: "Max pages per probe (each ~20 results). Keep low — the API allows 5 requests/min, so every page costs 13s."
         required: false
-        default: "10"
+        default: "2"
       debug:
         description: "Dump the raw API response — turn this on if the run fails"
         type: boolean
@@ -37,7 +37,10 @@ on:
 jobs:
   calibrate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # CourtListener allows 5 search requests/minute, so the run is dominated
+    # by deliberate waiting rather than work. Four probes plus the recall
+    # probe is ~15 requests ≈ 4 minutes; the headroom absorbs throttle backoff.
+    timeout-minutes: 25
 
     steps:
       - name: Check out repository

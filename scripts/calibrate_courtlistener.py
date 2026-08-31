@@ -24,11 +24,30 @@ Usage:
     python3 scripts/calibrate_courtlistener.py --days 90
     python3 scripts/calibrate_courtlistener.py --recall-only   # no API needed
 
-NOTE ON API ASSUMPTIONS: this was written without network access to
-CourtListener's docs. Every assumption about their API shape is isolated in
-fetch_page() and normalize_result() and flagged with ASSUMPTION comments.
-If the first run fails, --debug prints the raw response so the fix is a
-one-line correction rather than a rewrite.
+WHAT RUN #1 (2026-08-31) ESTABLISHED, and why this script changed shape:
+
+  1. The API shape was right. v4 /search/, `Token` auth, type=r, filed_after,
+     cursor pagination — all confirmed against the live service.
+
+  2. CourtListener throttles search at 5 requests/minute. This is the
+     binding constraint on the entire ingest design. The original approach —
+     page through recent federal dockets and filter them in Python — needs
+     roughly 15 hours of continuous polling to cover a single 90-day window,
+     because federal courts take in far more filings than 100/minute. It
+     scanned 100 dockets and kept 0, which is the arithmetic working
+     correctly, not the filter failing.
+
+  So the filter moved server-side. Instead of fetching everything and
+  discarding almost all of it locally, each probe below is one query the
+  server answers with matches only: a handful of requests per run instead
+  of thousands.
+
+  3. Docket-metadata matching recalls 97% of AI-as-subject litigation and
+     15% of sanctions cases. That gap is structural — in a sanctions case
+     the AI fact appears nowhere in the docket metadata, only inside the
+     judge's written order. So this version adds full-text opinion search
+     (type=o) and tests it directly against named cases the metadata filter
+     missed. That test, probe_recall(), is the point of run #2.
 """
 
 import argparse
@@ -150,47 +169,72 @@ def classify(item):
 # CourtListener fetch
 # ---------------------------------------------------------------------------
 
-def fetch_page(token, filed_after, cursor=None, debug=False):
-    """
-    ASSUMPTION: v4 search endpoint, RECAP docket type, Token auth header.
-    If this 401s/404s, the fix is here. Run with --debug to see the raw body.
-    """
-    params = {
-        "type": "r",                 # ASSUMPTION: 'r' = RECAP dockets
-        "filed_after": filed_after,  # ASSUMPTION: accepts YYYY-MM-DD
-        "order_by": "dateFiled desc",
-    }
-    url = f"{API_BASE}/search/?{urllib.parse.urlencode(params)}"
-    if cursor:
-        url = cursor
+# CourtListener throttles the search endpoint at 5 requests/minute. That
+# number is the single most important constraint on the whole ingest design:
+# it makes scanning the docket firehose and filtering client-side impossible
+# (see the header note), and it means every request has to earn its place.
+# Confirmed empirically on 2026-08-31 by run #1, which got:
+#   {"detail":"Request was throttled. Rate limit exceeded: 5/min."}
+RATE_LIMIT_PER_MIN = 5
+MIN_INTERVAL = 60.0 / RATE_LIMIT_PER_MIN + 1.0   # 13s, with a second of slack
 
+_last_request_at = [0.0]
+
+
+def _pace():
+    """Block until enough time has passed to stay under the published limit."""
+    wait = MIN_INTERVAL - (time.monotonic() - _last_request_at[0])
+    if wait > 0:
+        time.sleep(wait)
+    _last_request_at[0] = time.monotonic()
+
+
+def api_get(token, params, debug=False, _retries=2):
+    """
+    One paced call to the v4 search endpoint.
+
+    Run #1 confirmed the API shape: v4 /search/, `Token` auth, `type=r` for
+    RECAP dockets, `filed_after` as YYYY-MM-DD, cursor pagination via `next`.
+    Those are no longer assumptions. What run #1 did NOT confirm is the `q`
+    query syntax, which is what this version leans on — if a probe returns
+    zero across the board, suspect the query grammar first.
+    """
+    url = f"{API_BASE}/search/?{urllib.parse.urlencode(params)}"
     req = urllib.request.Request(url, headers={
-        "Authorization": f"Token {token}",   # ASSUMPTION: 'Token', not 'Bearer'
-        "User-Agent": "atheria-ai-tracker-calibration/0.1",
+        "Authorization": f"Token {token}",
+        "User-Agent": "atheria-ai-tracker-calibration/0.2",
         "Accept": "application/json",
     })
+    _pace()
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
+        with urllib.request.urlopen(req, timeout=60) as r:
             body = r.read().decode("utf-8")
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "replace")[:800]
+        if e.code == 429 and _retries > 0:
+            # Honour the hint in the body if there is one, else back off a
+            # full window. A 429 is not a failure — it is the API telling us
+            # to slow down, and the correct response is to slow down.
+            m = re.search(r"available in (\d+) second", detail)
+            backoff = int(m.group(1)) + 2 if m else 65
+            print(f"    (throttled; waiting {backoff}s)", flush=True)
+            time.sleep(backoff)
+            return api_get(token, params, debug, _retries - 1)
         print(f"\n  HTTP {e.code} from CourtListener", file=sys.stderr)
         print(f"  URL: {url}", file=sys.stderr)
         print(f"  Body: {detail}\n", file=sys.stderr)
         if e.code == 401:
             print("  -> token rejected. Check COURTLISTENER_TOKEN.", file=sys.stderr)
-        if e.code == 404:
-            print("  -> endpoint shape wrong. Correct fetch_page().", file=sys.stderr)
-        raise SystemExit(2)
+        if e.code == 400:
+            print("  -> query syntax rejected. Correct the probe's `q`.", file=sys.stderr)
+        return None
     except urllib.error.URLError as e:
         print(f"\n  Network error: {e.reason}", file=sys.stderr)
-        print("  If you are running this inside a sandbox, CourtListener may be", file=sys.stderr)
-        print("  blocked. Run it on your own machine or in GitHub Actions.\n", file=sys.stderr)
-        raise SystemExit(2)
+        return None
 
     data = json.loads(body)
     if debug:
-        print("\n--- RAW FIRST RESPONSE (keys) ---")
+        print("\n--- RAW RESPONSE (keys) ---")
         print(json.dumps({k: type(v).__name__ for k, v in data.items()}, indent=2))
         results = data.get("results") or []
         if results:
@@ -311,81 +355,168 @@ def recall_check():
 # Live run
 # ---------------------------------------------------------------------------
 
-def live_run(token, days, max_pages, debug):
-    filed_after = (date.today() - timedelta(days=days)).isoformat()
-    print("=" * 72)
-    print(f"LIVE RUN — federal filings since {filed_after}")
-    print("=" * 72)
+# Each probe is one server-side query. The point of expressing the filter as
+# a `q` string rather than as Python running over fetched pages is that the
+# server does the discarding, so a probe costs one request instead of the
+# thousands that scanning the firehose would cost.
+#
+# `type=r` searches RECAP docket metadata — case names, parties, docket text.
+# `type=o` searches the full text of written opinions, which is the only
+# place the AI fact exists for the sanctions lane: Gauthier, Frier and Whaley
+# are ordinary disputes whose docket metadata says nothing about AI at all.
+# Testing whether `type=o` reaches them is the whole reason this run exists.
+PROBES = [
+    {
+        "id": "P1-party-dockets",
+        "lane": "litigation",
+        "type": "r",
+        "windowed": True,
+        "q": ('caseName:("OpenAI" OR "Anthropic" OR "Stability AI" OR '
+              '"Midjourney" OR "Perplexity" OR "Character Technologies" OR '
+              '"NVIDIA" OR "Clearview AI")'),
+        "why": "known AI defendants by name — the high-precision baseline",
+    },
+    {
+        "id": "P2-keyword-dockets",
+        "lane": "litigation",
+        "type": "r",
+        "windowed": True,
+        "q": ('"artificial intelligence" OR "machine learning" OR '
+              '"large language model" OR "generative AI" OR "deepfake" OR '
+              '"facial recognition"'),
+        "why": "AI-as-subject suits against defendants we have never heard of",
+    },
+    {
+        "id": "P3-sanctions-opinions",
+        "lane": "sanctions",
+        "type": "o",
+        "windowed": False,
+        "q": ('("artificial intelligence" OR "ChatGPT" OR "generative AI") AND '
+              '("fabricated citation" OR "nonexistent case" OR '
+              '"non-existent case" OR "hallucinated")'),
+        "why": "THE KEY PROBE — can full-text opinion search reach the 15% lane?",
+    },
+    {
+        "id": "P4-datacenter-dockets",
+        "lane": "data-centre",
+        "type": "r",
+        "windowed": True,
+        "q": ('"data center" OR "data centre" OR "hyperscale"'),
+        "why": "the AEC professional-liability lane, currently hand-curated",
+    },
+]
 
-    scanned, kept = 0, []
-    cursor, page = None, 0
+# A hand-picked sample of the sanctions cases the docket-metadata filter
+# missed. Querying each by name answers the question the aggregate numbers
+# cannot: is the AI fact *findable* by full-text search, or is it genuinely
+# out of reach of any automated ingest?
+KNOWN_MISSES = [
+    "Gauthier v. Goodyear",
+    "Frier v. Hingiss",
+    "Whaley v. Experian",
+    "Morgan v. Community Against Violence",
+    "Wadsworth v. Walmart",
+    "Mata v. Avianca",
+]
+
+
+def run_probe(token, probe, days, max_pages, debug=False):
+    """Run one server-side query and report what came back."""
+    params = {"type": probe["type"], "q": probe["q"], "order_by": "dateFiled desc"}
+    if probe["windowed"]:
+        params["filed_after"] = (date.today() - timedelta(days=days)).isoformat()
+
+    print(f"  [{probe['id']}]  {probe['why']}")
+    scope = f"last {days}d" if probe["windowed"] else "all time"
+    print(f"    type={probe['type']} · {scope}")
+
+    collected, page, total = [], 0, None
     while page < max_pages:
-        data = fetch_page(token, filed_after, cursor, debug=(debug and page == 0))
+        data = api_get(token, params, debug=(debug and page == 0))
+        if data is None:
+            print("    -> request failed; see the error above")
+            return probe, [], None
+        total = data.get("count")
         results = data.get("results") or []
-        if not results:
-            break
         for raw in results:
-            item = normalize_result(raw)
-            scanned += 1
-            hits, parties, keywords, nos = classify(item)
-            if hits:
-                kept.append((item, hits, parties, keywords, nos))
-        cursor = data.get("next")
+            collected.append(normalize_result(raw))
         page += 1
-        print(f"  page {page}: scanned {scanned}, kept {len(kept)}")
-        if not cursor:
+        nxt = data.get("next")
+        if not nxt or not results:
             break
-        time.sleep(1.0)  # be polite
+        # `next` is an absolute URL; re-derive params from it for the pacer.
+        params = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(nxt).query))
 
-    print()
-    print(f"  Total scanned:  {scanned}")
-    print(f"  Passed filter:  {len(kept)}")
-    if scanned:
-        print(f"  Pass rate:      {100*len(kept)/scanned:.1f}%  "
-              f"(target: low single digits — high means the filter is too loose)")
-    print()
+    print(f"    -> {total if total is not None else '?'} total matches; "
+          f"pulled {len(collected)}")
+    return probe, collected, total
 
-    strat = Counter()
-    courts = Counter()
-    for item, hits, *_ in kept:
-        for h in hits:
-            strat[h] += 1
-        courts[item["court"]] += 1
-    print("  By strategy:")
-    for s, n in strat.most_common():
-        print(f"    {s:16s} {n:4d}")
-    print()
-    print("  By court (top 10):")
-    for c, n in courts.most_common(10):
-        star = " *" if c in PRIORITY_COURTS else ""
-        print(f"    {c:10s} {n:4d}{star}")
+
+def probe_recall(token, max_pages, debug=False):
+    """
+    The decisive experiment. For each sanctions case the metadata filter
+    missed, ask whether full-text opinion search can find it at all.
+    """
+    print("=" * 72)
+    print("PROBE B — can full-text search reach the cases metadata missed?")
+    print("=" * 72)
+    print("  Each of these is a case the docket-metadata filter dropped. If")
+    print("  full-text opinion search finds them, the 15% sanctions recall is")
+    print("  a wrong-endpoint problem, not a ceiling.")
     print()
 
-    print("  SAMPLE — read these and judge precision yourself:")
-    print("  (anything obviously not AI-related is a false positive)")
+    found = 0
+    for name in KNOWN_MISSES:
+        params = {"type": "o", "q": f'caseName:("{name}")', "order_by": "dateFiled desc"}
+        data = api_get(token, params, debug=False)
+        if data is None:
+            print(f"    {name:42s} request failed")
+            continue
+        results = data.get("results") or []
+        if results:
+            found += 1
+            top = normalize_result(results[0])
+            snippet = re.sub(r"<[^>]+>", "", top.get("snippet") or "")[:90]
+            print(f"    {name:42s} FOUND  ({data.get('count')} hits)")
+            print(f"        {top['caseName'][:70]}")
+            if snippet:
+                print(f"        …{snippet}…")
+        else:
+            print(f"    {name:42s} not found")
     print()
-    for item, hits, parties, keywords, nos in kept[:30]:
-        print(f"  - {item['caseName'][:80]}")
-        print(f"    {item['court']} | {item['dateFiled']} | {item['docketNumber']}")
-        why = []
-        if parties:
-            why.append(f"party={','.join(parties[:3])}")
-        if keywords:
-            why.append(f"kw={','.join(keywords[:3])}")
-        if nos:
-            why.append(f"nos={nos}")
-        print(f"    matched: {'; '.join(why)}")
+    pct = 100 * found / len(KNOWN_MISSES) if KNOWN_MISSES else 0
+    print(f"  Reachable by full-text opinion search: {found}/{len(KNOWN_MISSES)}"
+          f"  ({pct:.0f}%)")
+    print()
+    return found, len(KNOWN_MISSES)
+
+
+def live_run(token, days, max_pages, debug):
+    print("=" * 72)
+    print("PROBE A — server-side queries")
+    print("=" * 72)
+    print(f"  Paced at {RATE_LIMIT_PER_MIN}/min ({MIN_INTERVAL:.0f}s between calls);")
+    print("  this run will take a few minutes and that is expected.")
+    print()
+
+    all_hits = []
+    for probe in PROBES:
+        p, collected, total = run_probe(token, probe, days, max_pages, debug)
+        all_hits.append({"probe": p["id"], "lane": p["lane"], "total": total,
+                         "pulled": len(collected), "items": collected})
+        for item in collected[:5]:
+            print(f"       · {item['caseName'][:66]}")
+            print(f"         {item['court']} | {item['dateFiled']}")
         print()
+
+    probe_recall(token, max_pages, debug)
 
     outdir = REPO / "out"
     outdir.mkdir(exist_ok=True)
     outfile = outdir / f"calibration-{date.today().isoformat()}.json"
-    outfile.write_text(json.dumps([
-        {"item": i, "strategies": sorted(h), "parties": p, "keywords": k, "nos": n}
-        for i, h, p, k, n in kept
-    ], indent=2))
-    print(f"  Full candidate list written to {outfile.relative_to(REPO)}")
-    print("  (out/ is gitignored)")
+    outfile.write_text(json.dumps(all_hits, indent=2))
+    print(f"  Full results written to {outfile.relative_to(REPO)}")
+    print("  (out/ is gitignored; the workflow uploads it as an artifact)")
     print()
 
 
