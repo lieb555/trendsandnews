@@ -192,6 +192,33 @@ Unchanged from v1 in substance; now externalized to `data/taxonomy.json` so the 
 | SERFF | State-by-state, PDF-heavy | Hard — see §9 | deferred |
 | County planning boards | ~3,000 sites, PDF | Hard — see §9 | deferred |
 
+### 5.1a Two detection modes — a calibration finding
+
+A calibration run against our own 103 federal corpus items produced a result that changes the ingestion design:
+
+| Item type | Recall with docket-metadata filtering |
+|---|---|
+| Litigation (AI-as-subject) | **97%** — 35 of 36 |
+| Sanctions (AI-as-conduct) | **15%** — 10 of 67 |
+
+The gap is structural, not a tuning problem.
+
+**AI-as-subject** matters announce themselves in docket metadata. *NYT v. OpenAI* has an AI company as a party, AI in the caption, and a copyright nature-of-suit code. Party and keyword filtering finds these reliably.
+
+**AI-as-conduct** matters do not. *Gauthier v. Goodyear Tire*, *Frier v. Hingiss*, *Whaley v. Experian* are ordinary products, traffic, and credit-reporting disputes in which counsel happened to file a brief containing fabricated citations. Nothing in the docket indicates AI involvement — **the AI fact exists only inside the judge's order.** No amount of widening the term list fixes this, because the signal is not in the data being filtered.
+
+Consequently the pipeline needs three streams, not one:
+
+| Stream | Source | Method | Status |
+|---|---|---|---|
+| 1 — AI-as-subject | CourtListener dockets (`type=r`) | Party + keyword + NOS filter | Validated at 97% recall |
+| 2 — AI-as-conduct | CourtListener opinions (`type=o`) | Full-text search for sanctions language (*hallucinat\**, *fabricated citation*, *nonexistent case*) | Designed, not yet calibrated |
+| 3 — AI-as-conduct | Charlotin CSV export | Periodic import | Working; ~1,980 cases, near-total recall |
+
+Stream 3 likely obviates Stream 2 for the foreseeable future. Charlotin is already solving this problem comprehensively, and rebuilding an opinion-full-text sanctions detector duplicates work that is done well elsewhere. Build Stream 1 first; keep Stream 3 as a periodic manual import; revisit Stream 2 only if Charlotin's coverage lapses.
+
+**The methodological point generalizes.** Recall failures are invisible in production — a case the filter silently drops never appears to be noticed missing. Precision failures announce themselves as noise in the review queue. So every new source gets a recall check against known ground truth before it is trusted, not after.
+
 ### 5.2 Stage design
 
 Each stage is a pure function over files. Any stage can be re-run without side effects.

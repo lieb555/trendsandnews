@@ -1,0 +1,17 @@
+# Secrets — never commit
+.env
+.env.local
+*.token
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Scratch output
+out/
+*.log
+
+# Private attorney work-product
+private/
