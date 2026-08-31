@@ -1,0 +1,94 @@
+name: Calibrate ingest filter
+
+# Manual trigger only — no schedule. Go to the Actions tab, pick this
+# workflow, click "Run workflow". Nothing runs on its own until we add a
+# cron here, which happens after the filter is proven.
+#
+# SETUP (once):
+#   Repo → Settings → Secrets and variables → Actions → New repository secret
+#   Name:  COURTLISTENER_TOKEN
+#   Value: your token from https://www.courtlistener.com/profile/api/
+#
+# Without the secret the job still runs and reports the recall check
+# (which needs no network); it just skips the live API portion.
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Lookback window, in days"
+        required: false
+        default: "90"
+      max_pages:
+        description: "Max API pages to scan (each ~20 results)"
+        required: false
+        default: "10"
+      debug:
+        description: "Dump the raw API response — turn this on if the run fails"
+        type: boolean
+        required: false
+        default: false
+      recall_only:
+        description: "Skip the API entirely; only measure recall against our corpus"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Report whether the API token is configured
+        env:
+          TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::COURTLISTENER_TOKEN is not set. The recall check will run; the live API portion will be skipped."
+            echo "To add it: Settings → Secrets and variables → Actions → New repository secret"
+          else
+            echo "COURTLISTENER_TOKEN is configured (value not printed)."
+          fi
+
+      - name: Run calibration
+        env:
+          COURTLISTENER_TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
+        run: |
+          set -o pipefail
+          ARGS="--days ${{ inputs.days }} --max-pages ${{ inputs.max_pages }}"
+          if [ "${{ inputs.debug }}" = "true" ]; then ARGS="$ARGS --debug"; fi
+          if [ "${{ inputs.recall_only }}" = "true" ]; then ARGS="$ARGS --recall-only"; fi
+          echo "Running: python3 scripts/calibrate_courtlistener.py $ARGS"
+          echo
+          python3 scripts/calibrate_courtlistener.py $ARGS 2>&1 | tee /tmp/calibration.log
+
+      - name: Publish results to the run summary
+        if: always()
+        run: |
+          {
+            echo "## Calibration results"
+            echo
+            echo "Window: last ${{ inputs.days }} days · max ${{ inputs.max_pages }} pages"
+            echo
+            echo '```'
+            cat /tmp/calibration.log 2>/dev/null || echo "(no output captured — the run failed early; check the step log above)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload full candidate list
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calibration-candidates
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 14
