@@ -1,0 +1,651 @@
+# Source registry — the whole ingest surface as configuration.
+#
+# Adding a source is an entry here, not a new Python module. Four adapters in
+# scripts/adapters/ read this file and do the work. See SPEC.md §5.4.
+#
+# role:
+#   primary  — produces citable records. An item's `sources` link points here.
+#   signal   — produces sightings only. Credited, never republished. Its value
+#              is corroboration: how many independent trackers flagged this,
+#              and how fast. See SPEC.md §5.0 and §5.3.
+#
+# weight: contribution to salience (SPEC.md §5.3). Higher = a sighting here is
+#   stronger evidence something matters. Calibrate against observed lead time
+#   once the pipeline has run a few weeks — these are opening estimates, not
+#   measurements.
+#
+# extract: which identifier patterns the resolver should look for. Narrowing
+#   this is a precision lever; a US-only tracker should not be scanned for
+#   CELEX numbers.
+#
+# corpus: items (default) | intelligence  — see SPEC.md §5.5
+#
+# status: active | queued | paid
+#   queued = in the Coverage Gaps list, approved but not yet wired.
+#   paid   = requires a subscription; a partnership decision, not an eng task.
+
+meta:
+  version: 3
+  reviewBudgetPerWeek: 25          # drives the salience cutoff — SPEC.md §5.3
+  defaultCadence: weekly
+
+# ---------------------------------------------------------------------------
+# Primary sources — records. Build these first (SPEC.md §5.4, sequencing rule).
+# ---------------------------------------------------------------------------
+
+sources:
+  - id: courtlistener-dockets
+    name: CourtListener / RECAP — dockets
+    category: primary-us
+    adapter: api
+    role: primary
+    weight: 1.0
+    cadence: weekly
+    status: active
+    extract: [us_docket, case_caption]
+    config:
+      base: https://www.courtlistener.com/api/rest/v4
+      type: r
+      rateLimitPerMin: 5           # measured, not documented — SPEC.md §5.9
+      # Stream 1: validated 43 hits/90d at ~100% precision
+      queries:
+        - 'caseName:("OpenAI" OR "Anthropic" OR "Stability AI" OR "Midjourney"
+           OR "Perplexity" OR "Character Technologies" OR "Clearview AI")'
+
+  - id: courtlistener-opinions
+    name: CourtListener — opinion full text
+    category: primary-us
+    adapter: api
+    role: primary
+    weight: 1.0
+    cadence: weekly
+    status: active
+    extract: [us_docket, case_caption]
+    config:
+      base: https://www.courtlistener.com/api/rest/v4
+      type: o
+      rateLimitPerMin: 5
+      # Stream 2. Works but appellate-skewed; Charlotin covers this better.
+      # Quoted phrases do real phrase matching — SPEC.md §5.9.
+      queries:
+        - '("artificial intelligence" OR "ChatGPT" OR "generative AI") AND
+           ("fabricated citation" OR "nonexistent case" OR "hallucinated")'
+
+  - id: federal-register
+    name: Federal Register
+    category: primary-us
+    adapter: api
+    role: primary
+    weight: 1.0
+    cadence: daily
+    status: queued
+    extract: [fr_docnum, rin]
+    config:
+      base: https://www.federalregister.gov/api/v1
+
+  - id: regulations-gov
+    name: Regulations.gov
+    category: primary-us
+    adapter: api
+    role: primary
+    weight: 0.8
+    cadence: weekly
+    status: queued
+    extract: [fr_docnum, rin, docket_id]
+    notes: Public comment dockets reveal industry posture before final rules.
+
+  - id: openstates
+    name: Open States — US state legislation
+    category: primary-us
+    adapter: api
+    role: primary
+    weight: 0.9
+    cadence: weekly
+    status: queued
+    extract: [us_state_bill]
+
+  - id: eurlex
+    name: EUR-Lex
+    category: primary-eu
+    adapter: api
+    role: primary
+    weight: 1.0
+    cadence: weekly
+    status: queued
+    extract: [celex]
+    notes: >
+      CELEX numbers are the cleanest dedup keys in the whole system. A White &
+      Case post, a DLA Piper summary, and the EUR-Lex record all resolve to the
+      same key with no heuristics. See SPEC.md §5.2.
+
+  - id: legislation-gov-uk
+    name: legislation.gov.uk
+    category: primary-uk
+    adapter: api
+    role: primary
+    weight: 1.0
+    cadence: weekly
+    status: queued
+    extract: [uk_uri]
+
+  - id: bailii
+    name: BAILII — UK/Ireland case law
+    category: primary-uk
+    adapter: sitemap
+    role: primary
+    weight: 0.9
+    cadence: weekly
+    status: queued
+    extract: [uk_neutral_citation, case_caption]
+    notes: Primary source for Ayinde, Al-Haroun, Harber, Getty UK.
+
+  - id: gesetze-im-internet
+    name: Gesetze im Internet (DE)
+    category: primary-de
+    adapter: sitemap
+    role: primary
+    weight: 0.9
+    cadence: monthly
+    status: queued
+    extract: [de_shorttitle]
+    notes: Authoritative German statute citations for the German client base.
+
+  - id: eu-ai-office
+    name: EU AI Office (DG CNECT)
+    category: primary-eu
+    adapter: feed
+    role: primary
+    weight: 0.95
+    cadence: weekly
+    status: queued
+    extract: [celex]
+    notes: GPAI Code of Practice, delegated acts, interpretive guidance.
+
+  - id: charlotin
+    name: Charlotin AI Hallucination Cases
+    category: sanctions
+    adapter: manual
+    role: primary
+    weight: 1.0
+    cadence: monthly
+    status: active
+    extract: [us_docket, case_caption]
+    notes: >
+      ~1,980 cases, near-total recall on the sanctions lane. Obviates building
+      our own detector — SPEC.md §5.8. Manual CSV export until an API exists.
+
+# ---------------------------------------------------------------------------
+# Insurance — the differentiating gap. Nothing else in the source set speaks
+# from an insurer's viewpoint.
+# ---------------------------------------------------------------------------
+
+  - id: naic-ai-wg
+    name: NAIC — Big Data & AI Working Group
+    category: insurance
+    adapter: sitemap
+    role: signal
+    weight: 1.0
+    cadence: weekly
+    status: queued
+    extract: [us_state_bulletin]
+    notes: >
+      Highest-value insurance source. Dec 2023 Model Bulletin plus
+      state-by-state adoption tracking — the direct precursor to what SERFF
+      would eventually show.
+
+  - id: lloyds-futureset
+    name: Lloyd's Futureset — Emerging Risks
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.95
+    corpus: intelligence
+    cadence: weekly
+    status: queued
+    notes: London-market relevance; Lloyd's positions propagate through syndicates.
+
+  - id: swiss-re-institute
+    name: Swiss Re Institute — AI research
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.85
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: Reinsurer view sets the aggregate-limits ceiling for primary carriers.
+
+  - id: munich-re
+    name: Munich Re — AI risk research
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.85
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: German-headquartered — additional relevance for the German client base.
+
+  - id: marsh-ai-risk
+    name: Marsh McLennan — AI risk insights
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.75
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: Broker signal often precedes what carriers quietly file.
+
+  - id: aon-ai-risk
+    name: Aon — AI risk practice
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.7
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+
+  - id: iii-ai
+    name: Insurance Information Institute — AI hub
+    category: insurance
+    adapter: feed
+    role: signal
+    weight: 0.5
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+
+# ---------------------------------------------------------------------------
+# Global regulatory
+# ---------------------------------------------------------------------------
+
+  - id: whitecase-ai-watch
+    name: White & Case — AI Watch (global)
+    category: global-regulatory
+    adapter: feed
+    role: signal
+    weight: 1.0
+    cadence: weekly
+    status: queued
+    extract: [celex, uk_uri, us_state_bill, de_shorttitle]
+    notes: >
+      Single biggest coverage upgrade for cross-border work. If only one
+      tracker is added from the gaps list, this is it.
+
+  - id: oecd-ai-observatory
+    name: OECD AI Policy Observatory
+    category: global-regulatory
+    adapter: api
+    role: signal
+    weight: 0.9
+    cadence: weekly
+    status: queued
+    extract: [celex, country_policy_id]
+    notes: 70+ countries, partly machine-readable — closest thing to an API here.
+
+  - id: dlapiper-ai-regs
+    name: DLA Piper — Global AI regulations tracker
+    category: global-regulatory
+    adapter: feed
+    role: signal
+    weight: 0.85
+    cadence: weekly
+    status: queued
+    extract: [celex, uk_uri, us_state_bill]
+
+  - id: uk-ai-standards-hub
+    name: UK AI Standards Hub (Alan Turing Institute)
+    category: global-regulatory
+    adapter: feed
+    role: signal
+    weight: 0.8
+    cadence: weekly
+    status: queued
+    extract: [uk_uri]
+
+# ---------------------------------------------------------------------------
+# Law-firm trackers — pure signal, high mutual overlap by design.
+# That overlap is the point: it is what salience scoring reads.
+# ---------------------------------------------------------------------------
+
+  - id: debevoise-ai
+    name: Debevoise AI Regulatory Tracker
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.85
+    cadence: weekly
+    status: queued
+    extract: [us_docket, us_state_bill, case_caption]
+    notes: Financial-services and enforcement lens; directly relevant.
+
+  - id: bakerhostetler-enforcement
+    name: BakerHostetler AI Enforcement Tracker
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.8
+    cadence: weekly
+    status: queued
+    extract: [us_docket, agency_action, case_caption]
+    notes: Often fastest on FTC / SEC / EEOC actions.
+
+  - id: wilsonsonsini-ai
+    name: Wilson Sonsini AI Legal & Regulatory Tracker
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.7
+    cadence: weekly
+    status: queued
+    extract: [us_docket, us_state_bill, case_caption]
+
+  - id: latham-ai
+    name: Latham & Watkins AI Regulatory Guide
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.7
+    cadence: weekly
+    status: queued
+    extract: [us_docket, us_state_bill]
+
+  - id: cleary-ai
+    name: Cleary Gottlieb Global AI Regulation Tracker
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.7
+    cadence: weekly
+    status: queued
+    extract: [celex, uk_uri, us_state_bill]
+
+# ---------------------------------------------------------------------------
+# Academic — longer editorial horizon; mostly intelligence corpus.
+# ---------------------------------------------------------------------------
+
+  - id: stanford-hai-index
+    name: Stanford HAI — AI Index
+    category: academic
+    adapter: feed
+    role: signal
+    weight: 0.7
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: The citable dataset for briefings.
+
+  - id: berkeley-cltc
+    name: Berkeley CLTC — AI regulation tracker
+    category: academic
+    adapter: feed
+    role: signal
+    weight: 0.65
+    cadence: monthly
+    status: queued
+    extract: [us_state_bill, celex]
+
+  - id: ada-lovelace
+    name: Ada Lovelace Institute (UK)
+    category: academic
+    adapter: feed
+    role: signal
+    weight: 0.65
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+
+  - id: georgetown-cset
+    name: Georgetown CSET
+    category: academic
+    adapter: feed
+    role: signal
+    weight: 0.6
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: Only academic source meaningfully covering export controls / CFIUS.
+
+  - id: ai-now
+    name: AI Now Institute
+    category: academic
+    adapter: feed
+    role: signal
+    weight: 0.55
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+    notes: Plaintiff-side perspective on the bias/discrimination track.
+
+  - id: arxiv-cs-cy
+    name: arXiv cs.CY / cs.AI
+    category: academic
+    adapter: api
+    role: signal
+    weight: 0.4
+    corpus: intelligence
+    cadence: weekly
+    status: queued
+    notes: Clean API. Low weight — high volume, mostly not legally relevant.
+
+# ---------------------------------------------------------------------------
+# Content & copyright — heavy overlap with the Stream 1 litigation lane,
+# which is exactly what makes them useful as corroboration.
+# ---------------------------------------------------------------------------
+
+  - id: authors-guild
+    name: Authors Guild — AI cases tracker
+    category: content-copyright
+    adapter: feed
+    role: signal
+    weight: 0.75
+    cadence: weekly
+    status: queued
+    extract: [us_docket, case_caption]
+    notes: Plaintiff-side view; useful for anticipating theories.
+
+  - id: copyright-alliance
+    name: The Copyright Alliance
+    category: content-copyright
+    adapter: feed
+    role: signal
+    weight: 0.55
+    corpus: intelligence
+    cadence: monthly
+    status: queued
+
+  - id: riaa-ai
+    name: RIAA — AI resources
+    category: content-copyright
+    adapter: feed
+    role: signal
+    weight: 0.55
+    cadence: monthly
+    status: queued
+    extract: [us_docket, case_caption]
+    notes: Music vertical — UMG v. Suno, UMG v. Udio, Concord v. Anthropic.
+
+# ---------------------------------------------------------------------------
+# Data centre — indicators before disputes. The registry these build is the
+# precondition for matching later construction litigation. SPEC.md §5.7.
+# ---------------------------------------------------------------------------
+
+  - id: dcd
+    name: Data Center Dynamics
+    category: data-centre
+    adapter: feed
+    role: signal
+    weight: 0.85
+    cadence: daily
+    status: queued
+    extract: [dc_project, us_state]
+    notes: Fastest signal on new projects, opposition, and interconnection fights.
+
+  - id: data-center-frontier
+    name: Data Center Frontier
+    category: data-centre
+    adapter: feed
+    role: signal
+    weight: 0.8
+    cadence: daily
+    status: queued
+    extract: [dc_project, us_state, puc_docket]
+    notes: Strongest on power and grid interconnection.
+
+  - id: puc-virginia
+    name: Virginia SCC — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.9
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: puc-georgia
+    name: Georgia PSC — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.85
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: puc-ohio
+    name: Ohio PUCO — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.85
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: puc-texas
+    name: Texas PUC — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.85
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: puc-arizona
+    name: Arizona ACC — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.8
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: puc-indiana
+    name: Indiana IURC — utility dockets
+    category: data-centre
+    adapter: sitemap
+    role: primary
+    weight: 0.8
+    cadence: weekly
+    status: queued
+    extract: [puc_docket, dc_project]
+
+  - id: jll-dc-outlook
+    name: JLL — Data Center Outlook
+    category: data-centre
+    adapter: feed
+    role: signal
+    weight: 0.5
+    corpus: intelligence
+    cadence: quarterly
+    status: queued
+
+  - id: cbre-dc
+    name: CBRE — Data Center Reports
+    category: data-centre
+    adapter: feed
+    role: signal
+    weight: 0.5
+    corpus: intelligence
+    cadence: quarterly
+    status: queued
+
+  - id: datacenterhawk
+    name: DataCenterHawk
+    category: data-centre
+    adapter: manual
+    role: primary
+    weight: 0.9
+    cadence: quarterly
+    status: paid
+    notes: >
+      ~$4-8K/yr. Delivers most of the national DC picture with no engineering.
+      A partnership decision, not an engineering task.
+
+# ---------------------------------------------------------------------------
+# Already active in the tracker — carried forward from v1.
+# ---------------------------------------------------------------------------
+
+  - id: chatgpt-eating
+    name: ChatGPT Is Eating The World
+    category: content-copyright
+    adapter: feed
+    role: signal
+    weight: 0.9
+    cadence: weekly
+    status: active
+    extract: [us_docket, case_caption]
+
+  - id: aicopyrightcasetracker
+    name: AI Copyright Case Tracker
+    category: content-copyright
+    adapter: sitemap
+    role: signal
+    weight: 0.9
+    cadence: weekly
+    status: active
+    extract: [us_docket, case_caption]
+
+  - id: gwu-ai-litigation
+    name: GWU AI Litigation Database
+    category: academic
+    adapter: sitemap
+    role: signal
+    weight: 0.9
+    cadence: weekly
+    status: active
+    extract: [us_docket, case_caption]
+
+  - id: orrick-ai
+    name: Orrick AI Law Center
+    category: law-firm
+    adapter: feed
+    role: signal
+    weight: 0.8
+    cadence: weekly
+    status: active
+    extract: [us_docket, us_state_bill, case_caption]
+
+  - id: ncsl-ai
+    name: NCSL — AI legislation database
+    category: global-regulatory
+    adapter: sitemap
+    role: signal
+    weight: 0.85
+    cadence: weekly
+    status: active
+    extract: [us_state_bill]
+
+  - id: datacentertracker
+    name: datacentertracker.org
+    category: data-centre
+    adapter: sitemap
+    role: signal
+    weight: 0.75
+    cadence: weekly
+    status: active
+    extract: [dc_project, us_state]
