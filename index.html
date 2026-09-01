@@ -1230,6 +1230,134 @@ main {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* --- How It Works ------------------------------------------------------ */
+.hw-lead { color: var(--muted-ink); max-width: 72ch; margin: 0 0 8px; font-size: 15px; line-height: 1.65; }
+.hw-lead strong { color: var(--ink); font-weight: 600; }
+
+.hw-status {
+  display: flex; flex-wrap: wrap; gap: 10px 28px;
+  padding: 16px 18px; margin: 24px 0 40px;
+  background: var(--surface); border-left: 3px solid var(--accent);
+}
+.hw-status-item { font-size: 12px; color: var(--muted-ink); }
+.hw-status-item b {
+  display: block; color: var(--ink); font-weight: 600; font-size: 13px;
+  font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+}
+
+.hw-section { margin-top: 48px; }
+.hw-section > h2 {
+  font-family: "Newsreader", serif; font-variation-settings: "opsz" 32;
+  font-weight: 400; font-size: 23px; color: var(--ink);
+  margin: 0 0 6px; text-wrap: balance;
+}
+.hw-section > .hw-sub { color: var(--muted-ink); font-size: 14px; margin: 0 0 20px; max-width: 68ch; line-height: 1.6; }
+
+/* two-kinds-of-source comparison */
+.hw-kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-top: 1px solid var(--rule); }
+.hw-kind { padding: 20px 22px 22px 0; border-right: 1px solid var(--rule); }
+.hw-kind:last-child { border-right: none; padding-left: 22px; }
+.hw-kind-tag {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  font-weight: 600; margin-bottom: 8px;
+}
+.hw-kind--record .hw-kind-tag { color: var(--accent-ink); }
+.hw-kind--signal .hw-kind-tag { color: var(--info); }
+.hw-kind h3 { margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.hw-kind p { margin: 0 0 10px; font-size: 13px; color: var(--muted-ink); line-height: 1.6; max-width: 46ch; }
+.hw-kind ul { margin: 0; padding-left: 16px; font-size: 12px; color: var(--faint-ink); line-height: 1.7; }
+
+/* the funnel */
+.hw-funnel {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0; margin: 4px 0 0; border-top: 1px solid var(--rule-strong);
+}
+.hw-stage { padding: 20px 18px 20px 0; position: relative; display: flex; flex-direction: column; }
+.hw-stage + .hw-stage { padding-left: 18px; border-left: 1px solid var(--rule); }
+.hw-stage-n {
+  font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+  font-weight: 500; color: var(--ink); line-height: 1; margin-bottom: 3px;
+}
+.hw-stage:nth-child(1) .hw-stage-n { font-size: 30px; }
+.hw-stage:nth-child(2) .hw-stage-n { font-size: 27px; }
+.hw-stage:nth-child(3) .hw-stage-n { font-size: 24px; }
+.hw-stage:nth-child(4) .hw-stage-n { font-size: 21px; color: var(--accent-ink); }
+.hw-stage:nth-child(5) .hw-stage-n { font-size: 19px; color: var(--accent-ink); }
+.hw-stage-unit { font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--faint-ink); margin-bottom: 9px; }
+.hw-stage h4 { margin: 0 0 5px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.hw-stage p { margin: 0; font-size: 12px; color: var(--muted-ink); line-height: 1.55; }
+.hw-stage-cost {
+  margin-top: auto; padding-top: 14px; font-size: 10.5px;
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.03em; color: var(--muted-ink);
+}
+.hw-stage-cost.is-spend { color: var(--warn); }
+
+.hw-note {
+  margin: 22px 0 0; padding: 14px 16px; background: var(--surface);
+  font-size: 13px; color: var(--muted-ink); line-height: 1.65; max-width: 74ch;
+}
+.hw-note b { color: var(--ink); font-weight: 600; }
+
+/* worked example of merging */
+.hw-merge { margin-top: 4px; border-top: 1px solid var(--rule); padding-top: 18px; }
+.hw-merge-row { display: grid; grid-template-columns: 190px 1fr; gap: 16px; padding: 7px 0; font-size: 12.5px; align-items: baseline; }
+.hw-merge-row + .hw-merge-row { border-top: 1px dotted var(--rule); }
+.hw-merge-src { color: var(--muted-ink); }
+.hw-merge-key { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--accent-ink); }
+.hw-merge-out {
+  margin-top: 14px; padding: 13px 16px; border-left: 3px solid var(--accent);
+  background: var(--surface); font-size: 13px; color: var(--ink); line-height: 1.6;
+}
+
+/* status ladder */
+.hw-ladder { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 13px; }
+.hw-ladder th {
+  text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--faint-ink); font-weight: 600; padding: 0 14px 9px 0;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.hw-ladder td { padding: 12px 14px 12px 0; border-bottom: 1px solid var(--rule); color: var(--muted-ink); vertical-align: top; line-height: 1.55; }
+.hw-ladder tr:last-child td { border-bottom: none; }
+.hw-chip {
+  display: inline-block; font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase; padding: 3px 8px; white-space: nowrap;
+  border: 1px solid currentColor;
+}
+.hw-chip--unverified { color: var(--faint-ink); }
+.hw-chip--pending    { color: var(--warn); }
+.hw-chip--reviewed   { color: var(--info); }
+.hw-chip--verified   { color: var(--good); }
+.hw-yn { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; }
+.hw-yn--no { color: var(--faint-ink); }
+.hw-yn--yes { color: var(--good); }
+
+/* weekly rhythm */
+.hw-week { margin-top: 4px; }
+.hw-beat { display: grid; grid-template-columns: 132px 1fr; gap: 18px; padding: 15px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.hw-beat:last-child { border-bottom: none; }
+.hw-beat-when {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--accent-ink); font-weight: 600;
+}
+.hw-beat-who { font-size: 10px; color: var(--faint-ink); letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-top: 3px; }
+.hw-beat h4 { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.hw-beat p { margin: 0; font-size: 13px; color: var(--muted-ink); line-height: 1.6; max-width: 66ch; }
+
+/* limits */
+.hw-limit { padding: 15px 0; border-bottom: 1px solid var(--rule); }
+.hw-limit:last-child { border-bottom: none; }
+.hw-limit h4 { margin: 0 0 5px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.hw-limit p { margin: 0; font-size: 13px; color: var(--muted-ink); line-height: 1.6; max-width: 74ch; }
+.hw-limit p em { font-style: normal; color: var(--ink); }
+
+@media (max-width: 700px) {
+  .hw-kind, .hw-kind:last-child { border-right: none; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+  .hw-stage + .hw-stage { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; }
+  .hw-merge-row, .hw-beat { grid-template-columns: 1fr; gap: 4px; }
+}
+
 </style>
 
 <header class="site-header">
@@ -1249,6 +1377,7 @@ main {
       <button role="tab" aria-selected="false" data-view="sources">Source Trackers</button>
       <button role="tab" aria-selected="false" data-view="roadmap">What's Next</button>
       <button role="tab" aria-selected="false" data-view="wishlist">Coverage Gaps</button>
+      <button role="tab" aria-selected="false" data-view="howitworks">How It Works</button>
     </nav>
   </div>
 </header>
@@ -2175,6 +2304,222 @@ main {
       <strong>Note.</strong> None of these are in the current source list yet — this page is a queue for the partnership to prioritize. Once the Stage 2 pipeline exists, my recommendation is to add the Top 6 first — they are all article-page fetches with low ingest cost — and to leave the paid subscriptions (DataCenterHawk especially) for the Stage 3 conversation. The pipeline could reasonably absorb 15–20 total sources before curation load becomes the binding constraint.
     </div>
   </section>
+
+  <!-- How It Works view -->
+  <section class="view" data-view="howitworks">
+    <div class="view-head">
+      <span class="view-eyebrow">How It Works</span>
+      <h1 class="view-title">Where this comes from, and how much to trust it.</h1>
+      <p class="view-desc">Written for anyone deciding whether to rely on this — partners, colleagues, clients. No technical background assumed.</p>
+    </div>
+
+    <p class="hw-lead">This tracker follows AI litigation, regulation, and sanctions, and adds something no other tracker does: for each matter, <strong>the lines of insurance likely to respond, the policy triggers in play, and the exclusions a carrier would probably raise.</strong> That coverage read is the point of the thing. Everything below is about how the underlying facts get here and how far they have been checked.</p>
+
+    <div class="hw-status">
+      <div class="hw-status-item"><b>263</b> matters tracked</div>
+      <div class="hw-status-item"><b>Hand-curated</b> current method</div>
+      <div class="hw-status-item"><b>53</b> sources designed in</div>
+      <div class="hw-status-item"><b>Not yet automated</b> pipeline status</div>
+    </div>
+
+    <p class="hw-lead" style="margin-top:-22px">Two things are true at once and it matters to keep them apart. Every item you can see today was <strong>put here by hand</strong>. The automated pipeline described below has been designed and tested against the live court data, but it is not yet running. Where a section describes something not yet built, it says so.</p>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>Two kinds of source, and why the distinction matters</h2>
+      <p class="hw-sub">The single most important design decision here. Other trackers are treated as tip-offs, never as authority.</p>
+
+      <div class="hw-kinds">
+        <div class="hw-kind hw-kind--record">
+          <div class="hw-kind-tag">Records — where facts come from</div>
+          <h3>Courts and governments</h3>
+          <p>The docket, the register, the statute book. Every item links to one of these, and the facts in an item are taken from here and nowhere else.</p>
+          <ul>
+            <li>CourtListener / PACER dockets and opinions</li>
+            <li>Federal Register, Regulations.gov</li>
+            <li>EUR-Lex, legislation.gov.uk, BAILII</li>
+            <li>State legislatures, utility commissions</li>
+          </ul>
+        </div>
+        <div class="hw-kind hw-kind--signal">
+          <div class="hw-kind-tag">Signals — where we hear about things</div>
+          <h3>Law firm and academic trackers</h3>
+          <p>White &amp; Case, Debevoise, the GWU database and thirty others. They tell us something happened and that a serious practitioner thought it worth writing up. We record the tip and the link — never the text.</p>
+          <ul>
+            <li>Their analysis is credited, never reproduced</li>
+            <li>Nothing they write becomes an item's content</li>
+            <li>We always go back to the court record</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hw-note"><b>Why this is worth the trouble.</b> It keeps us clear of anyone else's copyright, because we republish nothing. It stops one blogger's mischaracterisation becoming our record of a case. And it turns the biggest nuisance in this field into an asset: when the same ruling shows up in six different trackers, that is not six pieces of work — it is six independent practitioners telling us the same thing is important. We count that.</div>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>What a week looks like, in numbers</h2>
+      <p class="hw-sub">Once automated. The narrowing is the whole design — attention is the scarce resource, not information.</p>
+
+      <div class="hw-funnel">
+        <div class="hw-stage">
+          <div class="hw-stage-n">53</div>
+          <div class="hw-stage-unit">sources</div>
+          <h4>Watched</h4>
+          <p>Courts, registers, and trackers, each checked on its own schedule.</p>
+          <div class="hw-stage-cost">no cost</div>
+        </div>
+        <div class="hw-stage">
+          <div class="hw-stage-n">~400</div>
+          <div class="hw-stage-unit">mentions</div>
+          <h4>Picked up</h4>
+          <p>Every article, filing, and notice that might be relevant. Mostly duplicates of each other.</p>
+          <div class="hw-stage-cost">no cost</div>
+        </div>
+        <div class="hw-stage">
+          <div class="hw-stage-n">~70</div>
+          <div class="hw-stage-unit">matters</div>
+          <h4>After merging</h4>
+          <p>Duplicates collapsed onto the actual case or statute they refer to.</p>
+          <div class="hw-stage-cost is-spend">~$0.09</div>
+        </div>
+        <div class="hw-stage">
+          <div class="hw-stage-n">~25</div>
+          <div class="hw-stage-unit">new</div>
+          <h4>Genuinely new</h4>
+          <p>The rest are matters already tracked. Coverage analysis is drafted for these.</p>
+          <div class="hw-stage-cost is-spend">~$0.28</div>
+        </div>
+        <div class="hw-stage">
+          <div class="hw-stage-n">~20</div>
+          <div class="hw-stage-unit">minutes</div>
+          <h4>Attorney review</h4>
+          <p>Read in order of importance, corrected, approved. Nothing publishes without this.</p>
+          <div class="hw-stage-cost">the real cost</div>
+        </div>
+      </div>
+
+      <div class="hw-note"><b>Roughly $19 a year in computing.</b> That is the entire machine cost of running this, and it is why the source list can be long. The expensive input is attorney attention, so the design spends money freely to protect it — the ranking exists so that twenty minutes of reading covers what matters, whether the week produced four hundred mentions or four thousand.</div>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>How six mentions become one case</h2>
+      <p class="hw-sub">Every court and legislature already assigns a unique number. We use theirs rather than inventing our own.</p>
+
+      <div class="hw-merge">
+        <div class="hw-merge-row"><div class="hw-merge-src">CourtListener docket</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+        <div class="hw-merge-row"><div class="hw-merge-src">GWU database entry</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+        <div class="hw-merge-row"><div class="hw-merge-src">Debevoise client alert</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+        <div class="hw-merge-row"><div class="hw-merge-src">Authors Guild tracker</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+        <div class="hw-merge-row"><div class="hw-merge-src">ChatGPT Is Eating The World</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+        <div class="hw-merge-row"><div class="hw-merge-src">AI Copyright Case Tracker</div><div class="hw-merge-key">cand:3:23-cv-03416</div></div>
+      </div>
+
+      <div class="hw-merge-out"><b>One matter. Six independent sightings.</b> They merge automatically, because the docket number is the same string in all six — no guesswork, no fuzzy name-matching. The count of six then becomes the reason this case appears at the top of the review list rather than buried in it. European instruments work the same way through their CELEX number, US state bills through their bill number.</div>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>What the status labels mean</h2>
+      <p class="hw-sub">The most practical thing on this page. An item's label tells you exactly how far it has been checked — and what you can safely do with it.</p>
+
+      <table class="hw-ladder">
+        <thead>
+          <tr><th>Label</th><th>What has happened</th><th>On timeline</th><th>Safe to send a client</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="hw-chip hw-chip--unverified">Unverified</span></td>
+            <td>A tracker reported it; no court or government record found yet. Present so a fast-moving development is not missed, and nothing more.</td>
+            <td><span class="hw-yn hw-yn--no">no</span></td>
+            <td><span class="hw-yn hw-yn--no">no</span></td>
+          </tr>
+          <tr>
+            <td><span class="hw-chip hw-chip--pending">Pending</span></td>
+            <td>The primary record exists and is linked. Summary and coverage read are machine-drafted and have not been read by an attorney.</td>
+            <td><span class="hw-yn hw-yn--yes">yes</span></td>
+            <td><span class="hw-yn hw-yn--no">no</span></td>
+          </tr>
+          <tr>
+            <td><span class="hw-chip hw-chip--reviewed">Reviewed</span></td>
+            <td>An attorney has read it. Caption, posture, and the coverage read are sound as a first pass.</td>
+            <td><span class="hw-yn hw-yn--yes">yes</span></td>
+            <td><span class="hw-yn hw-yn--yes">yes</span></td>
+          </tr>
+          <tr>
+            <td><span class="hw-chip hw-chip--verified">Verified</span></td>
+            <td>Checked against Westlaw or the primary document itself.</td>
+            <td><span class="hw-yn hw-yn--yes">yes</span></td>
+            <td><span class="hw-yn hw-yn--yes">yes</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="hw-note">An item moves from <b>Unverified</b> to <b>Pending</b> on its own, the moment a primary record turns up carrying the same docket or instrument number. The two steps above that need a person, and always will.</div>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>The weekly rhythm</h2>
+      <p class="hw-sub">Once automated. The important line is the last one: no machine output reaches this page without an attorney approving it.</p>
+
+      <div class="hw-week">
+        <div class="hw-beat">
+          <div><div class="hw-beat-when">Mon 06:00</div><span class="hw-beat-who">Automatic</span></div>
+          <div><h4>Everything gets checked</h4><p>All 53 sources are polled, mentions are collected, duplicates merged onto existing matters, and anything genuinely new gets a drafted summary and coverage read.</p></div>
+        </div>
+        <div class="hw-beat">
+          <div><div class="hw-beat-when">Mon 06:20</div><span class="hw-beat-who">Automatic</span></div>
+          <div><h4>A batch is proposed</h4><p>The week's findings arrive as a single reviewable list — new matters and updates to existing ones — ordered by how many independent sources flagged each and how fast.</p></div>
+        </div>
+        <div class="hw-beat">
+          <div><div class="hw-beat-when">Monday</div><span class="hw-beat-who">Attorney</span></div>
+          <div><h4>Read down the list, stop when it stops mattering</h4><p>Corrections and deletions happen here. Because the list is ordered by independent corroboration, what falls below the line was passed over by everyone else too — which is the closest thing to a guarantee that nothing important was skipped.</p></div>
+        </div>
+        <div class="hw-beat">
+          <div><div class="hw-beat-when">On approval</div><span class="hw-beat-who">Automatic</span></div>
+          <div><h4>The tracker rebuilds itself</h4><p>Approved items are published and this page updates. Every change is recorded, so it is always possible to see what changed, when, and who approved it.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div class="hw-section">
+      <h2>What this does not do</h2>
+      <p class="hw-sub">The limits are as much a part of using it well as the features.</p>
+
+      <div class="hw-limit">
+        <h4>It is not legal research</h4>
+        <p>This is a monitoring and triage tool. It tells you something exists and gives you a first read on the coverage angle. <em>It does not replace reading the opinion.</em> Every item links to the primary source precisely because that is where the actual work starts.</p>
+      </div>
+      <div class="hw-limit">
+        <h4>The coverage read is a first opinion, not an opinion</h4>
+        <p>Lines, triggers, and exclusions are the analysis you would give a colleague in a hallway conversation — a starting hypothesis about which policies are implicated. <em>It is not a coverage opinion and cannot be relied on as one</em>, and it is drafted by machine until an attorney has marked the item reviewed.</p>
+      </div>
+      <div class="hw-limit">
+        <h4>Sanctions coverage leans on someone else's work</h4>
+        <p>Cases where lawyers filed AI-fabricated citations are almost impossible to find automatically — the docket gives no hint, because the AI fact appears only inside the judge's order. Damien Charlotin's database has solved this properly, with roughly 1,980 cases. <em>We use it and credit it rather than pretending to have built our own.</em></p>
+      </div>
+      <div class="hw-limit">
+        <h4>The data-centre lane watches indicators, not just lawsuits</h4>
+        <p>Construction and professional-liability exposure surfaces years before litigation, and a defect suit's caption never says "data centre." So this lane follows utility dockets, interconnection queues, and trade press across the six states where most US hyperscale building happens. <em>It is deliberately a leading-indicator view, not complete litigation coverage.</em></p>
+      </div>
+      <div class="hw-limit">
+        <h4>What it misses is measured, not assumed</h4>
+        <p>A monitoring tool's worst failure is silent: a case it drops never announces itself. So when something relevant is found some other way — a client call, a conference, a Westlaw search — it gets logged, and we check whether the pipeline had already caught it. <em>That running count is the only honest measure of what is being missed</em>, and it is deliberately kept visible rather than buried.</p>
+      </div>
+      <div class="hw-limit">
+        <h4>Geographic and subject coverage is uneven, on purpose</h4>
+        <p>Depth follows the practice: US federal and state, the UK, the EU, and Germany are covered closely; other jurisdictions are covered only where a tracked source happens to reach them. <em>Absence of an item is not evidence that nothing happened.</em></p>
+      </div>
+    </div>
+
+    <div class="hw-note" style="margin-top:44px">
+      <b>Questions, corrections, or something we missed?</b> The fastest way to improve this is to tell us what it failed to surface — those reports are logged and drive what gets added next. Editorial contact: Nick Lieberknecht. Full technical specification lives in <code>SPEC.md</code> in the project repository.
+    </div>
+  </section>
+
 </main>
 
 <div class="modal-scrim" id="modalScrim" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
