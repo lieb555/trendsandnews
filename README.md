@@ -10,6 +10,8 @@ likely trigger clauses, and the exclusions likely to be invoked. No competing
 tracker captures that.
 
 - **Live tracker:** https://claude.ai/code/artifact/7418b1b0-c46b-46b5-8363-03a098efd17e
+- **State AI law exposure map:** [`laws.html`](laws.html) — 181 state measures scored
+  from an insurance-coverage angle; see *The state-law tracker* below
 - **Technical specification:** [`SPEC.md`](SPEC.md)
 - **Investment memo for partners:** the *What's Next* tab in the tracker
 
@@ -23,6 +25,50 @@ tracker captures that.
 | Curation | Manual. Automation is Phase 2; see [`SPEC.md` §10](SPEC.md) |
 | Presentation | Single `index.html`, published as a Claude artifact |
 | Hosting cost | $0 — the artifact runtime provides hosting, auth, and storage |
+
+---
+
+## The state-law tracker
+
+`laws.html` is a second, self-contained page: every AI statute on the books in
+the states, scored and sorted the way an insurer or a broker reads it rather
+than the way a legislature files it.
+
+The source is a weekly research drop, `data/laws/INDEX.csv` — one row per
+measure, 39 columns of primary-source findings (who is regulated, private right
+of action, damages formula, cure period, safe harbour, criminal overlay,
+territorial nexus, dates). The page adds three derived axes on top of it:
+
+| Axis | What it answers |
+|---|---|
+| **Claim exposure**, 0–100 | How likely is this statute to produce a claim someone tenders? Private right of action (30), aggregation potential (20), damages quantum (20), fee-shifting (10), absence of a cure period or safe harbour (10), public enforcement (10). |
+| **Insurability friction** | Once the claim arrives, what pushes it outside the policy? Criminal overlay, punitive damages, disgorgement, civil penalties, statutory bans on waiver and indemnity. |
+| **Controls available** | What can a compliant insured actually point to? Cure periods, notice-before-suit, NIST AI RMF / ISO 42001 defences, size thresholds. |
+
+Nothing is inferred by a model. Every derived field is arithmetic over columns
+an attorney filled in, and each measure's brief shows the derivation component
+by component so it can be checked against the statute.
+
+Six views: an exposure cartogram (shadeable by peak exposure, volume, private
+rights of action, pending duties, or measures with no off-ramp), a filterable
+ledger, a commencement-date runway for renewal planning, a coverage-line pivot,
+subject-adoption curves, and the method.
+
+### Refreshing it
+
+Drop the new CSV over `data/laws/INDEX.csv` and run:
+
+```
+python3 scripts/build_laws.py --inject
+```
+
+That rewrites `data/laws.json`, injects it into `laws.html`, and prints a
+summary including the diff against the previous build — new rows, changed rows,
+dropped rows. The diff is the week's review list; unchanged rows need no
+re-reading. Pushing the CSV also triggers `.github/workflows/build-laws.yml`,
+which does the same thing and commits the result.
+
+No network calls, no API keys, no backend. Python 3.9+ standard library only.
 
 ---
 
@@ -115,11 +161,18 @@ inside the judge's written order. See [`SPEC.md` §5.1a](SPEC.md).
 ## Layout
 
 ```
-index.html                          the tracker (data currently inline)
+index.html                          the litigation tracker (data currently inline)
+laws.html                           the state-law exposure map (data injected at build)
 SPEC.md                             technical specification, revision 2
+data/
+  laws/INDEX.csv                    the weekly research drop — source of truth
+  laws.json                         derived; rebuilt by build_laws.py
+  sources.yml                       source-tracker registry
 scripts/
+  build_laws.py                     CSV -> derived JSON -> laws.html
   calibrate_courtlistener.py        ingest calibration diagnostic
 .github/workflows/
+  build-laws.yml                    rebuilds laws.html when the CSV changes
   calibrate.yml                     manual-trigger calibration run
 .env.example                        template; copy to .env for local use
 ```
