@@ -310,7 +310,7 @@ a { color:inherit; text-decoration:none; }
 .mark span { color:var(--muted); font-weight:600; }
 .wg { font-family:"Newsreader",serif; font-style:italic; color:var(--muted); font-size:11pt; }
 .cover h1 { font-size:31pt; line-height:1.08; letter-spacing:-.015em; margin:auto 0 0;
-            max-width:15cm; font-weight:400; }
+            max-width:16.5cm; font-weight:400; text-wrap:balance; }
 .cover .sub { font-size:12pt; color:var(--muted); margin:14px 0 0; max-width:14cm;
               font-family:"Newsreader",serif; }
 .cover .meta { margin-top:26px; padding-top:14px; border-top:1px solid var(--rule);
@@ -551,6 +551,14 @@ def build(laws, meta, scope, args, today) -> str:
 </body></html>"""
 
 
+def rel(p: Path) -> str:
+    """Repo-relative where that reads better, absolute where it does not."""
+    try:
+        return str(p.relative_to(ROOT))
+    except ValueError:
+        return str(p)
+
+
 def render_pdf(html_path: Path, pdf_path: Path) -> bool:
     """Best-effort PDF. The browser is the supported path; this just saves a step."""
     script = f"""
@@ -601,6 +609,9 @@ def main() -> int:
     ap.add_argument("--pra", action="store_true", help="only measures with a private action")
     ap.add_argument("--pending", action="store_true", help="only duties not yet attached")
     ap.add_argument("--pdf", action="store_true", help="also render a PDF, if it can")
+    ap.add_argument("--embed-fonts", action="store_true",
+                    help="inline the web fonts so the brief renders identically "
+                         "with no network (adds roughly 230 KB)")
     ap.add_argument("--today", default=None)
     args = ap.parse_args()
 
@@ -621,18 +632,31 @@ def main() -> int:
         stem += "-" + "".join(sorted(s.upper() for s in args.state))
     if args.band:
         stem += "-" + "".join(sorted(args.band))
-    out = args.out or OUT_DIR / f"{stem}.html"
-    out.write_text(build(laws, payload["meta"], scope, args, today), encoding="utf-8")
+    out = (args.out or OUT_DIR / f"{stem}.html").resolve()
+    doc = build(laws, payload["meta"], scope, args, today)
+
+    if args.embed_fonts:
+        # A brief that goes in a claim file has to look the same on a machine
+        # with no network as it did on the one it was reviewed on.
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        try:
+            import embed_fonts
+            doc, raw, _, _ = embed_fonts.embed(doc, embed_fonts.DEFAULT_SUBSETS)
+            print(f"  embedded {raw / 1024:.0f} KB of fonts — renders offline")
+        except Exception as exc:  # network down, or Google changed the endpoint
+            print(f"  font embedding skipped: {exc}", file=sys.stderr)
+
+    out.write_text(doc, encoding="utf-8")
 
     states = len({l["jurisdiction"] for l in laws})
-    print(f"{len(laws)} measures across {states} jurisdictions -> {out.relative_to(ROOT)}")
+    print(f"{len(laws)} measures across {states} jurisdictions -> {rel(out)}")
     for s in scope:
         print(f"  scope: {s}")
     print("  open it and print to PDF from the browser (Chrome paginates it correctly)")
 
     if args.pdf and render_pdf(out.resolve(), out.with_suffix(".pdf").resolve()):
         pdf = out.with_suffix(".pdf")
-        print(f"  wrote {pdf.relative_to(ROOT)} ({pdf.stat().st_size / 1024:.0f} KB)")
+        print(f"  wrote {rel(pdf)} ({pdf.stat().st_size / 1024:.0f} KB)")
     return 0
 
 
