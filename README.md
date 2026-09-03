@@ -70,6 +70,38 @@ which does the same thing and commits the result.
 
 No network calls, no API keys, no backend. Python 3.9+ standard library only.
 
+### Exporting a standalone document
+
+`laws.html` is already standalone — one file, no backend, opens from a thumb
+drive offline (the Google Fonts link degrades to system faces). That covers
+"send someone the page."
+
+For something that goes in a claim file, an email attachment, or across a table
+at a renewal meeting, `scripts/export_doc.py` renders the same data as a
+paginated brief instead: cover, contents, the exposure map, coverage-line and
+runway tables, the full ledger, then every measure written out in full with its
+score decomposed, and a method appendix.
+
+```
+python3 scripts/export_doc.py                          # the whole index
+python3 scripts/export_doc.py --state CA --state NY    # a two-state brief
+python3 scripts/export_doc.py --band acute --pending    # what lands next, that matters
+python3 scripts/export_doc.py --line "Insurance Co. PL / E&O"
+python3 scripts/export_doc.py --pra --state IL
+```
+
+Filters combine with AND and repeat to widen, so `--state CA --state NY` means
+California *or* New York. Whatever was applied is printed on the cover, so an
+excerpt can never be mistaken for the whole index.
+
+Output lands in `out/`. Open it and print to PDF from the browser — Chrome
+paginates it correctly and needs nothing installed. `--pdf` does that step for
+you if Playwright and Chromium happen to be available.
+
+Rough sizes: the full index runs about 380 pages; a two-state brief about 40.
+Each measure gets its own page, which is deliberate — it means a single statute
+can be pulled out and handed over on its own.
+
 ---
 
 ## Running the ingest calibration
@@ -170,6 +202,7 @@ data/
   sources.yml                       source-tracker registry
 scripts/
   build_laws.py                     CSV -> derived JSON -> laws.html
+  export_doc.py                     derived JSON -> paginated brief (HTML/PDF)
   calibrate_courtlistener.py        ingest calibration diagnostic
 .github/workflows/
   build-laws.yml                    rebuilds laws.html when the CSV changes
