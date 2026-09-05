@@ -1,0 +1,61 @@
+name: Build state-law tracker
+
+# Fires when the Monday drop lands — that is, when data/laws/INDEX.csv changes
+# on the branch — and can also be run by hand from the Actions tab.
+#
+# The job is deliberately dumb: it re-derives data/laws.json from the CSV,
+# injects it into laws.html, and commits the result if anything moved. All the
+# judgement lives in scripts/build_laws.py, which is reviewable; nothing here
+# reaches the network or an API.
+
+on:
+  push:
+    paths:
+      - "data/laws/INDEX.csv"
+      - "scripts/build_laws.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        id: build
+        run: |
+          python3 scripts/build_laws.py --inject | tee build.log
+          echo "summary<<EOF" >> "$GITHUB_OUTPUT"
+          cat build.log >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Report
+        run: |
+          {
+            echo "## State-law tracker build"
+            echo
+            echo '```'
+            cat build.log
+            echo '```'
+            echo
+            echo "The diff below is the week's review list — new and changed rows only."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit the rebuild
+        run: |
+          if git diff --quiet -- data/laws.json laws.html; then
+            echo "Nothing changed; no commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/laws.json laws.html
+          git commit -m "Rebuild state-law tracker from the latest INDEX.csv drop"
+          git push

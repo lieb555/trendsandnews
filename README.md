@@ -10,6 +10,8 @@ likely trigger clauses, and the exclusions likely to be invoked. No competing
 tracker captures that.
 
 - **Live tracker:** https://claude.ai/code/artifact/7418b1b0-c46b-46b5-8363-03a098efd17e
+- **State AI law exposure map:** [`laws.html`](laws.html) — 181 state measures scored
+  from an insurance-coverage angle; see *The state-law tracker* below
 - **Technical specification:** [`SPEC.md`](SPEC.md)
 - **Investment memo for partners:** the *What's Next* tab in the tracker
 
@@ -23,6 +25,146 @@ tracker captures that.
 | Curation | Manual. Automation is Phase 2; see [`SPEC.md` §10](SPEC.md) |
 | Presentation | Single `index.html`, published as a Claude artifact |
 | Hosting cost | $0 — the artifact runtime provides hosting, auth, and storage |
+
+---
+
+## The state-law tracker
+
+`laws.html` is a second, self-contained page: every AI statute on the books in
+the states, scored and sorted the way an insurer or a broker reads it rather
+than the way a legislature files it.
+
+The source is a weekly research drop, `data/laws/INDEX.csv` — one row per
+measure, 39 columns of primary-source findings (who is regulated, private right
+of action, damages formula, cure period, safe harbour, criminal overlay,
+territorial nexus, dates). The page adds three derived axes on top of it:
+
+| Axis | What it answers |
+|---|---|
+| **Claim exposure**, 0–100 | How likely is this statute to produce a claim someone tenders? Private right of action (30), aggregation potential (20), damages quantum (20), fee-shifting (10), absence of a cure period or safe harbour (10), public enforcement (10). |
+| **Insurability friction** | Once the claim arrives, what pushes it outside the policy? Criminal overlay, punitive damages, disgorgement, civil penalties, statutory bans on waiver and indemnity. |
+| **Controls available** | What can a compliant insured actually point to? Cure periods, notice-before-suit, NIST AI RMF / ISO 42001 defences, size thresholds. |
+
+Nothing is inferred by a model. Every derived field is arithmetic over columns
+an attorney filled in, and each measure's brief shows the derivation component
+by component so it can be checked against the statute.
+
+Six views: an exposure cartogram (shadeable by peak exposure, volume, private
+rights of action, pending duties, or measures with no off-ramp), a filterable
+ledger, a commencement-date runway for renewal planning, a coverage-line pivot,
+subject-adoption curves, and the method.
+
+### Refreshing it — the Monday loop
+
+`main` is the trunk. Each week's drop goes in on its own branch and reaches
+`main` through a pull request, so the diff gets looked at before it is the
+published index.
+
+1. Branch off `main` — `git checkout -b drop/2026-09-09`.
+2. Drop the new CSV over `data/laws/INDEX.csv`.
+3. Run the build:
+
+   ```
+   python3 scripts/build_laws.py --inject
+   ```
+
+   It rewrites `data/laws.json`, injects the payload into `laws.html`, and
+   prints the diff against the previous build — new rows, changed rows, dropped
+   rows. Unchanged rows need no re-reading; **that diff is the week's review
+   list**, and it is the whole reason this is a pull request rather than a
+   commit straight to trunk.
+4. Push the branch and open a PR into `main`. Pushing also fires
+   `.github/workflows/build-laws.yml`, which reruns the build on the runner and
+   commits the result if the local run was skipped or stale — so the PR always
+   carries a payload that matches its CSV.
+5. Read the diff, merge.
+
+Dropping straight onto `main` works too and skips the gate. Do that when a
+re-check only moved `last_checked`; use the PR when the substance changed.
+
+No network calls, no API keys, no backend. Python 3.9+ standard library only.
+
+### Branches
+
+| Branch | What it holds |
+|---|---|
+| `main` | the trunk — everything reviewed and merged |
+| `claude/ai-laws-state-viz-99djgw` | the state-law tracker, pending review |
+| `claude/ai-litigation-trends-tkzj0q` | the litigation tracker; fully contained in `main` |
+
+`main` was cut from the litigation tracker's tip, so it already carries
+`index.html`, `SPEC.md` and the calibration harness. The state-law tracker
+(`laws.html`, `data/laws/`, the three scripts) merges in from its own branch.
+Once that lands, `claude/ai-litigation-trends-tkzj0q` is redundant and can be
+deleted.
+
+### Exporting a standalone document
+
+`laws.html` is already standalone — one file, no backend, opens from a thumb
+drive offline (the Google Fonts link degrades to system faces). That covers
+"send someone the page."
+
+For something that goes in a claim file, an email attachment, or across a table
+at a renewal meeting, `scripts/export_doc.py` renders the same data as a
+paginated brief instead: cover, contents, the exposure map, coverage-line and
+runway tables, the full ledger, then every measure written out in full with its
+score decomposed, and a method appendix.
+
+```
+python3 scripts/export_doc.py                          # the whole index
+python3 scripts/export_doc.py --state CA --state NY    # a two-state brief
+python3 scripts/export_doc.py --band acute --pending    # what lands next, that matters
+python3 scripts/export_doc.py --line "Insurance Co. PL / E&O"
+python3 scripts/export_doc.py --pra --state IL
+```
+
+Filters combine with AND and repeat to widen, so `--state CA --state NY` means
+California *or* New York. Whatever was applied is printed on the cover, so an
+excerpt can never be mistaken for the whole index.
+
+Output lands in `out/`. Open it and print to PDF from the browser — Chrome
+paginates it correctly and needs nothing installed. `--pdf` does that step for
+you if Playwright and Chromium happen to be available.
+
+Rough sizes: the full index runs about 380 pages; a two-state brief about 40.
+Each measure gets its own page, which is deliberate — it means a single statute
+can be pulled out and handed over on its own.
+
+### Fonts, and making a copy that never changes
+
+Both pages link Google Fonts. Online that is fine and costs the viewer nothing.
+Offline — a laptop in a deposition, a machine behind a firewall, an attachment
+opened on a plane — the link fails silently and the page falls back to system
+faces. Nothing breaks, but the metrics shift and the document is no longer the
+document that was reviewed.
+
+`scripts/embed_fonts.py` inlines the faces as base64 so the file renders
+identically with no network at all:
+
+```
+python3 scripts/embed_fonts.py laws.html --out out/laws-offline.html
+python3 scripts/export_doc.py --state CA --embed-fonts --pdf
+```
+
+Nine faces, 172 KB of woff2, about +230 KB on the page. Three things keep that
+number down: only the nine weights the CSS actually sets are fetched (the
+stylesheet asks for seventeen); faces come from the v1 endpoint, which returns
+a static instance rather than the variable font — Newsreader alone drops from
+90 KB to 22 KB; and only the `latin` subset is embedded, because the corpus's
+eight non-ASCII characters (`§ — – ' × ½` and the two comparison operators) need
+nothing more. The script checks that and names any character it cannot cover, so
+a future drop that needs `latin-ext` says so rather than quietly falling back.
+
+Fonts are cached in `data/fonts/` and committed, so the build is reproducible
+without network access.
+
+**Which to use.** Leave `laws.html` linking the fonts — online it loads fine, and
+230 KB on every view is a real cost for a page that is already 190 KB over the
+wire. Embed for anything meant to be archival: a PDF going into a claim file, a
+copy on a thumb drive, an email attachment.
+
+Archivo, Newsreader, IBM Plex Sans and IBM Plex Mono are all SIL Open Font
+License 1.1, which permits embedding; the generated CSS carries the attribution.
 
 ---
 
@@ -115,11 +257,21 @@ inside the judge's written order. See [`SPEC.md` §5.1a](SPEC.md).
 ## Layout
 
 ```
-index.html                          the tracker (data currently inline)
+index.html                          the litigation tracker (data currently inline)
+laws.html                           the state-law exposure map (data injected at build)
 SPEC.md                             technical specification, revision 2
+data/
+  laws/INDEX.csv                    the weekly research drop — source of truth
+  fonts/                            cached woff2 faces, so builds need no network
+  laws.json                         derived; rebuilt by build_laws.py
+  sources.yml                       source-tracker registry
 scripts/
+  build_laws.py                     CSV -> derived JSON -> laws.html
+  export_doc.py                     derived JSON -> paginated brief (HTML/PDF)
+  embed_fonts.py                    inline the web fonts for offline fidelity
   calibrate_courtlistener.py        ingest calibration diagnostic
 .github/workflows/
+  build-laws.yml                    rebuilds laws.html when the CSV changes
   calibrate.yml                     manual-trigger calibration run
 .env.example                        template; copy to .env for local use
 ```
