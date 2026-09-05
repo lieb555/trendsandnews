@@ -54,21 +54,49 @@ rights of action, pending duties, or measures with no off-ramp), a filterable
 ledger, a commencement-date runway for renewal planning, a coverage-line pivot,
 subject-adoption curves, and the method.
 
-### Refreshing it
+### Refreshing it — the Monday loop
 
-Drop the new CSV over `data/laws/INDEX.csv` and run:
+`main` is the trunk. Each week's drop goes in on its own branch and reaches
+`main` through a pull request, so the diff gets looked at before it is the
+published index.
 
-```
-python3 scripts/build_laws.py --inject
-```
+1. Branch off `main` — `git checkout -b drop/2026-09-09`.
+2. Drop the new CSV over `data/laws/INDEX.csv`.
+3. Run the build:
 
-That rewrites `data/laws.json`, injects it into `laws.html`, and prints a
-summary including the diff against the previous build — new rows, changed rows,
-dropped rows. The diff is the week's review list; unchanged rows need no
-re-reading. Pushing the CSV also triggers `.github/workflows/build-laws.yml`,
-which does the same thing and commits the result.
+   ```
+   python3 scripts/build_laws.py --inject
+   ```
+
+   It rewrites `data/laws.json`, injects the payload into `laws.html`, and
+   prints the diff against the previous build — new rows, changed rows, dropped
+   rows. Unchanged rows need no re-reading; **that diff is the week's review
+   list**, and it is the whole reason this is a pull request rather than a
+   commit straight to trunk.
+4. Push the branch and open a PR into `main`. Pushing also fires
+   `.github/workflows/build-laws.yml`, which reruns the build on the runner and
+   commits the result if the local run was skipped or stale — so the PR always
+   carries a payload that matches its CSV.
+5. Read the diff, merge.
+
+Dropping straight onto `main` works too and skips the gate. Do that when a
+re-check only moved `last_checked`; use the PR when the substance changed.
 
 No network calls, no API keys, no backend. Python 3.9+ standard library only.
+
+### Branches
+
+| Branch | What it holds |
+|---|---|
+| `main` | the trunk — everything reviewed and merged |
+| `claude/ai-laws-state-viz-99djgw` | the state-law tracker, pending review |
+| `claude/ai-litigation-trends-tkzj0q` | the litigation tracker; fully contained in `main` |
+
+`main` was cut from the litigation tracker's tip, so it already carries
+`index.html`, `SPEC.md` and the calibration harness. The state-law tracker
+(`laws.html`, `data/laws/`, the three scripts) merges in from its own branch.
+Once that lands, `claude/ai-litigation-trends-tkzj0q` is redundant and can be
+deleted.
 
 ### Exporting a standalone document
 
